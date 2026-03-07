@@ -1,0 +1,178 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* ═══════════════════════════════════════════════════════════
+   ASTRALEARNIA — Cyber-Neon Sci-Fi 2026 Edition
+   Stronger neon / holographic / cleaner cyberpunk vibe
+═══════════════════════════════════════════════════════════ */
+
+@import url('https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,300;12..96,400;12..96,500;12..96,600;12..96,700;12..96,800&family=Plus+Jakarta+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;1,300&family=JetBrains+Mono:wght@300;400;500&family=Orbitron:wght@500;700;900&family=Exo+2:wght@400;600;800;900&display=swap');
+
+/* ── Variables ─────────────────────────────────────────── */
+:root {
+  --font-display: 'Bricolage Grotesque', 'Orbitron', system-ui, sans-serif;
+  --font-body: 'Plus Jakarta Sans', system-ui, sans-serif;
+  --font-mono: 'JetBrains Mono', 'Exo 2', monospace;
+  --font-neon: 'Orbitron', sans-serif;
+
+  /* Neon palette — stronger but cleaner */
+  --void: #010307;
+  --abyss: #040a15;
+  --deep: #081120;
+  --surface: #0e1a30;
+  --elevated: #14243f;
+  --overlay: #1c2f50;
+
+  --cyan: #00f0ff;
+  --cyan-dark: #00c0cc;
+  --azure: #1e90ff;
+  --violet: #c084fc;
+  --magenta: #ff79cd;
+  --ice: #a5f3fc;
+
+  --glow-cyan: 0 0 35px rgba(0,240,255,0.45), 0 0 80px rgba(0,240,255,0.22), inset 0 0 20px rgba(0,240,255,0.15);
+  --glow-violet: 0 0 40px rgba(192,132,252,0.38), 0 0 90px rgba(192,132,252,0.18);
+  --glow-holo: 0 0 25px rgba(30,144,255,0.4), 0 0 60px rgba(0,240,255,0.2);
+
+  --section-v: clamp(80px, 12vw, 160px);
+  --section-h: clamp(20px, 6vw, 80px);
+
+  --ease-expo: cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-bounce: cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+/* ── Base + Responsive foundation ──────────────────────── */
+*, *::before, *::after { box-sizing: border-box; }
+
+html {
+  scroll-behavior: smooth;
+  font-size: 100%; /* Respect user font size preference */
+}
+
+body {
+  background: var(--void);
+  color: rgba(255,255,255,0.94);
+  font-family: var(--font-body);
+  font-size: clamp(15px, 2.2vw, 17px);
+  line-height: 1.68;
+  overflow-x: hidden;
+  cursor: none;
+  min-height: 100dvh;
+  position: relative;
+}
+
+/* Subtle animated background layers */
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background: 
+    radial-gradient(ellipse at 15% 25%, rgba(0,240,255,0.06) 0%, transparent 45%),
+    radial-gradient(ellipse at 85% 75%, rgba(192,132,252,0.05) 0%, transparent 50%);
+  z-index: -2;
+  pointer-events: none;
+}
+
+body::after {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background-image: 
+    linear-gradient(rgba(0,240,255,0.006) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(0,240,255,0.006) 1px, transparent 1px);
+  background-size: 80px 80px;
+  opacity: 0.35;
+  animation: grid-float 60s linear infinite;
+  z-index: -1;
+  pointer-events: none;
+}
+
+@keyframes grid-float {
+  0% { transform: translate(0, 0); }
+  100% { transform: translate(-80px, -80px); }
+}
+
+/* Typography – sharper, more neon-ready */
+.font-display { font-family: var(--font-display); }
+.font-neon { font-family: var(--font-neon); font-weight: 900; letter-spacing: -0.04em; }
+
+h1, h2, h3 { font-family: var(--font-display); font-weight: 800; line-height: 1.05; }
+h1 { font-size: clamp(3rem, 10vw, 9rem); }
+h2 { font-size: clamp(2.4rem, 7vw, 6rem); }
+h3 { font-size: clamp(1.6rem, 4.5vw, 3.2rem); }
+
+/* Gradients – stronger cyberpunk neon */
+.text-gradient-neon {
+  background: linear-gradient(80deg, #fff 0%, #00f0ff 30%, #1e90ff 55%, #c084fc 85%, #ff79cd 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  filter: drop-shadow(0 0 12px rgba(0,240,255,0.6));
+}
+
+/* Glass – holographic / stronger edge neon */
+.glass {
+  background: rgba(20, 36, 64, 0.48);
+  backdrop-filter: blur(32px) saturate(180%);
+  border: 1px solid rgba(0,240,255,0.22);
+  box-shadow: var(--glow-holo);
+  transition: all 0.6s var(--ease-expo);
+}
+
+.glass:hover,
+.glass.group-hover:hover {
+  border-color: rgba(0,240,255,0.45);
+  box-shadow: var(--glow-cyan);
+  transform: translateY(-10px) scale(1.015);
+}
+
+/* Hover / float effects */
+.group:hover .group-hover\:neon-glow { filter: drop-shadow(0 0 18px #00f0ff); }
+.group:hover .group-hover\:lift { transform: translateY(-14px) rotate(0.8deg) scale(1.03); }
+
+/* Reveal + pulse animations */
+@keyframes pulse-neon {
+  0%, 100% { opacity: 0.7; }
+  50% { opacity: 1; }
+}
+
+.animate-pulse-neon { animation: pulse-neon 4s ease-in-out infinite; }
+
+.reveal-up { animation: reveal-up 1.2s var(--ease-expo) both; }
+@keyframes reveal-up {
+  from { opacity: 0; transform: translateY(80px) scale(0.92); }
+  to   { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+/* Keep / enhance your existing utilities: noise, shimmer, scanline, etc. */
+.scanline::after {
+  background: linear-gradient(90deg, transparent, #00f0ff40, transparent);
+  animation: scan 5s linear infinite;
+}
+
+/* Fluid spacing & containers */
+.section-padding {
+  padding: var(--section-v) var(--section-h);
+}
+
+.container-fluid {
+  width: 100%;
+  max-width: 1600px;
+  margin-inline: auto;
+  padding-inline: var(--section-h);
+}
+
+/* Mobile-first defaults + responsive overrides */
+@media (max-width: 640px) {
+  :root { --section-v: clamp(60px, 15vw, 100px); --section-h: 16px; }
+  h1 { font-size: clamp(2.6rem, 12vw, 4.8rem); }
+}
+
+@media (min-width: 768px) {
+  :root { --section-v: clamp(100px, 12vw, 140px); }
+}
+
+@media (min-width: 1280px) {
+  .container-fluid { max-width: 1480px; }
+}
