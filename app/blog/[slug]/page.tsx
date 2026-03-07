@@ -1,4 +1,5 @@
 "use client";
+export const runtime = "edge";
 import Link from "next/link";
 import { useParams } from "next/navigation";
 import { BLOG_POSTS, getPostBySlug } from "@/lib/blog-data";
