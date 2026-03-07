@@ -1,6 +1,3 @@
-// Required for Cloudflare Pages — must be the very first line of the file
-export const runtime = "edge";
-
 "use client";
 import Link from "next/link";
 import { useParams } from "next/navigation";
