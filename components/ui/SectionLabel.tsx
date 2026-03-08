@@ -10,7 +10,7 @@ export function SectionLabel({ children, className, align = "left" }: SectionLab
   return (
     <div
       className={cn(
-        "label-line",
+        "label-line text-[10px] sm:text-[11px] tracking-[0.15em] uppercase font-black",
         align === "center" && "justify-center",
         className
       )}

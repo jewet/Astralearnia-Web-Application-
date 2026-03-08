@@ -3,6 +3,11 @@
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import { usePathname } from "next/navigation";
+// If `@/assets/logo.png` still errors, add this to your next-env.d.ts or a custom global.d.ts:
+//   declare module "*.png" { const src: string; export default { src: string }; }
+// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+// @ts-ignore
+import logoImage from "@/assets/logo.png";
 
 const navLinks = [
   { label: "Technology", href: "/technologies" },
@@ -13,11 +18,19 @@ const navLinks = [
   { label: "Blog",       href: "/blog"         },
 ];
 
+/* ── Properly typed event helpers ── */
+type AEl = React.MouseEvent<HTMLAnchorElement>;
+type DEl = React.MouseEvent<HTMLElement>;
+
+function styleEl(el: HTMLElement, styles: Partial<CSSStyleDeclaration>) {
+  Object.assign(el.style, styles);
+}
+
 export function Navbar() {
-  const pathname = usePathname();
-  const [scrolled, setScrolled]     = useState(false);
-  const [mobileOpen, setMobileOpen] = useState(false);
-  const [logoError, setLogoError]   = useState(false);
+  const pathname                        = usePathname();
+  const [scrolled,    setScrolled]      = useState(false);
+  const [mobileOpen,  setMobileOpen]    = useState(false);
+  const [logoError,   setLogoError]     = useState(false);
 
   useEffect(() => {
     const fn = () => setScrolled(window.scrollY > 20);
@@ -32,349 +45,276 @@ export function Navbar() {
 
   useEffect(() => { setMobileOpen(false); }, [pathname]);
 
+  /* ── Typed mouse handlers ── */
+  const hContactEnter  = (e: AEl) => styleEl(e.currentTarget, { color: "#fff", borderColor: "rgba(0,200,255,0.3)", background: "rgba(0,200,255,0.05)" });
+  const hContactLeave  = (e: AEl) => styleEl(e.currentTarget, { color: "rgba(255,255,255,0.55)", borderColor: "rgba(255,255,255,0.1)", background: "rgba(255,255,255,0.03)" });
+  const hCtaEnter      = (e: AEl) => styleEl(e.currentTarget, { transform: "translateY(-1px)", boxShadow: "0 10px 32px rgba(0,200,255,0.55)" });
+  const hCtaLeave      = (e: AEl) => styleEl(e.currentTarget, { transform: "translateY(0)", boxShadow: "0 4px 18px rgba(0,200,255,0.35)" });
+  const hMLinkEnter    = (e: DEl) => styleEl(e.currentTarget, { background: "rgba(255,255,255,0.04)", color: "#fff" });
+  const hMLinkLeave    = (e: DEl) => styleEl(e.currentTarget, { background: "transparent", color: "rgba(255,255,255,0.7)" });
+  const hMContactEnter = (e: AEl) => styleEl(e.currentTarget, { color: "#fff", borderColor: "rgba(0,200,255,0.28)" });
+  const hMContactLeave = (e: AEl) => styleEl(e.currentTarget, { color: "rgba(255,255,255,0.62)", borderColor: "rgba(255,255,255,0.1)" });
+
+  const logoSrc = typeof logoImage === "object" && logoImage?.src
+    ? (logoImage as { src: string }).src
+    : (logoImage as string);
+
   return (
     <>
       <style>{`
-        @keyframes _nb2_fadeDown  { from{opacity:0;transform:translateY(-8px)} to{opacity:1;transform:translateY(0)} }
-        @keyframes _nb2_shimmer   { 0%{background-position:-500px 0} 100%{background-position:500px 0} }
-        @keyframes _nb2_logoTilt  { 0%,100%{transform:rotate(0deg) scale(1)} 50%{transform:rotate(3deg) scale(1.04)} }
-        @keyframes _nb2_ctaPulse  { 0%,100%{box-shadow:0 5px 20px rgba(0,200,255,.4),inset 0 1px 0 rgba(255,255,255,.2)} 50%{box-shadow:0 5px 28px rgba(0,200,255,.62),inset 0 1px 0 rgba(255,255,255,.25)} }
-        @keyframes _nb2_beamSlide { 0%{transform:translateX(-100%);opacity:0} 15%{opacity:1} 85%{opacity:1} 100%{transform:translateX(100%);opacity:0} }
-        @keyframes _nb2_slideIn   { from{opacity:0;transform:translateX(28px)} to{opacity:1;transform:translateX(0)} }
-        @keyframes _nb2_bBeam     { 0%,100%{opacity:.72} 50%{opacity:1} }
-        .nb2-lk span.nb2-bar { width:0;opacity:0;transition:width .22s ease,opacity .22s ease; }
-        .nb2-lk:hover span.nb2-bar, .nb2-lk.active span.nb2-bar { width:60%;opacity:1; }
-        .nb2-lk:hover { color:#fff !important; }
+        @keyframes nb-fadeDown   { from{opacity:0;transform:translateY(-10px)} to{opacity:1;transform:translateY(0)} }
+        @keyframes nb-shimmer    { 0%{background-position:-600px 0} 100%{background-position:600px 0} }
+        @keyframes nb-pulse      { 0%,100%{opacity:.5} 50%{opacity:1} }
+        @keyframes nb-beam       { 0%{transform:translateX(-100%)} 100%{transform:translateX(100%)} }
+        @keyframes nb-slideRight { from{opacity:0;transform:translateX(100%)} to{opacity:1;transform:translateX(0)} }
+        @keyframes nb-glow       { 0%,100%{box-shadow:0 4px 18px rgba(0,200,255,.35)} 50%{box-shadow:0 4px 26px rgba(0,200,255,.55)} }
+
+        .nb-link { position:relative; display:block; text-decoration:none; }
+        .nb-link::after {
+          content:""; position:absolute;
+          bottom:4px; left:50%; transform:translateX(-50%);
+          width:0; height:2px; border-radius:2px;
+          background:linear-gradient(90deg,#00c8ff,#7c5cff);
+          box-shadow:0 0 8px rgba(0,200,255,.65);
+          transition:width .22s ease;
+        }
+        .nb-link:hover::after, .nb-link.active::after { width:55%; }
+        .nb-link:hover  { color:#fff !important; }
+        .nb-link.active { color:#00c8ff !important; }
+
+        @media (min-width:1024px) {
+          .nb-desk-ul      { display:flex !important; }
+          .nb-desk-actions { display:flex !important; }
+          .nb-mob-ctrl     { display:none  !important; }
+        }
       `}</style>
 
-      {/* ══════════════════════════════════════════════════════
-          HEADER — always has visible dark background on mobile
-      ══════════════════════════════════════════════════════ */}
-      <header
-        className="fixed top-0 left-0 right-0 z-50 transition-all duration-500"
-        style={{
-          animation: "_nb2_fadeDown .5s ease both",
-          /* KEY FIX: always semi-dark (not fully transparent) so it's visible on mobile */
-          background: scrolled
-            ? "linear-gradient(180deg,rgba(3,5,8,.98) 0%,rgba(3,5,8,.95) 100%)"
-            : "linear-gradient(180deg,rgba(3,5,8,.88) 0%,rgba(3,5,8,.65) 100%)",
-          backdropFilter: "blur(24px) saturate(180%)",
-          borderBottom: scrolled
-            ? "1px solid rgba(0,200,255,.14)"
-            : "1px solid rgba(0,200,255,.06)",
-          boxShadow: scrolled
-            ? "0 0 0 1px rgba(0,200,255,.04),0 18px 48px rgba(0,0,0,.65)"
-            : "none",
-        }}
-      >
-        {/* scrolled bottom beam */}
+      {/* ════════════════ HEADER ════════════════ */}
+      <header style={{
+        position:"fixed", top:0, left:0, right:0, zIndex:60,
+        animation:"nb-fadeDown .45s ease both",
+        background: scrolled ? "rgba(6,10,20,0.72)" : "rgba(6,10,20,0.48)",
+        backdropFilter:"blur(20px) saturate(180%)",
+        WebkitBackdropFilter:"blur(20px) saturate(180%)",
+        borderBottom: scrolled ? "1px solid rgba(255,255,255,0.08)" : "1px solid rgba(255,255,255,0.04)",
+        boxShadow: scrolled ? "0 1px 0 rgba(0,200,255,0.05),0 8px 32px rgba(0,0,0,0.4)" : "none",
+        transition:"background .4s ease,border-color .4s ease,box-shadow .4s ease",
+      }}>
         {scrolled && (
-          <div
-            className="absolute bottom-0 left-0 right-0 h-[1px] pointer-events-none"
-            style={{
-              background: "linear-gradient(90deg,transparent 0%,#00c8ff 25%,#7c5cff 50%,#00c8ff 75%,transparent 100%)",
-              boxShadow: "0 0 14px rgba(0,200,255,.32),0 0 45px rgba(124,92,255,.16)",
-              animation: "_nb2_bBeam 4s ease-in-out infinite",
-            }}
-          />
+          <div style={{
+            position:"absolute", bottom:0, left:0, right:0, height:1,
+            background:"linear-gradient(90deg,transparent,rgba(0,200,255,0.38) 30%,rgba(124,92,255,0.38) 70%,transparent)",
+            animation:"nb-pulse 3s ease-in-out infinite",
+          }} />
         )}
 
-        {/* ambient glow */}
-        <div
-          className="absolute top-0 left-1/2 -translate-x-1/2 w-80 h-14 pointer-events-none"
-          style={{ background: "radial-gradient(ellipse,rgba(0,200,255,.06) 0%,transparent 70%)" }}
-        />
+        <nav style={{ maxWidth:1280, margin:"0 auto", padding:"0 20px" }}>
+          <div style={{ display:"flex", alignItems:"center", justifyContent:"space-between", height:62, gap:12 }}>
 
-        <nav className="mx-auto w-full max-w-screen-xl px-4 sm:px-6 lg:px-12">
-          <div className="flex h-14 sm:h-[4.25rem] items-center justify-between gap-3">
-
-            {/* ── LOGO ── */}
-            <Link href="/" className="group relative flex items-center gap-2.5 shrink-0 z-20 min-w-0">
-              {/* Logo container
-                  ▸ Place your logo at /public/logo.png  (or .svg/.webp)
-                  ▸ If the file is missing, it automatically shows the gradient "A" fallback
-              */}
-              <div
-                className="relative flex items-center justify-center rounded-xl overflow-hidden shrink-0"
-                style={{
-                  width: 36,
-                  height: 36,
-                  background: logoError
-                    ? "linear-gradient(135deg,#00c8ff 0%,#3b6bff 45%,#7c5cff 100%)"
-                    : "transparent",
-                  boxShadow: "0 5px 18px rgba(0,200,255,.5),inset 0 -2px 5px rgba(0,0,0,.4)",
-                  animation: "_nb2_logoTilt 5s ease-in-out infinite",
-                  transition: "box-shadow .3s",
-                }}
-                onMouseEnter={e => {
-                  (e.currentTarget as HTMLElement).style.boxShadow =
-                    "0 12px 36px rgba(0,200,255,.78),inset 0 -2px 5px rgba(0,0,0,.4),0 0 50px rgba(0,200,255,.3)";
-                }}
-                onMouseLeave={e => {
-                  (e.currentTarget as HTMLElement).style.boxShadow =
-                    "0 5px 18px rgba(0,200,255,.5),inset 0 -2px 5px rgba(0,0,0,.4)";
-                }}
-              >
+            {/* LOGO */}
+            <Link href="/" style={{ display:"flex", alignItems:"center", gap:10, textDecoration:"none", flexShrink:0, zIndex:20 }}>
+              <div style={{
+                width:36, height:36, borderRadius:10, flexShrink:0,
+                display:"flex", alignItems:"center", justifyContent:"center", overflow:"hidden",
+                background: logoError ? "linear-gradient(135deg,#00c8ff,#7c5cff)" : "rgba(255,255,255,0.92)",
+                border: logoError ? "1px solid rgba(0,200,255,0.3)" : "1.5px solid rgba(255,255,255,0.85)",
+                boxShadow:"0 2px 12px rgba(0,0,0,0.3)", padding:3,
+              }}>
                 {!logoError ? (
-                  // Your logo image — change src to "/logo.svg" etc. if needed
                   // eslint-disable-next-line @next/next/no-img-element
-                  <img
-                    src="/logo.png"
-                    alt="Astralearnia"
-                    style={{ width: "100%", height: "100%", objectFit: "contain", borderRadius: 10 }}
-                    onError={() => setLogoError(true)}
-                  />
+                  <img src={logoSrc} alt="Astralearnia"
+                    style={{ width:"100%", height:"100%", objectFit:"contain", borderRadius:7 }}
+                    onError={() => setLogoError(true)} />
                 ) : (
-                  /* Gradient "A" fallback when logo.png is not found */
-                  <>
-                    <div className="absolute inset-0 opacity-35" style={{ background: "linear-gradient(135deg,rgba(255,255,255,.42) 0%,transparent 52%)" }} />
-                    <span className="relative z-10 font-black text-white drop-shadow-[0_2px_5px_rgba(0,0,0,.7)]" style={{ fontSize: "1.15rem" }}>A</span>
-                  </>
+                  <span style={{ fontWeight:900, color:"#fff", fontSize:"1rem" }}>A</span>
                 )}
               </div>
-
-              {/* Brand name — shown on all screen sizes (removed hidden sm:block) */}
-              <span
-                className="font-black tracking-tight truncate"
-                style={{
-                  fontSize: "clamp(0.85rem, 3.5vw, 1.15rem)",
-                  background: "linear-gradient(90deg,rgba(0,200,255,.85) 0%,#fff 35%,rgba(124,92,255,.85) 65%,rgba(0,200,255,.85) 100%)",
-                  backgroundSize: "500px 100%",
-                  WebkitBackgroundClip: "text",
-                  WebkitTextFillColor: "transparent",
-                  backgroundClip: "text",
-                  animation: "_nb2_shimmer 5s linear infinite",
-                  filter: "drop-shadow(0 0 9px rgba(0,200,255,.28))",
-                }}
-              >
-                Astralearnia
-              </span>
+              <span style={{
+                fontWeight:800, fontSize:"1.05rem", letterSpacing:"-0.025em",
+                background:"linear-gradient(90deg,rgba(0,200,255,.9) 0%,#fff 40%,rgba(124,92,255,.9) 75%,rgba(0,200,255,.9) 100%)",
+                backgroundSize:"500px 100%",
+                WebkitBackgroundClip:"text", WebkitTextFillColor:"transparent", backgroundClip:"text",
+                animation:"nb-shimmer 6s linear infinite",
+              }}>Astralearnia</span>
             </Link>
 
-            {/* ── DESKTOP NAV LINKS ── */}
-            <ul className="hidden lg:flex items-center gap-0.5">
+            {/* DESKTOP LINKS */}
+            <ul style={{ display:"none", listStyle:"none", margin:0, padding:0, gap:2, alignItems:"center" }}
+              className="nb-desk-ul">
               {navLinks.map(link => {
                 const active = pathname.startsWith(link.href);
                 return (
                   <li key={link.href}>
-                    <Link
-                      href={link.href}
-                      className={`nb2-lk${active ? " active" : ""} relative flex flex-col items-center px-3.5 xl:px-4 py-2 rounded-xl font-semibold transition-all duration-200`}
+                    <Link href={link.href} className={`nb-link${active ? " active" : ""}`}
                       style={{
-                        fontSize: ".85rem",
-                        color: active ? "#00c8ff" : "rgba(255,255,255,.55)",
-                        background: active ? "linear-gradient(135deg,rgba(0,200,255,.09),rgba(124,92,255,.06))" : "transparent",
-                        boxShadow: active ? "0 0 16px rgba(0,200,255,.11)" : "none",
-                      }}
-                      onMouseEnter={e => {
-                        if (!active) {
-                          const el = e.currentTarget as HTMLElement;
-                          el.style.background = "linear-gradient(135deg,rgba(0,200,255,.07),rgba(124,92,255,.04))";
-                          el.style.boxShadow = "0 0 14px rgba(0,200,255,.09)";
-                        }
-                      }}
-                      onMouseLeave={e => {
-                        if (!active) {
-                          const el = e.currentTarget as HTMLElement;
-                          el.style.background = "transparent";
-                          el.style.boxShadow = "none";
-                        }
-                      }}
-                    >
-                      <span className="relative z-10">{link.label}</span>
-                      <span
-                        className="nb2-bar absolute bottom-1 left-1/2 -translate-x-1/2 h-[2px] rounded-full"
-                        style={{
-                          background: "linear-gradient(90deg,#00c8ff,#7c5cff)",
-                          boxShadow: "0 0 7px rgba(0,200,255,.7)",
-                          width: active ? "60%" : "0%",
-                          opacity: active ? 1 : 0,
-                        }}
-                      />
+                        padding:"6px 14px", borderRadius:8,
+                        fontSize:"0.875rem", fontWeight:600,
+                        color: active ? "#00c8ff" : "rgba(255,255,255,0.6)",
+                        background: active ? "rgba(0,200,255,0.07)" : "transparent",
+                        transition:"color .2s,background .2s",
+                      }}>
+                      {link.label}
                     </Link>
                   </li>
                 );
               })}
             </ul>
 
-            {/* ── DESKTOP ACTIONS ── */}
-            <div className="hidden lg:flex items-center gap-2.5">
-              <Link
-                href="/contact"
-                className="font-semibold transition-all duration-200 hover:-translate-y-px"
-                style={{ fontSize: ".85rem", color: "rgba(255,255,255,.52)", padding: "8px 16px", borderRadius: 10, border: "1px solid rgba(255,255,255,.1)", background: "rgba(255,255,255,.02)" }}
-                onMouseEnter={e => {
-                  const el = e.currentTarget as HTMLElement;
-                  el.style.color = "#fff";
-                  el.style.borderColor = "rgba(0,200,255,.38)";
-                  el.style.boxShadow = "0 0 18px rgba(0,200,255,.14)";
-                }}
-                onMouseLeave={e => {
-                  const el = e.currentTarget as HTMLElement;
-                  el.style.color = "rgba(255,255,255,.52)";
-                  el.style.borderColor = "rgba(255,255,255,.1)";
-                  el.style.boxShadow = "";
-                }}
-              >
-                Contact
-              </Link>
-
-              <Link
-                href="/book-demo"
-                className="relative overflow-hidden font-bold text-white transition-all duration-300 hover:-translate-y-px active:scale-95"
+            {/* DESKTOP ACTIONS */}
+            <div style={{ display:"none", alignItems:"center", gap:8 }} className="nb-desk-actions">
+              <Link href="/contact"
                 style={{
-                  fontSize: ".85rem",
-                  padding: "9px 20px",
-                  borderRadius: 10,
-                  background: "linear-gradient(135deg,#00c8ff 0%,#3b6bff 50%,#7c5cff 100%)",
-                  animation: "_nb2_ctaPulse 4s ease-in-out infinite",
+                  padding:"7px 16px", borderRadius:8,
+                  fontSize:"0.875rem", fontWeight:600,
+                  color:"rgba(255,255,255,0.55)", textDecoration:"none",
+                  border:"1px solid rgba(255,255,255,0.1)",
+                  background:"rgba(255,255,255,0.03)",
+                  backdropFilter:"blur(8px)", transition:"all .2s",
                 }}
-                onMouseEnter={e => {
-                  (e.currentTarget as HTMLElement).style.boxShadow =
-                    "0 10px 38px rgba(0,200,255,.68),0 0 55px rgba(124,92,255,.32),inset 0 1px 0 rgba(255,255,255,.22)";
+                onMouseEnter={hContactEnter}
+                onMouseLeave={hContactLeave}
+              >Contact</Link>
+
+              <Link href="/book-demo"
+                style={{
+                  position:"relative", overflow:"hidden",
+                  padding:"8px 18px", borderRadius:8,
+                  fontSize:"0.875rem", fontWeight:700, color:"#fff",
+                  textDecoration:"none",
+                  background:"linear-gradient(135deg,#00c8ff 0%,#3b6bff 55%,#7c5cff 100%)",
+                  animation:"nb-glow 3.5s ease-in-out infinite",
+                  transition:"transform .2s,box-shadow .2s",
                 }}
-                onMouseLeave={e => {
-                  (e.currentTarget as HTMLElement).style.boxShadow = "";
-                }}
+                onMouseEnter={hCtaEnter}
+                onMouseLeave={hCtaLeave}
               >
-                <span className="absolute inset-0 pointer-events-none" style={{ background: "linear-gradient(105deg,transparent 35%,rgba(255,255,255,.18) 50%,transparent 65%)", animation: "_nb2_beamSlide 3s linear infinite" }} />
-                <span className="relative z-10">Book Demo →</span>
+                <span style={{ position:"absolute", inset:0, background:"linear-gradient(105deg,transparent 30%,rgba(255,255,255,0.18) 50%,transparent 70%)", animation:"nb-beam 2.8s linear infinite" }} />
+                <span style={{ position:"relative", zIndex:1 }}>Book Demo →</span>
               </Link>
             </div>
 
-            {/* ── MOBILE CONTROLS (Book Demo pill + Hamburger) ── */}
-            <div className="lg:hidden flex items-center gap-2 shrink-0">
-              {/* Compact Book Demo button — visible on mobile */}
-              <Link
-                href="/book-demo"
-                className="relative overflow-hidden font-bold text-white text-xs rounded-lg active:scale-95 transition-all whitespace-nowrap"
-                style={{
-                  padding: "8px 12px",
-                  background: "linear-gradient(135deg,#00c8ff 0%,#3b6bff 50%,#7c5cff 100%)",
-                  boxShadow: "0 4px 14px rgba(0,200,255,.4)",
-                }}
-              >
-                Book Demo
-              </Link>
+            {/* MOBILE CONTROLS */}
+            <div style={{ display:"flex", alignItems:"center", gap:8 }} className="nb-mob-ctrl">
+              <Link href="/book-demo" style={{
+                padding:"7px 14px", borderRadius:8,
+                fontSize:"0.8rem", fontWeight:700, color:"#fff",
+                textDecoration:"none",
+                background:"linear-gradient(135deg,#00c8ff,#3b6bff,#7c5cff)",
+                boxShadow:"0 3px 12px rgba(0,200,255,0.35)",
+                whiteSpace:"nowrap", zIndex:62,
+              }}>Book Demo</Link>
 
-              {/* Hamburger — solid background so it's always visible */}
-              <button
-                aria-label="Toggle menu"
-                onClick={() => setMobileOpen(!mobileOpen)}
-                className="relative z-[60] flex flex-col items-center justify-center gap-[5px] rounded-xl transition-all duration-300"
+              <button aria-label="Toggle menu" onClick={() => setMobileOpen(p => !p)}
                 style={{
-                  width: 42,
-                  height: 42,
-                  background: mobileOpen
-                    ? "rgba(0,200,255,.15)"
-                    : "rgba(255,255,255,.1)",
-                  border: `1px solid ${mobileOpen ? "rgba(0,200,255,.55)" : "rgba(255,255,255,.25)"}`,
-                  boxShadow: mobileOpen ? "0 0 24px rgba(0,200,255,.38)" : "none",
-                  flexShrink: 0,
-                }}
-              >
-                <span className={`w-[18px] h-[2px] rounded-full transition-all duration-300 ${mobileOpen ? "rotate-45 translate-y-[7px] bg-cyan-300" : "bg-white"}`} />
-                <span className={`w-[18px] h-[2px] rounded-full transition-all duration-200 bg-white ${mobileOpen ? "opacity-0 scale-x-0" : ""}`} />
-                <span className={`w-[18px] h-[2px] rounded-full transition-all duration-300 ${mobileOpen ? "-rotate-45 -translate-y-[7px] bg-cyan-300" : "bg-white"}`} />
+                  width:38, height:38, borderRadius:9, flexShrink:0,
+                  display:"flex", flexDirection:"column",
+                  alignItems:"center", justifyContent:"center", gap:5,
+                  background: mobileOpen ? "rgba(0,200,255,0.1)" : "rgba(255,255,255,0.06)",
+                  border:`1px solid ${mobileOpen ? "rgba(0,200,255,0.4)" : "rgba(255,255,255,0.12)"}`,
+                  cursor:"pointer", zIndex:200,
+                  backdropFilter:"blur(8px)", transition:"all .25s",
+                }}>
+                {[0,1,2].map(i => (
+                  <span key={i} style={{
+                    display:"block", width:17, height:2, borderRadius:2,
+                    background: mobileOpen ? "#00c8ff" : "rgba(255,255,255,0.8)",
+                    transition:"all .3s",
+                    transform: mobileOpen
+                      ? i===0 ? "rotate(45deg) translate(5px,5px)"
+                      : i===2 ? "rotate(-45deg) translate(5px,-5px)" : "scaleX(0)"
+                      : "none",
+                    opacity: mobileOpen && i===1 ? 0 : 1,
+                  }} />
+                ))}
               </button>
             </div>
           </div>
         </nav>
-
-        {/* ══ MOBILE FULL-SCREEN PANEL ══ */}
-        {mobileOpen && (
-          <div className="lg:hidden fixed inset-0 z-50" style={{ backdropFilter: "blur(24px)" }}>
-            <div className="absolute inset-0 bg-[#030508]/96" onClick={() => setMobileOpen(false)} />
-            <div className="absolute inset-0 pointer-events-none opacity-[0.033]"
-              style={{ backgroundImage: "radial-gradient(circle,rgba(0,200,255,.5) 1px,transparent 1px)", backgroundSize: "34px 34px" }} />
-            <div className="absolute top-0 right-0 w-80 h-80 pointer-events-none"
-              style={{ background: "radial-gradient(circle,rgba(124,92,255,.1) 0%,transparent 60%)", filter: "blur(40px)" }} />
-
-            <div
-              className="relative ml-auto h-full flex flex-col overflow-y-auto"
-              style={{
-                width: "min(100%,360px)",
-                background: "linear-gradient(180deg,rgba(4,6,10,.99) 0%,rgba(8,12,22,.99) 100%)",
-                borderLeft: "1px solid rgba(0,200,255,.14)",
-                boxShadow: "-18px 0 70px rgba(0,200,255,.07)",
-                animation: "_nb2_slideIn .33s cubic-bezier(.22,1,.36,1) both",
-              }}
-            >
-              <div className="h-[1px] shrink-0" style={{ background: "linear-gradient(90deg,transparent,#00c8ff 35%,#7c5cff 65%,transparent)" }} />
-
-              <div className="flex items-center justify-between px-5 py-4 shrink-0" style={{ borderBottom: "1px solid rgba(255,255,255,.05)" }}>
-                <div>
-                  <p className="font-extrabold text-white tracking-tight" style={{ fontSize: "1rem" }}>Navigation</p>
-                  <p className="font-bold uppercase tracking-[.2em] mt-0.5" style={{ fontSize: ".65rem", color: "rgba(0,200,255,.68)" }}>Astralearnia</p>
-                </div>
-                <button
-                  onClick={() => setMobileOpen(false)}
-                  className="flex items-center justify-center rounded-xl text-white/48 hover:text-white transition-colors font-bold"
-                  style={{ width: 34, height: 34, background: "rgba(255,255,255,.05)", border: "1px solid rgba(255,255,255,.08)", fontSize: ".85rem" }}
-                >✕</button>
-              </div>
-
-              <div className="flex flex-col gap-1 p-4 flex-1">
-                {navLinks.map((link, i) => {
-                  const active = pathname.startsWith(link.href);
-                  return (
-                    <Link
-                      key={link.href}
-                      href={link.href}
-                      className="flex items-center gap-3 px-4 py-3.5 rounded-xl font-semibold transition-all duration-200"
-                      style={{
-                        fontSize: ".95rem",
-                        color: active ? "#00c8ff" : "rgba(255,255,255,.7)",
-                        background: active ? "linear-gradient(90deg,rgba(0,200,255,.1),rgba(124,92,255,.06))" : "transparent",
-                        border: active ? "1px solid rgba(0,200,255,.2)" : "1px solid transparent",
-                        boxShadow: active ? "0 0 16px rgba(0,200,255,.1)" : "none",
-                        animationDelay: `${i * 38}ms`,
-                      }}
-                      onMouseEnter={e => {
-                        if (!active) {
-                          (e.currentTarget as HTMLElement).style.background = "rgba(0,200,255,.055)";
-                          (e.currentTarget as HTMLElement).style.color = "#fff";
-                        }
-                      }}
-                      onMouseLeave={e => {
-                        if (!active) {
-                          (e.currentTarget as HTMLElement).style.background = "transparent";
-                          (e.currentTarget as HTMLElement).style.color = "rgba(255,255,255,.7)";
-                        }
-                      }}
-                      onClick={() => setMobileOpen(false)}
-                    >
-                      <span style={{ fontSize: 8, color: active ? "#00c8ff" : "rgba(0,200,255,.32)" }}>▶</span>
-                      {link.label}
-                      {active && <span className="ml-auto w-1.5 h-1.5 rounded-full bg-cyan-400" style={{ boxShadow: "0 0 7px rgba(0,200,255,.9)" }} />}
-                    </Link>
-                  );
-                })}
-              </div>
-
-              <div className="p-4 flex flex-col gap-2.5 shrink-0" style={{ borderTop: "1px solid rgba(255,255,255,.06)" }}>
-                <Link
-                  href="/contact"
-                  className="w-full text-center font-bold text-white/70 hover:text-white transition-colors"
-                  style={{ fontSize: ".9rem", padding: "12px", borderRadius: 10, border: "1px solid rgba(255,255,255,.14)", background: "rgba(255,255,255,.03)" }}
-                  onClick={() => setMobileOpen(false)}
-                >Contact Us</Link>
-                <Link
-                  href="/book-demo"
-                  className="relative w-full text-center font-bold text-white overflow-hidden active:scale-95 transition-all duration-200"
-                  style={{ fontSize: ".9rem", padding: "13px", borderRadius: 10, background: "linear-gradient(135deg,#00c8ff 0%,#3b6bff 50%,#7c5cff 100%)", boxShadow: "0 7px 26px rgba(0,200,255,.48)" }}
-                  onClick={() => setMobileOpen(false)}
-                >
-                  <span className="absolute inset-0 pointer-events-none" style={{ background: "linear-gradient(105deg,transparent 35%,rgba(255,255,255,.16) 50%,transparent 65%)", animation: "_nb2_beamSlide 3s linear infinite" }} />
-                  <span className="relative z-10">Book Demo →</span>
-                </Link>
-              </div>
-
-              <div className="h-[1px] shrink-0" style={{ background: "linear-gradient(90deg,transparent,rgba(124,92,255,.75) 50%,transparent)" }} />
-            </div>
-          </div>
-        )}
       </header>
+
+      {/* ════════════════ MOBILE OVERLAY ════════════════ */}
+      {mobileOpen && (
+        <div style={{ position:"fixed", inset:0, zIndex:150 }}>
+          <div style={{ position:"absolute", inset:0, background:"rgba(4,7,16,0.72)", backdropFilter:"blur(8px)" }}
+            onClick={() => setMobileOpen(false)} />
+
+          <div style={{
+            position:"absolute", top:0, right:0, bottom:0, width:"min(320px,100%)",
+            display:"flex", flexDirection:"column",
+            background:"rgba(8,13,26,0.94)",
+            backdropFilter:"blur(28px) saturate(180%)",
+            WebkitBackdropFilter:"blur(28px) saturate(180%)",
+            borderLeft:"1px solid rgba(255,255,255,0.07)",
+            boxShadow:"-12px 0 48px rgba(0,0,0,0.55)",
+            animation:"nb-slideRight .3s cubic-bezier(.22,1,.36,1) both",
+          }}>
+            <div style={{ height:1, background:"linear-gradient(90deg,transparent,#00c8ff 40%,#7c5cff 70%,transparent)", flexShrink:0 }} />
+
+            {/* Panel header */}
+            <div style={{ display:"flex", alignItems:"center", justifyContent:"space-between", padding:"16px 20px", borderBottom:"1px solid rgba(255,255,255,0.06)", flexShrink:0 }}>
+              <div>
+                <p style={{ margin:0, fontWeight:800, fontSize:"0.95rem", color:"#fff" }}>Navigation</p>
+                <p style={{ margin:"2px 0 0", fontSize:"0.6rem", fontWeight:700, letterSpacing:"0.18em", color:"rgba(0,200,255,0.6)", textTransform:"uppercase" }}>Astralearnia</p>
+              </div>
+              <button onClick={() => setMobileOpen(false)}
+                style={{ width:32, height:32, borderRadius:8, background:"rgba(255,255,255,0.04)", border:"1px solid rgba(255,255,255,0.08)", color:"rgba(255,255,255,0.5)", cursor:"pointer", fontSize:"0.875rem", fontWeight:600, display:"flex", alignItems:"center", justifyContent:"center" }}>
+                ✕
+              </button>
+            </div>
+
+            {/* Links */}
+            <div style={{ flex:1, overflowY:"auto", padding:"10px 14px", display:"flex", flexDirection:"column", gap:3 }}>
+              {navLinks.map((link, i) => {
+                const active = pathname.startsWith(link.href);
+                return (
+                  <Link key={link.href} href={link.href}
+                    onClick={() => setMobileOpen(false)}
+                    style={{
+                      display:"flex", alignItems:"center", justifyContent:"space-between",
+                      padding:"12px 14px", borderRadius:10,
+                      fontSize:"0.925rem", fontWeight:600,
+                      color: active ? "#00c8ff" : "rgba(255,255,255,0.7)",
+                      textDecoration:"none",
+                      background: active ? "rgba(0,200,255,0.07)" : "transparent",
+                      border:`1px solid ${active ? "rgba(0,200,255,0.2)" : "transparent"}`,
+                      transition:"all .18s", animationDelay:`${i*35}ms`,
+                    }}
+                    onMouseEnter={!active ? hMLinkEnter : undefined}
+                    onMouseLeave={!active ? hMLinkLeave : undefined}
+                  >
+                    <span style={{ display:"flex", alignItems:"center", gap:10 }}>
+                      <span style={{ width:5, height:5, borderRadius:"50%", flexShrink:0, background: active ? "#00c8ff" : "rgba(255,255,255,0.18)", boxShadow: active ? "0 0 6px rgba(0,200,255,0.8)" : "none" }} />
+                      {link.label}
+                    </span>
+                    {active && (
+                      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#00c8ff" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                        <polyline points="9 18 15 12 9 6" />
+                      </svg>
+                    )}
+                  </Link>
+                );
+              })}
+            </div>
+
+            {/* Bottom CTAs */}
+            <div style={{ padding:"14px", flexShrink:0, borderTop:"1px solid rgba(255,255,255,0.06)", display:"flex", flexDirection:"column", gap:9 }}>
+              <Link href="/contact" onClick={() => setMobileOpen(false)}
+                style={{ display:"block", textAlign:"center", padding:"11px", borderRadius:10, fontSize:"0.875rem", fontWeight:600, color:"rgba(255,255,255,0.62)", textDecoration:"none", border:"1px solid rgba(255,255,255,0.1)", background:"rgba(255,255,255,0.03)", backdropFilter:"blur(8px)", transition:"all .2s" }}
+                onMouseEnter={hMContactEnter}
+                onMouseLeave={hMContactLeave}
+              >Contact Us</Link>
+
+              <Link href="/book-demo" onClick={() => setMobileOpen(false)}
+                style={{ position:"relative", overflow:"hidden", display:"block", textAlign:"center", padding:"12px", borderRadius:10, fontSize:"0.875rem", fontWeight:700, color:"#fff", textDecoration:"none", background:"linear-gradient(135deg,#00c8ff 0%,#3b6bff 50%,#7c5cff 100%)", boxShadow:"0 5px 22px rgba(0,200,255,0.38)" }}>
+                <span style={{ position:"absolute", inset:0, background:"linear-gradient(105deg,transparent 35%,rgba(255,255,255,0.15) 50%,transparent 65%)", animation:"nb-beam 2.8s linear infinite" }} />
+                <span style={{ position:"relative", zIndex:1 }}>Book Demo →</span>
+              </Link>
+            </div>
+
+            <div style={{ height:1, background:"linear-gradient(90deg,transparent,rgba(124,92,255,0.55) 50%,transparent)", flexShrink:0 }} />
+          </div>
+        </div>
+      )}
     </>
   );
 }

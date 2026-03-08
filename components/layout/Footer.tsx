@@ -1,215 +1,296 @@
 "use client";
 
 import Link from "next/link";
+import { useEffect, useState } from "react";
+import logoImage from "@/assets/logo.png";
 
-const cols = [
-  {
-    heading: "Divisions",
-    accent: "#00c8ff",
+const FOOTER_LINKS = {
+  company: {
+    label: "Company",
     links: [
-      { label: "Technology Division", href: "/technologies" },
-      { label: "Institute Division",  href: "/institute"    },
-      { label: "Compare Divisions",   href: "/#divisions"   },
+      { label: "About Us",  href: "/about"   },
+      { label: "Careers",   href: "/careers" },
+      { label: "Blog",      href: "/blog"    },
+      { label: "Press",     href: "/press"   },
+      { label: "Contact",   href: "/contact" },
     ],
   },
-  {
-    heading: "Platform",
-    accent: "#7c5cff",
+  technology: {
+    label: "Technology",
     links: [
-      { label: "AI Solutions",  href: "/solutions"    },
-      { label: "Products",      href: "/products"     },
-      { label: "API & SDK",     href: "/api-docs"     },
-      { label: "Integrations",  href: "/integrations" },
-      { label: "Documentation", href: "/docs"         },
-      { label: "Changelog",     href: "/changelog"    },
+      { label: "AI Models",      href: "/divisions/technology"          },
+      { label: "API Platform",   href: "/api-docs"                      },
+      { label: "Integrations",   href: "/solutions"                     },
+      { label: "Data Pipelines", href: "/divisions/technology#services" },
+      { label: "AI Security",    href: "/divisions/technology#security" },
     ],
   },
-  {
-    heading: "Company",
-    accent: "#00ffb2",
+  institute: {
+    label: "Institute",
     links: [
-      { label: "About Us", href: "/about"    },
-      { label: "Blog",     href: "/blog"     },
-      { label: "Careers",  href: "/careers"  },
-      { label: "Partners", href: "/partners" },
-      { label: "Contact",  href: "/contact"  },
+      { label: "Individuals",      href: "/divisions/institute"                },
+      { label: "Enterprise",       href: "/divisions/institute#enterprise"     },
+      { label: "Certifications",   href: "/divisions/institute#certifications" },
+      { label: "Skills Analytics", href: "/divisions/institute#analytics"      },
+      { label: "Partner With Us",  href: "/contact"                            },
     ],
   },
-  {
-    heading: "Legal",
-    accent: "#ff6ec7",
+  legal: {
+    label: "Legal",
     links: [
-      { label: "Privacy Policy",   href: "/privacy"    },
-      { label: "Terms of Service", href: "/terms"      },
-      { label: "Security",         href: "/security"   },
-      { label: "Compliance",       href: "/compliance" },
-      { label: "Cookie Policy",    href: "/cookies"    },
+      { label: "Privacy Policy",   href: "/privacy"  },
+      { label: "Terms of Service", href: "/terms"    },
+      { label: "Cookie Policy",    href: "/cookies"  },
+      { label: "Data Processing",  href: "/dpa"      },
+      { label: "Security",         href: "/security" },
     ],
   },
-];
+};
 
-const socials = [
-  { label: "X",        href: "https://twitter.com/astralearnia",          symbol: "𝕏",   color: "#00c8ff" },
-  { label: "LinkedIn", href: "https://linkedin.com/company/astralearnia", symbol: "in",  color: "#0a85ff" },
-  { label: "GitHub",   href: "https://github.com/astralearnia",           symbol: "</>", color: "#7c5cff" },
-  { label: "YouTube",  href: "https://youtube.com/@astralearnia",         symbol: "▶",   color: "#ff3b3b" },
+const SOCIAL = [
+  {
+    label: "X / Twitter", href: "https://twitter.com/astralearnia",
+    icon: <svg viewBox="0 0 24 24" fill="currentColor" style={{ width: 13, height: 13 }}><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-4.714-6.231-5.401 6.231H2.744l7.737-8.849L1.253 2.25h6.938l4.259 5.631 5.794-5.631Zm-1.161 17.52h1.833L7.084 4.126H5.117z" /></svg>,
+  },
+  {
+    label: "LinkedIn", href: "https://linkedin.com/company/astralearnia",
+    icon: <svg viewBox="0 0 24 24" fill="currentColor" style={{ width: 13, height: 13 }}><path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433a2.062 2.062 0 0 1-2.063-2.065 2.064 2.064 0 1 1 2.063 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z" /></svg>,
+  },
+  {
+    label: "GitHub", href: "https://github.com/astralearnia",
+    icon: <svg viewBox="0 0 24 24" fill="currentColor" style={{ width: 13, height: 13 }}><path d="M12 .297c-6.63 0-12 5.373-12 12 0 5.303 3.438 9.8 8.205 11.385.6.113.82-.258.82-.577 0-.285-.01-1.04-.015-2.04-3.338.724-4.042-1.61-4.042-1.61C4.422 18.07 3.633 17.7 3.633 17.7c-1.087-.744.084-.729.084-.729 1.205.084 1.838 1.236 1.838 1.236 1.07 1.835 2.809 1.305 3.495.998.108-.776.417-1.305.76-1.605-2.665-.3-5.466-1.332-5.466-5.93 0-1.31.465-2.38 1.235-3.22-.135-.303-.54-1.523.105-3.176 0 0 1.005-.322 3.3 1.23.96-.267 1.98-.399 3-.405 1.02.006 2.04.138 3 .405 2.28-1.552 3.285-1.23 3.285-1.23.645 1.653.24 2.873.12 3.176.765.84 1.23 1.91 1.23 3.22 0 4.61-2.805 5.625-5.475 5.92.42.36.81 1.096.81 2.22 0 1.606-.015 2.896-.015 3.286 0 .315.21.69.825.57C20.565 22.092 24 17.592 24 12.297c0-6.627-5.373-12-12-12" /></svg>,
+  },
+  {
+    label: "YouTube", href: "https://youtube.com/@astralearnia",
+    icon: <svg viewBox="0 0 24 24" fill="currentColor" style={{ width: 13, height: 13 }}><path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z" /></svg>,
+  },
 ];
 
 export function Footer() {
-  const year = new Date().getFullYear();
+  const [year, setYear]           = useState(2025);
+  const [logoError, setLogoError] = useState(false);
+  useEffect(() => { setYear(new Date().getFullYear()); }, []);
 
   return (
-    <footer className="relative bg-[#030508] overflow-hidden">
+    <footer style={{ position: "relative", overflow: "hidden" }}>
       <style>{`
-        @keyframes _fp2_grid   { 0%,100%{opacity:.02} 50%{opacity:.05} }
-        @keyframes _fp2_orb1   { 0%,100%{transform:translate(0,0) scale(1)} 50%{transform:translate(40px,-28px) scale(1.12)} }
-        @keyframes _fp2_orb2   { 0%,100%{transform:translate(0,0) scale(1)} 50%{transform:translate(-45px,22px) scale(1.08)} }
-        @keyframes _fp2_scan   { 0%{top:-1px;opacity:0} 5%{opacity:.4} 95%{opacity:.4} 100%{top:100%;opacity:0} }
-        @keyframes _fp2_shim   { 0%{background-position:-700px 0} 100%{background-position:700px 0} }
-        @keyframes _fp2_float  { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-7px)} }
-        @keyframes _fp2_flick  { 0%,85%,100%{opacity:1} 87%{opacity:.6} 91%{opacity:.95} 93%{opacity:.55} 96%{opacity:1} }
-        @keyframes _fp2_card   { 0%,100%{border-color:rgba(255,255,255,.05)} 50%{border-color:rgba(0,200,255,.14)} }
-        @keyframes _fp2_beam   { 0%,100%{opacity:.75} 50%{opacity:1} }
-        .fp2-lk .fp2-arr { transition:transform .2s; display:inline-block; }
-        .fp2-lk:hover .fp2-arr { transform:translateX(4px); }
-        .fp2-lk:hover  { color:#fff !important; }
+        @keyframes ft-shimmer { 0%{background-position:-600px 0} 100%{background-position:600px 0} }
+        @keyframes ft-pulse   { 0%,100%{opacity:.45} 50%{opacity:1} }
+
+        /* Glass surface */
+        .ft-root {
+          background: rgba(6,10,20,0.85);
+          backdrop-filter: blur(24px) saturate(160%);
+          -webkit-backdrop-filter: blur(24px) saturate(160%);
+          border-top: 1px solid rgba(255,255,255,0.07);
+        }
+
+        /* Link styles */
+        .ft-link {
+          display: block;
+          font-size: 0.8125rem;
+          font-weight: 500;
+          color: rgba(255,255,255,0.42);
+          text-decoration: none;
+          transition: color .18s;
+          line-height: 1;
+        }
+        .ft-link:hover { color: rgba(255,255,255,0.85); }
+
+        .ft-col-head {
+          font-size: 0.65rem;
+          font-weight: 700;
+          letter-spacing: 0.14em;
+          text-transform: uppercase;
+          color: rgba(255,255,255,0.2);
+          margin-bottom: 16px;
+        }
+
+        /* Social icon */
+        .ft-social {
+          width: 30px; height: 30px;
+          border-radius: 8px;
+          display: flex; align-items: center; justify-content: center;
+          background: rgba(255,255,255,0.04);
+          border: 1px solid rgba(255,255,255,0.07);
+          color: rgba(255,255,255,0.32);
+          text-decoration: none;
+          transition: all .18s;
+          flex-shrink: 0;
+        }
+        .ft-social:hover {
+          background: rgba(0,200,255,0.08);
+          border-color: rgba(0,200,255,0.28);
+          color: #00c8ff;
+          transform: translateY(-2px);
+        }
       `}</style>
 
-      {/* ── dot grid ── */}
-      <div className="absolute inset-0 pointer-events-none"
-        style={{ backgroundImage:"radial-gradient(circle,rgba(0,200,255,.25) 1px,transparent 1px)", backgroundSize:"44px 44px", animation:"_fp2_grid 8s ease-in-out infinite" }}
-      />
+      {/* Ambient top gradient */}
+      <div style={{ position: "absolute", top: 0, left: 0, right: 0, height: 1, zIndex: 2,
+        background: "linear-gradient(90deg,transparent,rgba(0,200,255,0.3) 30%,rgba(124,92,255,0.3) 70%,transparent)" }} />
+      <div style={{ position: "absolute", inset: 0, pointerEvents: "none",
+        background: "radial-gradient(ellipse 60% 30% at 50% 0%,rgba(0,200,255,0.03),transparent)" }} />
 
-      {/* ── orbs ── */}
-      <div className="absolute -top-48 -left-48 w-[520px] h-[520px] rounded-full pointer-events-none"
-        style={{ background:"radial-gradient(circle,rgba(0,200,255,.11) 0%,transparent 65%)", filter:"blur(55px)", animation:"_fp2_orb1 14s ease-in-out infinite" }}
-      />
-      <div className="absolute -bottom-52 -right-52 w-[600px] h-[600px] rounded-full pointer-events-none"
-        style={{ background:"radial-gradient(circle,rgba(124,92,255,.09) 0%,transparent 65%)", filter:"blur(60px)", animation:"_fp2_orb2 18s ease-in-out infinite" }}
-      />
+      <div className="ft-root" style={{ position: "relative", zIndex: 1 }}>
+        <div style={{ maxWidth: 1280, margin: "0 auto", padding: "0 20px" }}>
 
-      {/* ── scanline ── */}
-      <div className="absolute left-0 right-0 h-[1px] pointer-events-none z-[2]"
-        style={{ background:"linear-gradient(90deg,transparent,rgba(0,200,255,.45) 50%,transparent)", animation:"_fp2_scan 14s linear infinite" }}
-      />
+          {/* ── MAIN GRID ── */}
+          <div style={{ padding: "52px 0 44px" }}>
+            <div style={{
+              display: "grid",
+              gridTemplateColumns: "repeat(2,1fr)",
+              gap: "36px 24px",
+            }} className="ft-grid">
+              <style>{`
+                @media (min-width:640px)  { .ft-grid { grid-template-columns: repeat(3,1fr); } }
+                @media (min-width:1024px) { .ft-grid { grid-template-columns: 2fr 1fr 1fr 1fr 1fr; } }
+              `}</style>
 
-      {/* ── top beam ── */}
-      <div className="absolute top-0 left-0 right-0 h-[1px] pointer-events-none z-[3]"
-        style={{ background:"linear-gradient(90deg,transparent 0%,#00c8ff 20%,#7c5cff 50%,#00ffb2 80%,transparent 100%)", boxShadow:"0 0 18px rgba(0,200,255,.65),0 0 55px rgba(0,200,255,.22),0 0 90px rgba(124,92,255,.16)", animation:"_fp2_beam 4s ease-in-out infinite" }}
-      />
+              {/* ── BRAND col — full width on mobile ── */}
+              <div style={{ gridColumn: "1 / -1", display: "flex", flexDirection: "column", gap: 18 }}
+                className="ft-brand">
+                <style>{`
+                  @media (min-width:640px)  { .ft-brand { grid-column:1/-1; } }
+                  @media (min-width:1024px) { .ft-brand { grid-column:auto; } }
+                `}</style>
 
-      <div className="relative z-10 mx-auto w-full max-w-screen-xl px-6 lg:px-12">
+                {/* Logo */}
+                <Link href="/" style={{ display: "inline-flex", alignItems: "center", gap: 10, textDecoration: "none", width: "fit-content" }}>
+                  <div style={{
+                    width: 36, height: 36, borderRadius: 10, flexShrink: 0,
+                    display: "flex", alignItems: "center", justifyContent: "center", overflow: "hidden",
+                    background: logoError ? "linear-gradient(135deg,#00c8ff,#7c5cff)" : "rgba(255,255,255,0.9)",
+                    border: logoError ? "1px solid rgba(0,200,255,0.3)" : "1.5px solid rgba(255,255,255,0.8)",
+                    boxShadow: "0 2px 10px rgba(0,0,0,0.3)",
+                    padding: 3,
+                  }}>
+                    {!logoError ? (
+                      // eslint-disable-next-line @next/next/no-img-element
+                      <img src={logoImage.src} alt="Astralearnia"
+                        style={{ width: "100%", height: "100%", objectFit: "contain", borderRadius: 7 }}
+                        onError={() => setLogoError(true)} />
+                    ) : (
+                      <span style={{ fontWeight: 900, color: "#fff", fontSize: "1rem" }}>A</span>
+                    )}
+                  </div>
+                  <span style={{
+                    fontWeight: 800, fontSize: "1rem", letterSpacing: "-0.02em",
+                    background: "linear-gradient(90deg,rgba(0,200,255,.85) 0%,#fff 38%,rgba(124,92,255,.85) 70%,rgba(0,200,255,.85) 100%)",
+                    backgroundSize: "400px 100%",
+                    WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent", backgroundClip: "text",
+                    animation: "ft-shimmer 6s linear infinite",
+                  }}>Astralearnia</span>
+                </Link>
 
-        {/* ── WORDMARK ── */}
-        <div className="pt-12 pb-8 text-center">
-          <div style={{ animation:"_fp2_float 7s ease-in-out infinite" }}>
-            <h2
-              className="font-black leading-none tracking-[-0.05em] select-none"
-              style={{
-                fontSize:"clamp(2.8rem,8vw,6.5rem)",
-                background:"linear-gradient(135deg,#00c8ff 0%,#fff 25%,#7c5cff 52%,#fff 70%,#00ffb2 100%)",
-                WebkitBackgroundClip:"text", WebkitTextFillColor:"transparent", backgroundClip:"text",
-                filter:"drop-shadow(0 0 30px rgba(0,200,255,.4)) drop-shadow(0 0 65px rgba(124,92,255,.22))",
-                animation:"_fp2_flick 10s ease-in-out infinite",
-              }}
-            >
-              ASTRALEARNIA
-            </h2>
-          </div>
+                {/* Tagline */}
+                <p style={{ margin: 0, fontSize: "0.8rem", color: "rgba(255,255,255,0.35)", lineHeight: 1.65, maxWidth: 230 }}>
+                  Engineering Intelligence. Empowering Minds. The AI platform modern organisations trust to scale.
+                </p>
 
-          {/* tagline */}
-          <p
-            className="mt-4 font-bold uppercase"
-            style={{
-              fontSize:"clamp(.7rem,1.8vw,1.1rem)", letterSpacing:"0.22em",
-              background:"linear-gradient(90deg,rgba(0,200,255,.5) 0%,rgba(255,255,255,.95) 40%,rgba(124,92,255,.5) 70%,rgba(0,200,255,.5) 100%)",
-              backgroundSize:"700px 100%",
-              WebkitBackgroundClip:"text", WebkitTextFillColor:"transparent", backgroundClip:"text",
-              animation:"_fp2_shim 5s linear infinite",
-            }}
-          >
-            Engineering Intelligence · Empowering Minds
-          </p>
-
-          {/* division pills */}
-          <div className="flex flex-wrap items-center justify-center gap-3 mt-6">
-            {[
-              { label:"⚡ Technology Division", href:"/technologies", c:"#00c8ff" },
-              { label:"🎓 Institute Division",  href:"/institute",    c:"#a855f7" },
-            ].map(d=>(
-              <Link key={d.href} href={d.href}
-                className="font-bold uppercase tracking-widest text-white transition-all duration-300 hover:-translate-y-1 hover:scale-105"
-                style={{ fontSize:".72rem", padding:"8px 18px", borderRadius:10, border:`1px solid ${d.c}40`, background:`linear-gradient(135deg,${d.c}14,${d.c}07)` }}
-                onMouseEnter={e=>{ const el=e.currentTarget as HTMLElement; el.style.boxShadow=`0 0 26px ${d.c}60,inset 0 0 16px ${d.c}22`; el.style.borderColor=`${d.c}85`; }}
-                onMouseLeave={e=>{ const el=e.currentTarget as HTMLElement; el.style.boxShadow=""; el.style.borderColor=`${d.c}40`; }}
-              >{d.label}</Link>
-            ))}
-          </div>
-        </div>
-
-        {/* ── separator ── */}
-        <div className="h-[1px] mb-8"
-          style={{ background:"linear-gradient(90deg,transparent,rgba(0,200,255,.45) 25%,rgba(124,92,255,.65) 50%,rgba(0,200,255,.45) 75%,transparent)", boxShadow:"0 0 14px rgba(0,200,255,.28),0 0 40px rgba(124,92,255,.15)" }}
-        />
-
-        {/* ── COLUMNS ── */}
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
-          {cols.map(col=>(
-            <div key={col.heading} className="rounded-xl p-4 lg:p-5"
-              style={{ background:"linear-gradient(145deg,rgba(255,255,255,.03),rgba(255,255,255,.01))", border:"1px solid rgba(255,255,255,.06)", backdropFilter:"blur(10px)", animation:"_fp2_card 7s ease-in-out infinite" }}
-            >
-              <h4 className="font-extrabold uppercase mb-4"
-                style={{ fontSize:".65rem", letterSpacing:"0.28em", color:col.accent, textShadow:`0 0 14px ${col.accent}90` }}
-              >{col.heading}</h4>
-              <ul className="flex flex-col gap-2">
-                {col.links.map(lk=>(
-                  <li key={lk.href}>
-                    <Link href={lk.href} className="fp2-lk flex items-center gap-1.5 font-medium transition-colors duration-200"
-                      style={{ fontSize:".82rem", color:"rgba(255,255,255,.42)" }}
+                {/* Division pills */}
+                <div style={{ display: "flex", flexDirection: "column", gap: 7 }}>
+                  {[
+                    { href: "/divisions/technology", label: "Division 01 — Technology", color: "#00c8ff" },
+                    { href: "/divisions/institute",  label: "Division 02 — Institute",  color: "#a855f7" },
+                  ].map(d => (
+                    <Link key={d.href} href={d.href} style={{
+                      display: "inline-flex", alignItems: "center", gap: 7,
+                      fontSize: "0.65rem", fontWeight: 700, letterSpacing: "0.05em",
+                      padding: "5px 11px", borderRadius: 7, width: "fit-content",
+                      background: `${d.color}0d`,
+                      border: `1px solid ${d.color}25`,
+                      color: `${d.color}cc`,
+                      textDecoration: "none",
+                      transition: "border-color .18s, color .18s",
+                    }}
+                      onMouseEnter={e => { (e.currentTarget as HTMLElement).style.borderColor=`${d.color}55`; (e.currentTarget as HTMLElement).style.color=d.color; }}
+                      onMouseLeave={e => { (e.currentTarget as HTMLElement).style.borderColor=`${d.color}25`; (e.currentTarget as HTMLElement).style.color=`${d.color}cc`; }}
                     >
-                      <span className="fp2-arr" style={{ fontSize:8, color:col.accent, opacity:.65 }}>▶</span>
-                      {lk.label}
+                      <span style={{ width: 5, height: 5, borderRadius: "50%", background: d.color, boxShadow: `0 0 5px ${d.color}`, flexShrink: 0, animation: "ft-pulse 2.5s ease-in-out infinite" }} />
+                      {d.label}
                     </Link>
-                  </li>
-                ))}
-              </ul>
-            </div>
-          ))}
-        </div>
+                  ))}
+                </div>
 
-        {/* ── BOTTOM BAR ── */}
-        <div className="py-5 flex flex-col sm:flex-row items-center justify-between gap-3"
-          style={{ borderTop:"1px solid rgba(255,255,255,.06)" }}
-        >
-          <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-5 text-center sm:text-left">
-            <p className="font-semibold tracking-wide" style={{ fontSize:".78rem", color:"rgba(255,255,255,.28)" }}>
-              © {year} Astralearnia Technologies Ltd. All rights reserved.
-            </p>
-            <div className="flex gap-3">
-              {[{label:"Privacy",href:"/privacy"},{label:"Terms",href:"/terms"},{label:"Security",href:"/security"},{label:"Cookies",href:"/cookies"}].map(l=>(
-                <Link key={l.href} href={l.href} className="transition-colors hover:text-white/60"
-                  style={{ fontSize:".72rem", color:"rgba(255,255,255,.2)" }}>{l.label}</Link>
+                {/* Socials */}
+                <div style={{ display: "flex", gap: 7, flexWrap: "wrap" }}>
+                  {SOCIAL.map(s => (
+                    <a key={s.label} href={s.href} target="_blank" rel="noopener noreferrer"
+                      aria-label={s.label} className="ft-social">{s.icon}</a>
+                  ))}
+                </div>
+              </div>
+
+              {/* ── LINK COLUMNS ── */}
+              {Object.values(FOOTER_LINKS).map(col => (
+                <div key={col.label} style={{ display: "flex", flexDirection: "column" }}>
+                  <div className="ft-col-head">{col.label}</div>
+                  <ul style={{ listStyle: "none", margin: 0, padding: 0, display: "flex", flexDirection: "column", gap: 12 }}>
+                    {col.links.map(link => (
+                      <li key={link.href}>
+                        <Link href={link.href} className="ft-link">{link.label}</Link>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
               ))}
             </div>
           </div>
 
-          <div className="flex items-center gap-2">
-            {socials.map(s=>(
-              <Link key={s.href} href={s.href} target="_blank" rel="noopener noreferrer" aria-label={s.label}
-                className="flex items-center justify-center rounded-xl font-bold transition-all duration-300 hover:-translate-y-1"
-                style={{ width:36, height:36, fontSize:".78rem", color:"rgba(255,255,255,.4)", background:"linear-gradient(145deg,rgba(255,255,255,.05),rgba(255,255,255,.02))", border:"1px solid rgba(255,255,255,.08)" }}
-                onMouseEnter={e=>{ const el=e.currentTarget as HTMLElement; el.style.boxShadow=`0 0 20px ${s.color}65,inset 0 0 10px ${s.color}22`; el.style.borderColor=`${s.color}60`; el.style.color="#fff"; }}
-                onMouseLeave={e=>{ const el=e.currentTarget as HTMLElement; el.style.boxShadow=""; el.style.borderColor="rgba(255,255,255,.08)"; el.style.color="rgba(255,255,255,.4)"; }}
-              >{s.symbol}</Link>
-            ))}
+          {/* ── DIVIDER ── */}
+          <div style={{ height: 1, background: "rgba(255,255,255,0.06)" }} />
+
+          {/* ── BOTTOM BAR ── */}
+          <div style={{
+            padding: "16px 0",
+            display: "flex", flexWrap: "wrap",
+            alignItems: "center", justifyContent: "space-between",
+            gap: "10px 16px",
+          }}>
+            {/* Left */}
+            <div style={{ display: "flex", flexWrap: "wrap", alignItems: "center", gap: "6px 12px" }}>
+              <span style={{ fontSize: "0.72rem", color: "rgba(255,255,255,0.2)", fontWeight: 500 }}>
+                © {year} Astralearnia Technologies Ltd. All rights reserved.
+              </span>
+              <span style={{ fontSize: "0.72rem", color: "rgba(255,255,255,0.13)", fontWeight: 400 }}>
+                Built with AI. Secured with intent.
+              </span>
+            </div>
+
+            {/* Right */}
+            <div style={{ display: "flex", alignItems: "center", flexWrap: "wrap", gap: "8px 14px" }}>
+              {[{ label: "Privacy", href: "/privacy" }, { label: "Terms", href: "/terms" }, { label: "Cookies", href: "/cookies" }].map(l => (
+                <Link key={l.href} href={l.href} style={{
+                  fontSize: "0.72rem", fontWeight: 500,
+                  color: "rgba(255,255,255,0.25)", textDecoration: "none", transition: "color .18s",
+                }}
+                  onMouseEnter={e => { (e.currentTarget as HTMLElement).style.color="rgba(0,200,255,0.75)"; }}
+                  onMouseLeave={e => { (e.currentTarget as HTMLElement).style.color="rgba(255,255,255,0.25)"; }}
+                >{l.label}</Link>
+              ))}
+
+              {/* Status pill — glass style */}
+              <div style={{
+                display: "flex", alignItems: "center", gap: 5,
+                padding: "4px 10px", borderRadius: 20,
+                background: "rgba(0,255,100,0.04)",
+                border: "1px solid rgba(0,255,100,0.12)",
+                backdropFilter: "blur(8px)",
+              }}>
+                <span style={{
+                  width: 5, height: 5, borderRadius: "50%", flexShrink: 0,
+                  background: "#00ff64", boxShadow: "0 0 5px rgba(0,255,100,0.8)",
+                  animation: "ft-pulse 2s ease-in-out infinite",
+                }} />
+                <span style={{ fontSize: "0.6rem", fontWeight: 700, letterSpacing: "0.06em", color: "rgba(0,255,100,0.7)" }}>
+                  All Systems Operational
+                </span>
+              </div>
+            </div>
           </div>
         </div>
       </div>
-
-      {/* ── bottom edge ── */}
-      <div className="absolute bottom-0 left-0 right-0 h-[1px] pointer-events-none"
-        style={{ background:"linear-gradient(90deg,transparent,rgba(124,92,255,.7) 50%,transparent)", boxShadow:"0 0 12px rgba(124,92,255,.4)" }}
-      />
     </footer>
   );
 }

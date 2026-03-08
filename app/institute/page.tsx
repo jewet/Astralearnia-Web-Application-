@@ -95,11 +95,11 @@ export default function InstitutePage() {
         <div className="absolute inset-0 opacity-[0.02]" style={{ backgroundImage: "linear-gradient(rgba(180,100,255,.9) 1px,transparent 1px),linear-gradient(90deg,rgba(180,100,255,.9) 1px,transparent 1px)", backgroundSize: "72px 72px" }} />
       </div>
 
-      {/* ── HERO — pt-20 on mobile clears the fixed navbar ── */}
+      {/* ── HERO ── */}
       <section className="relative z-10 pt-20 sm:pt-24 lg:pt-32 pb-10 sm:pb-12 px-4 sm:px-6 lg:px-14 max-w-screen-xl mx-auto">
         <FadeIn>
           <div className="flex items-center gap-3 mb-6 sm:mb-7">
-            <Link href="/" className="text-xs text-white/30 hover:text-white/60 transition-colors">← Home</Link>
+            <Link href="/" className="text-xs font-bold text-white/40 hover:text-white/70 transition-colors">← Home</Link>
             <span className="text-white/15">/</span>
             <span className="inline-flex items-center gap-2 px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-wider"
               style={{ border: "1px solid rgba(168,85,247,0.28)", background: "rgba(168,85,247,0.07)", color: "#a855f7" }}>
@@ -116,26 +116,28 @@ export default function InstitutePage() {
           </h1>
         </FadeIn>
         <FadeIn d={130}>
-          <p className="text-base sm:text-xl text-white/50 max-w-2xl leading-relaxed mb-7 sm:mb-9 font-light">
+          <p className="text-base sm:text-xl text-white/60 max-w-2xl leading-relaxed mb-7 sm:mb-9 font-semibold">
             AI-powered learning systems that meet each person where they are, close skill gaps faster, and produce measurable outcomes for individuals and enterprises alike.
           </p>
         </FadeIn>
         <FadeIn d={200}>
-          <div className="flex flex-row flex-wrap gap-3 mb-8 sm:mb-12">
-            <Link href="/book-demo" className="px-6 sm:px-7 py-3 sm:py-3.5 rounded-xl font-black text-white text-sm hover:-translate-y-0.5 transition-all"
+          {/* 2-col buttons on mobile */}
+          <div className="grid grid-cols-2 sm:flex sm:flex-row flex-wrap gap-3 mb-8 sm:mb-12">
+            <Link href="/book-demo" className="px-5 sm:px-7 py-3 sm:py-3.5 rounded-xl font-black text-white text-sm hover:-translate-y-0.5 transition-all text-center"
               style={{ background: "linear-gradient(135deg,#a855f7,#ec4899)", boxShadow: "0 6px 28px rgba(168,85,247,0.32)" }}>
               Book a Learning Demo →
             </Link>
-            <Link href="/contact" className="px-6 sm:px-7 py-3 sm:py-3.5 rounded-xl font-bold text-white/50 text-sm hover:text-white transition-all"
-              style={{ border: "1px solid rgba(255,255,255,0.12)" }}>
+            <Link href="/contact" className="px-5 sm:px-7 py-3 sm:py-3.5 rounded-xl font-black text-white/60 text-sm hover:text-white transition-all text-center"
+              style={{ border: "1px solid rgba(255,255,255,0.16)" }}>
               Talk to Our Team
             </Link>
           </div>
-          <div className="flex flex-wrap gap-6 sm:gap-10 pt-7 sm:pt-9">
+          {/* Stats — 2-col on mobile */}
+          <div className="grid grid-cols-2 sm:flex sm:flex-wrap gap-4 sm:gap-10 pt-6 sm:pt-9" style={{ borderTop: "1px solid rgba(255,255,255,0.06)" }}>
             {[["12K+","Active Learners","#a855f7"],["60%","Training Time Saved","#00ffb2"],["94%","Certification Rate","#ff6ec7"],["300+","Corporate Clients","#fbbf24"]].map(([v,l,c])=>(
               <div key={l} className="shrink-0">
                 <div className="text-2xl sm:text-3xl font-black" style={{ color: c, filter: `drop-shadow(0 0 8px ${c}45)` }}>{v}</div>
-                <div className="text-[10px] font-bold uppercase tracking-widest text-white/28 mt-0.5">{l}</div>
+                <div className="text-[10px] font-black uppercase tracking-widest text-white/32 mt-0.5">{l}</div>
               </div>
             ))}
           </div>
@@ -155,32 +157,33 @@ export default function InstitutePage() {
               <div className="inline-flex px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-widest mb-4"
                 style={{ border: "1px solid rgba(168,85,247,0.25)", background: "rgba(168,85,247,0.07)", color: "#a855f7" }}>Who We Serve</div>
               <h2 className="text-3xl sm:text-4xl lg:text-5xl font-black text-white mb-3">Built for Every Learner</h2>
-              <p className="text-white/38 text-sm max-w-sm mx-auto">From individual professionals to enterprise L&D teams — one platform, multiple journeys.</p>
+              <p className="text-white/45 text-sm max-w-sm mx-auto font-semibold">From individual professionals to enterprise L&D teams — one platform, multiple journeys.</p>
             </div>
           </FadeIn>
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+          {/* Audience — 2-col on mobile (with 3rd spanning full) */}
+          <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4">
             {AUDIENCES.map((a,i)=>(
               <FadeIn key={a.title} d={i*60}>
-                <div className="rounded-2xl overflow-hidden flex flex-col h-full transition-all duration-300 hover:-translate-y-1"
+                <div className={`rounded-2xl overflow-hidden flex flex-col h-full transition-all duration-300 hover:-translate-y-1 ${i === 2 ? "col-span-2 sm:col-span-1" : ""}`}
                   style={{ background: "#0a1020", border: `1px solid ${a.color}18` }}
                   onMouseEnter={e=>{(e.currentTarget as HTMLElement).style.borderColor=a.color+"45";(e.currentTarget as HTMLElement).style.boxShadow=`0 0 35px ${a.color}10`;}}
                   onMouseLeave={e=>{(e.currentTarget as HTMLElement).style.borderColor=a.color+"18";(e.currentTarget as HTMLElement).style.boxShadow="none";}}>
-                  <div className="h-28 flex items-center justify-center relative overflow-hidden" style={{ background: `linear-gradient(135deg,${a.color}09,transparent)` }}>
+                  <div className="h-24 sm:h-28 flex items-center justify-center relative overflow-hidden" style={{ background: `linear-gradient(135deg,${a.color}09,transparent)` }}>
                     <div className="absolute inset-0 opacity-[0.04]" style={{ backgroundImage: `radial-gradient(circle,${a.color} 1px,transparent 1px)`, backgroundSize: "18px 18px" }} />
-                    <div className="absolute top-3 left-3 px-2.5 py-1 rounded-lg text-[10px] font-black uppercase tracking-widest" style={{ background: "rgba(0,0,0,0.5)", color: a.color }}>{a.label}</div>
-                    <span className="text-4xl fl relative z-10" style={{ animationDelay: `${i*0.4}s` }}>{a.icon}</span>
+                    <div className="absolute top-2 left-2 sm:top-3 sm:left-3 px-2 py-0.5 sm:px-2.5 sm:py-1 rounded-lg text-[9px] sm:text-[10px] font-black uppercase tracking-widest" style={{ background: "rgba(0,0,0,0.5)", color: a.color }}>{a.label}</div>
+                    <span className="text-3xl sm:text-4xl fl relative z-10" style={{ animationDelay: `${i*0.4}s` }}>{a.icon}</span>
                   </div>
-                  <div className="p-5 flex flex-col flex-1">
-                    <h3 className="text-base font-black text-white mb-2">{a.title}</h3>
-                    <p className="text-xs text-white/45 leading-relaxed mb-4 flex-1">{a.desc}</p>
-                    <ul className="flex flex-col gap-1.5 mb-5">
+                  <div className="p-4 sm:p-5 flex flex-col flex-1">
+                    <h3 className="text-sm sm:text-base font-black text-white mb-1.5 sm:mb-2">{a.title}</h3>
+                    <p className="text-xs text-white/50 leading-relaxed mb-3 sm:mb-4 flex-1 font-semibold">{a.desc}</p>
+                    <ul className="flex flex-col gap-1 sm:gap-1.5 mb-4 sm:mb-5">
                       {a.features.map(f=>(
-                        <li key={f} className="flex items-center gap-2 text-xs text-white/55">
+                        <li key={f} className="flex items-center gap-1.5 text-[10px] sm:text-xs text-white/58 font-semibold">
                           <span className="w-1 h-1 rounded-full shrink-0" style={{ background: a.color }} />{f}
                         </li>
                       ))}
                     </ul>
-                    <Link href={a.href} className="w-full text-center py-2.5 rounded-xl font-black text-xs text-white hover:-translate-y-0.5 transition-all"
+                    <Link href={a.href} className="w-full text-center py-2 sm:py-2.5 rounded-xl font-black text-xs text-white hover:-translate-y-0.5 transition-all"
                       style={{ background: `linear-gradient(135deg,${a.color},#ec4899)`, boxShadow: `0 4px 16px ${a.color}28` }}>
                       {a.cta} →
                     </Link>
@@ -204,36 +207,38 @@ export default function InstitutePage() {
               </h2>
             </div>
           </FadeIn>
+          {/* Feature grid — 2-col on mobile for small cards */}
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
             <FadeIn>
               <div className="rounded-2xl overflow-hidden flex flex-col h-full" style={{ background: "#0a1020", border: "1px solid rgba(168,85,247,0.18)" }}>
                 <VideoSlot color="#a855f7" h={200} title="Adaptive AI Engine in Action" sub="See personalisation live" />
-                <div className="p-6 sm:p-7 flex flex-col flex-1">
+                <div className="p-5 sm:p-7 flex flex-col flex-1">
                   <span className="inline-block px-2.5 py-1 rounded text-[9px] font-black uppercase tracking-widest mb-3 self-start" style={{ background: "rgba(168,85,247,0.12)", color: "#a855f7" }}>Core Feature</span>
                   <h3 className="text-xl sm:text-2xl font-black text-white mb-3 leading-tight">Adaptive AI Learning Engine</h3>
-                  <p className="text-sm text-white/50 leading-relaxed mb-5 flex-1">
-                    Our AI continuously analyses each learner performance, adjusts difficulty in real time, identifies knowledge gaps, and recommends the next best content — automatically, without instructor intervention.
+                  <p className="text-sm text-white/52 leading-relaxed mb-5 flex-1 font-semibold">
+                    Our AI continuously analyses each learner&apos;s performance, adjusts difficulty in real time, identifies knowledge gaps, and recommends the next best content — automatically, without instructor intervention.
                   </p>
                   <div className="flex flex-row flex-wrap gap-3">
                     <Link href="/book-demo" className="px-5 py-2.5 rounded-xl font-black text-xs text-white hover:-translate-y-0.5 transition-all"
                       style={{ background: "linear-gradient(135deg,#a855f7,#ec4899)", boxShadow: "0 4px 16px rgba(168,85,247,0.28)" }}>See It in Action →</Link>
-                    <Link href="/contact" className="px-5 py-2.5 rounded-xl font-bold text-xs text-white/50 hover:text-white transition-all"
-                      style={{ border: "1px solid rgba(255,255,255,0.12)" }}>Learn More</Link>
+                    <Link href="/contact" className="px-5 py-2.5 rounded-xl font-black text-xs text-white/55 hover:text-white transition-all"
+                      style={{ border: "1px solid rgba(255,255,255,0.16)" }}>Learn More</Link>
                   </div>
                 </div>
               </div>
             </FadeIn>
-            <div className="grid grid-cols-2 gap-4">
+            {/* Features — 2-col grid */}
+            <div className="grid grid-cols-2 gap-3 sm:gap-4">
               {FEATURES.map((f,i)=>(
                 <FadeIn key={f.title} d={i*50}>
-                  <div className="rounded-2xl p-5 h-full flex flex-col transition-all duration-300 hover:-translate-y-1"
+                  <div className="rounded-2xl p-4 sm:p-5 h-full flex flex-col transition-all duration-300 hover:-translate-y-1"
                     style={{ background: "#0a1020", border: `1px solid ${f.color}14` }}
                     onMouseEnter={e=>(e.currentTarget as HTMLElement).style.borderColor=f.color+"40"}
                     onMouseLeave={e=>(e.currentTarget as HTMLElement).style.borderColor=f.color+"14"}>
                     <span className="text-2xl fl mb-2" style={{ animationDelay: `${i*0.4}s` }}>{f.icon}</span>
                     <span className="text-[9px] font-black uppercase tracking-widest mb-1.5" style={{ color: f.color }}>{f.tag}</span>
-                    <h3 className="text-sm font-black text-white mb-1.5 leading-tight">{f.title}</h3>
-                    <p className="text-xs text-white/40 leading-relaxed flex-1">{f.desc}</p>
+                    <h3 className="text-xs sm:text-sm font-black text-white mb-1.5 leading-tight">{f.title}</h3>
+                    <p className="text-[11px] sm:text-xs text-white/42 leading-relaxed flex-1 font-semibold">{f.desc}</p>
                   </div>
                 </FadeIn>
               ))}
@@ -252,20 +257,21 @@ export default function InstitutePage() {
               <h2 className="text-3xl sm:text-4xl lg:text-5xl font-black text-white">Learning Results That Move Businesses</h2>
             </div>
           </FadeIn>
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
+          {/* Results — 2-col on mobile */}
+          <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-5">
             {RESULTS.map((r,i)=>(
               <FadeIn key={r.metric} d={i*65}>
-                <div className="rounded-2xl p-6 h-full transition-all duration-300 hover:-translate-y-1"
+                <div className={`rounded-2xl p-5 sm:p-6 h-full transition-all duration-300 hover:-translate-y-1 ${i === 2 ? "col-span-2 sm:col-span-1" : ""}`}
                   style={{ background: "#0a1020", border: `1px solid ${r.color}14` }}
                   onMouseEnter={e=>(e.currentTarget as HTMLElement).style.borderColor=r.color+"40"}
                   onMouseLeave={e=>(e.currentTarget as HTMLElement).style.borderColor=r.color+"14"}>
-                  <div className="w-full h-24 rounded-xl mb-5 relative overflow-hidden"
+                  <div className="w-full h-16 sm:h-24 rounded-xl mb-4 sm:mb-5 relative overflow-hidden"
                     style={{ background: `linear-gradient(135deg,${r.color}08,transparent)`, border: `1px solid ${r.color}0f` }}>
                     <div className="absolute inset-0 opacity-[0.04]" style={{ backgroundImage: `radial-gradient(circle,${r.color} 1px,transparent 1px)`, backgroundSize: "18px 18px" }} />
                   </div>
                   <div className="text-[10px] font-black uppercase tracking-widest mb-1.5" style={{ color: r.color + "88" }}>{r.org}</div>
-                  <div className="text-4xl font-black text-white mb-2" style={{ filter: `drop-shadow(0 0 10px ${r.color}30)` }}>{r.metric}</div>
-                  <p className="text-sm text-white/48 leading-relaxed">{r.label}</p>
+                  <div className="text-3xl sm:text-4xl font-black text-white mb-2" style={{ filter: `drop-shadow(0 0 10px ${r.color}30)` }}>{r.metric}</div>
+                  <p className="text-xs sm:text-sm text-white/50 leading-relaxed font-semibold">{r.label}</p>
                 </div>
               </FadeIn>
             ))}
@@ -278,15 +284,15 @@ export default function InstitutePage() {
         <div className="absolute inset-0 pointer-events-none" style={{ background: "radial-gradient(ellipse 70% 55% at 50% 50%,rgba(168,85,247,0.07),transparent)" }} />
         <FadeIn>
           <h2 className="text-3xl sm:text-4xl lg:text-5xl font-black text-white mb-4 relative z-10">Give Your Team the Intelligence to Grow</h2>
-          <p className="text-white/40 text-base max-w-md mx-auto mb-8 relative z-10">Book a demo tailored to your learning goals. We will show you exactly how Astralearnia Institute can transform your workforce — in 30 minutes.</p>
-          <div className="flex flex-row flex-wrap justify-center gap-3 relative z-10">
-            <Link href="/book-demo" className="px-7 sm:px-8 py-3.5 sm:py-4 rounded-xl font-black text-white text-sm hover:-translate-y-0.5 transition-all"
+          <p className="text-white/48 text-base max-w-md mx-auto mb-8 relative z-10 font-semibold">Book a demo tailored to your learning goals. We will show you exactly how Astralearnia Institute can transform your workforce — in 30 minutes.</p>
+          <div className="grid grid-cols-2 sm:flex sm:flex-row flex-wrap justify-center gap-3 relative z-10 max-w-sm mx-auto sm:max-w-none">
+            <Link href="/book-demo" className="px-6 sm:px-8 py-3.5 sm:py-4 rounded-xl font-black text-white text-sm hover:-translate-y-0.5 transition-all text-center"
               style={{ background: "linear-gradient(135deg,#a855f7,#ec4899)", boxShadow: "0 8px 26px rgba(168,85,247,0.3)" }}>Book Learning Demo →</Link>
-            <Link href="/contact" className="px-7 sm:px-8 py-3.5 sm:py-4 rounded-xl font-bold text-white/50 text-sm hover:text-white transition-all"
-              style={{ border: "1px solid rgba(255,255,255,0.12)" }}>Talk to Our Team</Link>
+            <Link href="/contact" className="px-6 sm:px-8 py-3.5 sm:py-4 rounded-xl font-black text-white/55 text-sm hover:text-white transition-all text-center"
+              style={{ border: "1px solid rgba(255,255,255,0.16)" }}>Talk to Our Team</Link>
           </div>
           <div className="mt-8 relative z-10">
-            <Link href="/divisions/technology" className="text-xs text-white/22 hover:text-white/50 transition-colors underline underline-offset-4">
+            <Link href="/divisions/technology" className="text-xs text-white/28 hover:text-white/55 transition-colors underline underline-offset-4 font-semibold">
               Need AI systems instead? → Visit Technology Division
             </Link>
           </div>

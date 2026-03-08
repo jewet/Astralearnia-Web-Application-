@@ -2,7 +2,8 @@
 import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
 
-function useFade(thr = 0.08) {
+/* ─── Fade-in hook ─── */
+function useFade(thr = 0.06) {
   const ref = useRef<HTMLDivElement>(null);
   const [v, setV] = useState(false);
   useEffect(() => {
@@ -15,44 +16,59 @@ function useFade(thr = 0.08) {
 function FadeIn({ children, d = 0, cls = "" }: { children: React.ReactNode; d?: number; cls?: string }) {
   const { ref, v } = useFade();
   return (
-    <div ref={ref} className={cls} style={{ opacity: v ? 1 : 0, transform: v ? "none" : "translateY(22px)", transition: `opacity .65s ease ${d}ms,transform .65s ease ${d}ms` }}>
+    <div ref={ref} className={cls}
+      style={{ opacity: v ? 1 : 0, transform: v ? "none" : "translateY(18px)", transition: `opacity .6s ease ${d}ms,transform .6s ease ${d}ms` }}>
       {children}
     </div>
   );
 }
 
-function VideoSlot({ color = "#00c8ff", h = 300, title = "Platform Demo", sub = "4 min" }: { color?: string; h?: number; title?: string; sub?: string }) {
+/* ─── Video slot ─── */
+function VideoSlot({ color = "#00c8ff", h = 260, title = "Platform Demo", sub = "4 min" }: { color?: string; h?: number; title?: string; sub?: string }) {
   const [on, setOn] = useState(false);
   return (
-    <div className="relative w-full rounded-2xl overflow-hidden cursor-pointer group" style={{ height: h, background: "#060e1c", border: `1px solid ${color}1c` }} onClick={() => setOn(p => !p)}>
-      <div className="absolute inset-0 opacity-[0.04]" style={{ backgroundImage: `linear-gradient(${color} 1px,transparent 1px),linear-gradient(90deg,${color} 1px,transparent 1px)`, backgroundSize: "40px 40px" }} />
-      <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500" style={{ background: `radial-gradient(ellipse 60% 50% at 50% 50%,${color}0d,transparent)` }} />
-      <div className="absolute top-0 left-0 w-14 h-px" style={{ background: `linear-gradient(90deg,${color}55,transparent)` }} />
-      <div className="absolute top-0 left-0 w-px h-14" style={{ background: `linear-gradient(180deg,${color}55,transparent)` }} />
-      <div className="absolute bottom-0 right-0 w-14 h-px" style={{ background: `linear-gradient(270deg,${color}55,transparent)` }} />
-      <div className="absolute bottom-0 right-0 w-px h-14" style={{ background: `linear-gradient(0deg,${color}55,transparent)` }} />
-      <div className="absolute inset-0 flex flex-col items-center justify-center gap-3">
-        <div className="relative">
-          <div className="absolute inset-0 rounded-full opacity-0 group-hover:opacity-100 transition-opacity" style={{ background: `${color}1c`, filter: "blur(18px)", transform: "scale(2.2)" }} />
-          <div className="relative w-16 h-16 rounded-full flex items-center justify-center transition-transform duration-300 group-hover:scale-110" style={{ background: `${color}14`, border: `1.5px solid ${color}4a` }}>
-            {on
-              ? <div className="flex gap-1.5"><div className="w-1.5 h-5 rounded-sm" style={{ background: color }} /><div className="w-1.5 h-5 rounded-sm" style={{ background: color }} /></div>
-              : <svg width="22" height="22" viewBox="0 0 24 24" fill={color}><path d="M8 5v14l11-7z" /></svg>}
-          </div>
+    <div className="hp-video" onClick={() => setOn(p => !p)}
+      style={{ position: "relative", width: "100%", borderRadius: 16, overflow: "hidden", cursor: "pointer", height: h, background: "#060e1c", border: `1px solid ${color}1c` }}>
+      <div style={{ position: "absolute", inset: 0, opacity: 0.04,
+        backgroundImage: `linear-gradient(${color} 1px,transparent 1px),linear-gradient(90deg,${color} 1px,transparent 1px)`, backgroundSize: "40px 40px" }} />
+      <div style={{ position: "absolute", top: 0, left: 0, width: 48, height: 1, background: `linear-gradient(90deg,${color}55,transparent)` }} />
+      <div style={{ position: "absolute", top: 0, left: 0, width: 1, height: 48, background: `linear-gradient(180deg,${color}55,transparent)` }} />
+      <div style={{ position: "absolute", bottom: 0, right: 0, width: 48, height: 1, background: `linear-gradient(270deg,${color}55,transparent)` }} />
+      <div style={{ position: "absolute", bottom: 0, right: 0, width: 1, height: 48, background: `linear-gradient(0deg,${color}55,transparent)` }} />
+      <div style={{ position: "absolute", inset: 0, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: 12 }}>
+        <div style={{
+          width: 60, height: 60, borderRadius: "50%",
+          display: "flex", alignItems: "center", justifyContent: "center",
+          background: `${color}14`, border: `1.5px solid ${color}4a`,
+          transition: "transform .3s",
+        }}>
+          {on
+            ? <div style={{ display: "flex", gap: 5 }}>
+                <div style={{ width: 5, height: 20, borderRadius: 2, background: color }} />
+                <div style={{ width: 5, height: 20, borderRadius: 2, background: color }} />
+              </div>
+            : <svg width="20" height="20" viewBox="0 0 24 24" fill={color}><path d="M8 5v14l11-7z"/></svg>}
         </div>
-        <div className="text-center">
-          <p className="text-white font-black text-sm">{title}</p>
-          <p className="text-white/30 text-xs mt-0.5">{sub}</p>
+        <div style={{ textAlign: "center" }}>
+          <p style={{ margin: 0, color: "#fff", fontWeight: 800, fontSize: "0.85rem" }}>{title}</p>
+          <p style={{ margin: "3px 0 0", color: "rgba(255,255,255,0.3)", fontSize: "0.72rem" }}>{sub}</p>
         </div>
       </div>
-      <div className="absolute inset-0 bg-gradient-to-t from-[#060e1c] via-transparent to-transparent pointer-events-none" />
-      <div className="absolute top-3.5 left-3.5 flex items-center gap-1.5 px-3 py-1 rounded-full text-[10px] font-black" style={{ background: "rgba(0,0,0,0.5)", border: `1px solid ${color}28`, color }}>
-        <span className="w-1.5 h-1.5 rounded-full" style={{ background: color, boxShadow: `0 0 5px ${color}` }} />WATCH DEMO
+      <div style={{ position: "absolute", inset: 0, background: "linear-gradient(to top,#060e1c,transparent)", pointerEvents: "none" }} />
+      <div style={{
+        position: "absolute", top: 12, left: 12,
+        display: "flex", alignItems: "center", gap: 6,
+        padding: "4px 10px", borderRadius: 20, fontSize: "0.65rem", fontWeight: 800,
+        background: "rgba(0,0,0,0.5)", border: `1px solid ${color}28`, color,
+      }}>
+        <span style={{ width: 5, height: 5, borderRadius: "50%", background: color, boxShadow: `0 0 5px ${color}` }} />
+        WATCH DEMO
       </div>
     </div>
   );
 }
 
+/* ─── Data ─── */
 const SERVICES = [
   { icon: "🧠", title: "Custom AI Model Development",  desc: "Fine-tuned LLMs, classification models, vision systems, and recommendation engines trained on your proprietary data.", tag: "Core",          color: "#00c8ff" },
   { icon: "⚡", title: "Intelligence API Platform",    desc: "REST & GraphQL endpoints with sub-100ms response times, token-level streaming, and enterprise-grade auth built in.", tag: "Developer",      color: "#00ffb2" },
@@ -79,103 +95,207 @@ const RESULTS = [
   { metric: "$2.1M", label: "Average annual cost saving per client post-integration",industry: "Healthcare Tech",          color: "#a855f7" },
 ];
 
+/* ─── Shared tokens ─── */
+const PILL = (label: string) => (
+  <div style={{
+    display: "inline-flex", alignItems: "center", gap: 6,
+    padding: "4px 12px", borderRadius: 20, marginBottom: 14,
+    fontSize: "0.65rem", fontWeight: 800, letterSpacing: "0.12em", textTransform: "uppercase" as const,
+    color: "#00c8ff",
+    border: "1px solid rgba(0,200,255,0.22)",
+    background: "rgba(0,200,255,0.06)",
+  }}>{label}</div>
+);
+
 export default function TechnologyPage() {
   return (
-    <main className="bg-[#040710] text-white font-sans antialiased overflow-x-hidden">
+    <main style={{ background: "#040710", color: "#fff", fontFamily: "sans-serif", overflowX: "hidden" }}>
       <style>{`
-        @keyframes shimmer{0%{background-position:200% center}100%{background-position:-200% center}}
-        @keyframes gpulse{0%,100%{opacity:.35}50%{opacity:1}}
-        @keyframes float{0%,100%{transform:translateY(0)}50%{transform:translateY(-6px)}}
-        .st{background-size:200% auto;animation:shimmer 5s linear infinite}
-        .gp{animation:gpulse 2.5s ease-in-out infinite}
-        .fl{animation:float 4.5s ease-in-out infinite}
+        @keyframes shimmer { 0%{background-position:200% center} 100%{background-position:-200% center} }
+        @keyframes gpulse  { 0%,100%{opacity:.35} 50%{opacity:1} }
+        @keyframes float   { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-5px)} }
+        @keyframes beam    { 0%{transform:translateX(-100%)} 100%{transform:translateX(100%)} }
+        .st  { background-size:200% auto; animation:shimmer 5s linear infinite; }
+        .gp  { animation:gpulse 2.5s ease-in-out infinite; }
+        .fl  { animation:float 4.5s ease-in-out infinite; }
+
+        /* ── Compact service card ── */
+        .svc-card {
+          background: #0a1220;
+          border-radius: 14px;
+          padding: 14px;
+          height: 100%;
+          display: flex;
+          flex-direction: column;
+          transition: transform .25s, box-shadow .25s;
+        }
+        .svc-card:hover { transform: translateY(-3px); }
+
+        /* ── Mobile-first grid overrides ── */
+        .hp-services-grid  { display:grid; grid-template-columns:repeat(2,1fr); gap:10px; }
+        .hp-process-grid   { display:grid; grid-template-columns:repeat(2,1fr); gap:10px; }
+        .hp-results-grid   { display:grid; grid-template-columns:repeat(2,1fr); gap:12px; }
+        .hp-stats-row      { display:grid; grid-template-columns:repeat(2,1fr); gap:14px; }
+        .hp-cta-btns       { display:grid; grid-template-columns:repeat(2,1fr); gap:10px; max-width:340px; margin:0 auto; }
+
+        @media (min-width:640px) {
+          .hp-services-grid  { grid-template-columns:repeat(3,1fr); gap:12px; }
+          .hp-process-grid   { grid-template-columns:repeat(4,1fr); gap:12px; }
+          .hp-results-grid   { grid-template-columns:repeat(3,1fr); }
+          .hp-stats-row      { display:flex; flex-wrap:wrap; gap:28px; }
+          .hp-cta-btns       { display:flex; flex-wrap:wrap; justify-content:center; max-width:none; }
+        }
+        @media (min-width:1024px) {
+          .hp-services-grid { grid-template-columns:repeat(5,1fr); gap:14px; }
+        }
+
+        /* Hide desc on mobile, show on sm+ */
+        .svc-desc { display:none; }
+        @media (min-width:640px) { .svc-desc { display:block; } }
+
+        /* Video height responsive */
+        .hp-video { height: 200px !important; }
+        @media (min-width:640px) { .hp-video { height: 240px !important; } }
+        @media (min-width:1024px){ .hp-video { height: 300px !important; } }
       `}</style>
 
-      <div className="fixed inset-0 pointer-events-none z-0">
-        <div className="absolute inset-0" style={{ background: "radial-gradient(ellipse 100% 55% at 50% -8%,rgba(0,180,255,0.11),transparent)" }} />
-        <div className="absolute inset-0" style={{ background: "radial-gradient(ellipse 55% 40% at 90% 65%,rgba(59,130,246,0.06),transparent)" }} />
-        <div className="absolute inset-0 opacity-[0.02]" style={{ backgroundImage: "linear-gradient(rgba(0,220,255,.9) 1px,transparent 1px),linear-gradient(90deg,rgba(0,220,255,.9) 1px,transparent 1px)", backgroundSize: "72px 72px" }} />
+      {/* ── Fixed bg ── */}
+      <div style={{ position: "fixed", inset: 0, pointerEvents: "none", zIndex: 0 }}>
+        <div style={{ position: "absolute", inset: 0, background: "radial-gradient(ellipse 100% 50% at 50% -5%,rgba(0,180,255,0.1),transparent)" }} />
+        <div style={{ position: "absolute", inset: 0, background: "radial-gradient(ellipse 50% 40% at 90% 65%,rgba(59,130,246,0.05),transparent)" }} />
+        <div style={{ position: "absolute", inset: 0, opacity: 0.018,
+          backgroundImage: "linear-gradient(rgba(0,220,255,.9) 1px,transparent 1px),linear-gradient(90deg,rgba(0,220,255,.9) 1px,transparent 1px)",
+          backgroundSize: "72px 72px" }} />
       </div>
 
-      {/* HERO — FIX: pt-20 on mobile (was pt-32 everywhere = big blank gap) */}
-      <section className="relative z-10 pt-20 sm:pt-24 lg:pt-32 pb-10 sm:pb-12 px-4 sm:px-6 lg:px-14 max-w-screen-xl mx-auto">
-        <FadeIn>
-          <div className="flex items-center gap-3 mb-5 sm:mb-7">
-            <Link href="/" className="text-xs text-white/30 hover:text-white/60 transition-colors">← Home</Link>
-            <span className="text-white/15">/</span>
-            <span className="inline-flex items-center gap-2 px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-wider"
-              style={{ border: "1px solid rgba(0,200,255,0.28)", background: "rgba(0,200,255,0.07)", color: "#00c8ff" }}>
-              <span className="w-1.5 h-1.5 rounded-full bg-cyan-400 gp" />Division 01 — Technology
-            </span>
-          </div>
-        </FadeIn>
-        <FadeIn d={60}>
-          <h1 className="font-black leading-[0.93] tracking-[-0.045em] text-[clamp(2.2rem,8vw,8rem)] max-w-5xl mb-5 sm:mb-6">
-            <span className="block text-white">Enterprise AI</span>
-            <span className="block st" style={{ background: "linear-gradient(90deg,#00c8ff,#3b82f6,#00ffb2,#00c8ff)", WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent", backgroundClip: "text" }}>
-              That Actually Ships.
-            </span>
-          </h1>
-        </FadeIn>
-        <FadeIn d={130}>
-          <p className="text-base sm:text-xl text-white/50 max-w-2xl leading-relaxed mb-7 sm:mb-9 font-light">
-            We build, integrate, and operate custom AI systems for businesses ready to move beyond demos — turning your data into working intelligence, fast.
-          </p>
-        </FadeIn>
-        <FadeIn d={200}>
-          <div className="flex flex-col sm:flex-row flex-wrap gap-3 mb-8 sm:mb-12">
-            <Link href="/book-demo" className="px-6 sm:px-7 py-3 sm:py-3.5 rounded-xl font-black text-white text-sm hover:-translate-y-0.5 transition-all text-center"
-              style={{ background: "linear-gradient(135deg,#00c8ff,#3b82f6)", boxShadow: "0 6px 28px rgba(0,200,255,0.32)" }}>
-              Book Technical Demo →
-            </Link>
-            <Link href="/contact" className="px-6 sm:px-7 py-3 sm:py-3.5 rounded-xl font-bold text-white/50 text-sm hover:text-white transition-all text-center"
-              style={{ border: "1px solid rgba(255,255,255,0.12)" }}>
-              Talk to an Engineer
-            </Link>
-          </div>
-          <div className="grid grid-cols-2 sm:flex sm:flex-wrap gap-4 sm:gap-10 pt-6 sm:pt-9" style={{ paddingLeft: "0.5rem", borderRadius: 12 }}>
-            {[["< 48h","Avg Deployment","#00c8ff"],["99.9%","API Uptime","#00ffb2"],["200+","Enterprise Clients","#a855f7"],["50M+","Daily API Calls","#fbbf24"]].map(([v,l,c]) => (
-              <div key={l}>
-                <div className="text-2xl sm:text-3xl font-black" style={{ color: c, filter: `drop-shadow(0 0 8px ${c}45)` }}>{v}</div>
-                <div className="text-[10px] font-bold uppercase tracking-widest text-white/28 mt-0.5">{l}</div>
-              </div>
-            ))}
-          </div>
-        </FadeIn>
+      {/* ════════════════════════════════
+          HERO
+      ════════════════════════════════ */}
+      <section style={{ position: "relative", zIndex: 10, paddingTop: "clamp(72px,12vw,120px)", paddingBottom: "clamp(24px,5vw,48px)", padding: "clamp(72px,12vw,120px) clamp(16px,4vw,56px) clamp(24px,5vw,48px)" }}>
+        <div style={{ maxWidth: 1280, margin: "0 auto" }}>
+
+          {/* Breadcrumb */}
+          <FadeIn>
+            <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 20, flexWrap: "wrap" }}>
+              <Link href="/" style={{ fontSize: "0.75rem", fontWeight: 700, color: "rgba(255,255,255,0.38)", textDecoration: "none" }}>← Home</Link>
+              <span style={{ color: "rgba(255,255,255,0.15)" }}>/</span>
+              <span style={{
+                display: "inline-flex", alignItems: "center", gap: 7,
+                padding: "3px 10px", borderRadius: 20,
+                fontSize: "0.65rem", fontWeight: 800, letterSpacing: "0.12em", textTransform: "uppercase",
+                border: "1px solid rgba(0,200,255,0.28)", background: "rgba(0,200,255,0.07)", color: "#00c8ff",
+              }}>
+                <span className="gp" style={{ width: 6, height: 6, borderRadius: "50%", background: "#00c8ff", display: "inline-block" }} />
+                Division 01 — Technology
+              </span>
+            </div>
+          </FadeIn>
+
+          {/* Headline */}
+          <FadeIn d={60}>
+            <h1 style={{
+              fontWeight: 900, lineHeight: 0.95,
+              letterSpacing: "-0.04em",
+              fontSize: "clamp(2.2rem,9vw,7.5rem)",
+              maxWidth: 900, marginBottom: "clamp(14px,3vw,24px)",
+            }}>
+              <span style={{ display: "block", color: "#fff" }}>Enterprise AI</span>
+              <span className="st" style={{
+                display: "block",
+                background: "linear-gradient(90deg,#00c8ff,#3b82f6,#00ffb2,#00c8ff)",
+                WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent", backgroundClip: "text",
+              }}>That Actually Ships.</span>
+            </h1>
+          </FadeIn>
+
+          {/* Sub */}
+          <FadeIn d={120}>
+            <p style={{
+              fontSize: "clamp(0.9rem,2vw,1.15rem)", color: "rgba(255,255,255,0.55)",
+              maxWidth: 580, lineHeight: 1.65, fontWeight: 500,
+              marginBottom: "clamp(20px,4vw,36px)",
+            }}>
+              We build, integrate, and operate custom AI systems for businesses ready to move beyond demos — turning your data into working intelligence, fast.
+            </p>
+          </FadeIn>
+
+          {/* CTAs */}
+          <FadeIn d={180}>
+            <div style={{ display: "grid", gridTemplateColumns: "repeat(2,1fr)", gap: 10, maxWidth: 340, marginBottom: "clamp(24px,5vw,44px)" }}
+              className="hp-cta-btns-inner">
+              <style>{`@media(min-width:480px){.hp-cta-btns-inner{display:flex;flex-wrap:wrap;max-width:none;}}`}</style>
+              <Link href="/book-demo" style={{
+                padding: "11px 20px", borderRadius: 10,
+                fontWeight: 800, color: "#fff", fontSize: "0.875rem",
+                textDecoration: "none", textAlign: "center",
+                background: "linear-gradient(135deg,#00c8ff,#3b82f6)",
+                boxShadow: "0 5px 22px rgba(0,200,255,0.3)",
+              }}>Book Technical Demo →</Link>
+              <Link href="/contact" style={{
+                padding: "11px 20px", borderRadius: 10,
+                fontWeight: 700, color: "rgba(255,255,255,0.6)", fontSize: "0.875rem",
+                textDecoration: "none", textAlign: "center",
+                border: "1px solid rgba(255,255,255,0.14)",
+                background: "rgba(255,255,255,0.02)",
+              }}>Talk to an Engineer</Link>
+            </div>
+
+            {/* Stats */}
+            <div className="hp-stats-row" style={{ paddingTop: "clamp(18px,3vw,32px)", borderTop: "1px solid rgba(255,255,255,0.06)" }}>
+              {[["< 48h","Avg Deployment","#00c8ff"],["99.9%","API Uptime","#00ffb2"],["200+","Enterprise Clients","#a855f7"],["50M+","Daily API Calls","#fbbf24"]].map(([v,l,c]) => (
+                <div key={l}>
+                  <div style={{ fontSize: "clamp(1.4rem,4vw,2rem)", fontWeight: 900, color: c, filter: `drop-shadow(0 0 6px ${c}45)` }}>{v}</div>
+                  <div style={{ fontSize: "0.62rem", fontWeight: 800, letterSpacing: "0.1em", textTransform: "uppercase", color: "rgba(255,255,255,0.28)", marginTop: 2 }}>{l}</div>
+                </div>
+              ))}
+            </div>
+          </FadeIn>
+        </div>
       </section>
 
       {/* Hero Video */}
-      <section className="relative z-10 max-w-screen-xl mx-auto px-4 sm:px-6 lg:px-14 pb-14 sm:pb-20">
-        <FadeIn><VideoSlot color="#00c8ff" h={240} title="Technology Platform Demo" sub="4 min · Live system walkthrough" /></FadeIn>
+      <section style={{ position: "relative", zIndex: 10, maxWidth: 1280, margin: "0 auto", padding: "0 clamp(16px,4vw,56px) clamp(32px,6vw,60px)" }}>
+        <FadeIn>
+          <VideoSlot color="#00c8ff" title="Technology Platform Demo" sub="4 min · Live system walkthrough" />
+        </FadeIn>
       </section>
 
-      {/* SERVICES */}
-      <section className="relative z-10 px-4 sm:px-6 lg:px-14" style={{ paddingTop: 60, paddingBottom: 60, background: "linear-gradient(180deg,#040710,#070c18 30%,#070c18 70%,#040710)" }}>
-        <div className="max-w-screen-xl mx-auto">
+      {/* ════════════════════════════════
+          SERVICES
+      ════════════════════════════════ */}
+      <section style={{ position: "relative", zIndex: 10, padding: "clamp(40px,6vw,72px) clamp(16px,4vw,56px)", background: "linear-gradient(180deg,#040710,#070c18 30%,#070c18 70%,#040710)" }}>
+        <div style={{ maxWidth: 1280, margin: "0 auto" }}>
           <FadeIn>
-            <div className="text-center mb-8 sm:mb-12">
-              <div className="inline-flex px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-widest mb-4"
-                style={{ border: "1px solid rgba(0,200,255,0.25)", background: "rgba(0,200,255,0.07)", color: "#00c8ff" }}>Our Services</div>
-              <h2 className="text-3xl sm:text-4xl lg:text-5xl font-black text-white mb-3">What We Build for You</h2>
-              <p className="text-white/38 text-sm max-w-sm mx-auto">Every engagement custom. Every system production-ready.</p>
+            <div style={{ textAlign: "center", marginBottom: "clamp(24px,4vw,48px)" }}>
+              {PILL("Our Services")}
+              <h2 style={{ fontWeight: 900, fontSize: "clamp(1.6rem,4vw,3rem)", color: "#fff", marginBottom: 8, marginTop: 0 }}>What We Build for You</h2>
+              <p style={{ color: "rgba(255,255,255,0.42)", fontSize: "0.875rem", maxWidth: 280, margin: "0 auto", fontWeight: 500 }}>Every engagement custom. Every system production-ready.</p>
             </div>
           </FadeIn>
-          <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-3 sm:gap-4">
+
+          <div className="hp-services-grid">
             {SERVICES.map((s, i) => (
-              <FadeIn key={s.title} d={i * 40}>
-                <div className="rounded-2xl p-3.5 sm:p-5 h-full flex flex-col transition-all duration-300 hover:-translate-y-1"
-                  style={{ background: "#0a1220", border: `1px solid ${s.color}14` }}
-                  onMouseEnter={e => { (e.currentTarget as HTMLElement).style.borderColor = s.color + "45"; (e.currentTarget as HTMLElement).style.boxShadow = `0 0 30px ${s.color}10`; }}
-                  onMouseLeave={e => { (e.currentTarget as HTMLElement).style.borderColor = s.color + "14"; (e.currentTarget as HTMLElement).style.boxShadow = "none"; }}>
-                  <div className="w-full h-14 sm:h-20 rounded-xl mb-2.5 sm:mb-3.5 flex items-center justify-center relative overflow-hidden"
-                    style={{ background: `linear-gradient(135deg,${s.color}09,transparent)`, border: `1px solid ${s.color}10` }}>
-                    <div className="absolute inset-0 opacity-[0.04]" style={{ backgroundImage: `radial-gradient(circle,${s.color} 1px,transparent 1px)`, backgroundSize: "14px 14px" }} />
-                    <span className="text-xl sm:text-2xl fl relative z-10" style={{ animationDelay: `${i * 0.3}s` }}>{s.icon}</span>
+              <FadeIn key={s.title} d={i * 35}>
+                <div className="svc-card"
+                  style={{ border: `1px solid ${s.color}14` }}
+                  onMouseEnter={e => { (e.currentTarget as HTMLElement).style.borderColor=s.color+"40"; (e.currentTarget as HTMLElement).style.boxShadow=`0 0 24px ${s.color}0d`; }}
+                  onMouseLeave={e => { (e.currentTarget as HTMLElement).style.borderColor=s.color+"14"; (e.currentTarget as HTMLElement).style.boxShadow="none"; }}>
+                  {/* Icon area */}
+                  <div style={{
+                    width: "100%", height: "clamp(44px,8vw,72px)", borderRadius: 10, marginBottom: 10,
+                    display: "flex", alignItems: "center", justifyContent: "center", position: "relative", overflow: "hidden",
+                    background: `linear-gradient(135deg,${s.color}09,transparent)`,
+                    border: `1px solid ${s.color}0f`,
+                  }}>
+                    <span className="fl" style={{ fontSize: "clamp(1rem,3vw,1.4rem)", position: "relative", zIndex: 1, animationDelay: `${i*0.3}s` }}>{s.icon}</span>
                   </div>
-                  <span className="inline-block px-1.5 sm:px-2 py-0.5 rounded text-[8px] sm:text-[9px] font-black uppercase tracking-widest mb-1.5 sm:mb-2"
-                    style={{ background: `${s.color}12`, color: s.color }}>{s.tag}</span>
-                  <h3 className="text-[11px] sm:text-[13px] font-black text-white mb-1 leading-tight">{s.title}</h3>
-                  <p className="hidden sm:block text-[11px] text-white/38 leading-relaxed flex-1">{s.desc}</p>
+                  <span style={{
+                    display: "inline-block", padding: "2px 7px", borderRadius: 5,
+                    fontSize: "0.6rem", fontWeight: 800, letterSpacing: "0.08em", textTransform: "uppercase",
+                    background: `${s.color}12`, color: s.color, marginBottom: 7,
+                  }}>{s.tag}</span>
+                  <h3 style={{ fontSize: "clamp(0.7rem,2vw,0.8rem)", fontWeight: 800, color: "#fff", marginBottom: 4, lineHeight: 1.3 }}>{s.title}</h3>
+                  <p className="svc-desc" style={{ fontSize: "0.72rem", color: "rgba(255,255,255,0.42)", lineHeight: 1.55, fontWeight: 500, flex: 1 }}>{s.desc}</p>
                 </div>
               </FadeIn>
             ))}
@@ -183,31 +303,50 @@ export default function TechnologyPage() {
         </div>
       </section>
 
-      {/* PROCESS */}
-      <section className="relative z-10 px-4 sm:px-6 lg:px-14" style={{ paddingTop: 60, paddingBottom: 60, background: "#040710" }}>
-        <div className="max-w-screen-xl mx-auto">
+      {/* ════════════════════════════════
+          PROCESS
+      ════════════════════════════════ */}
+      <section style={{ position: "relative", zIndex: 10, padding: "clamp(40px,6vw,72px) clamp(16px,4vw,56px)", background: "#040710" }}>
+        <div style={{ maxWidth: 1280, margin: "0 auto" }}>
           <FadeIn>
-            <div className="text-center mb-8 sm:mb-12">
-              <div className="inline-flex px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-widest mb-4"
-                style={{ border: "1px solid rgba(0,200,255,0.25)", background: "rgba(0,200,255,0.07)", color: "#00c8ff" }}>Our Process</div>
-              <h2 className="text-3xl sm:text-4xl lg:text-5xl font-black text-white">
+            <div style={{ textAlign: "center", marginBottom: "clamp(24px,4vw,48px)" }}>
+              {PILL("Our Process")}
+              <h2 style={{ fontWeight: 900, fontSize: "clamp(1.6rem,4vw,3rem)", color: "#fff", margin: "0 0 0" }}>
                 Discovery to{" "}
-                <span className="st" style={{ background: "linear-gradient(90deg,#00c8ff,#3b82f6,#00c8ff)", WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent", backgroundClip: "text" }}>Live in 30 Days</span>
+                <span className="st" style={{ background: "linear-gradient(90deg,#00c8ff,#3b82f6,#00c8ff)", WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent", backgroundClip: "text" }}>
+                  Live in 30 Days
+                </span>
               </h2>
             </div>
           </FadeIn>
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 relative">
-            <div className="hidden lg:block absolute top-7 left-[calc(12.5%+1.5rem)] right-[calc(12.5%+1.5rem)] h-px"
-              style={{ background: "linear-gradient(90deg,rgba(0,200,255,0.08),rgba(0,200,255,0.35),rgba(0,200,255,0.08))" }} />
+
+          <div className="hp-process-grid" style={{ position: "relative" }}>
+            {/* Connector line — desktop only */}
+            <div style={{
+              display: "none", position: "absolute", top: 22, left: "12.5%", right: "12.5%", height: 1,
+              background: "linear-gradient(90deg,rgba(0,200,255,0.06),rgba(0,200,255,0.28),rgba(0,200,255,0.06))",
+            }} className="hp-connector" />
+            <style>{`@media(min-width:640px){.hp-connector{display:block!important;}}`}</style>
+
             {STEPS.map((s, i) => (
-              <FadeIn key={s.n} d={i * 70}>
-                <div className="rounded-2xl p-4 sm:p-5 h-full transition-all duration-300 hover:-translate-y-1" style={{ background: "#0a1220", border: "1px solid rgba(0,200,255,0.1)" }}>
-                  <div className="w-8 h-8 rounded-full flex items-center justify-center text-[10px] font-black mb-3 sm:mb-4"
-                    style={{ background: "rgba(0,200,255,0.12)", border: "1px solid rgba(0,200,255,0.3)", color: "#00c8ff" }}>{s.n}</div>
-                  <div className="text-xl mb-2 fl" style={{ animationDelay: `${i * 0.5}s` }}>{s.icon}</div>
-                  <div className="text-[10px] font-black uppercase tracking-widest text-cyan-400/40 mb-1">{s.days}</div>
-                  <h3 className="text-sm font-black text-white mb-1.5">{s.title}</h3>
-                  <p className="text-xs text-white/40 leading-relaxed">{s.body}</p>
+              <FadeIn key={s.n} d={i * 60}>
+                <div style={{
+                  background: "#0a1220", borderRadius: 14, padding: "clamp(14px,3vw,20px)",
+                  border: "1px solid rgba(0,200,255,0.1)", height: "100%",
+                  transition: "transform .25s",
+                }}
+                  onMouseEnter={e => { (e.currentTarget as HTMLElement).style.transform="translateY(-3px)"; }}
+                  onMouseLeave={e => { (e.currentTarget as HTMLElement).style.transform="translateY(0)"; }}>
+                  <div style={{
+                    width: 30, height: 30, borderRadius: "50%",
+                    display: "flex", alignItems: "center", justifyContent: "center",
+                    fontSize: "0.65rem", fontWeight: 800, marginBottom: 10,
+                    background: "rgba(0,200,255,0.1)", border: "1px solid rgba(0,200,255,0.28)", color: "#00c8ff",
+                  }}>{s.n}</div>
+                  <div className="fl" style={{ fontSize: "clamp(1rem,3vw,1.25rem)", marginBottom: 6, animationDelay: `${i*0.5}s` }}>{s.icon}</div>
+                  <div style={{ fontSize: "0.6rem", fontWeight: 800, letterSpacing: "0.1em", textTransform: "uppercase", color: "rgba(0,200,255,0.38)", marginBottom: 4 }}>{s.days}</div>
+                  <h3 style={{ fontSize: "0.8rem", fontWeight: 800, color: "#fff", marginBottom: 6 }}>{s.title}</h3>
+                  <p style={{ fontSize: "0.72rem", color: "rgba(255,255,255,0.42)", lineHeight: 1.55, fontWeight: 500, margin: 0 }}>{s.body}</p>
                 </div>
               </FadeIn>
             ))}
@@ -215,30 +354,41 @@ export default function TechnologyPage() {
         </div>
       </section>
 
-      {/* RESULTS */}
-      <section className="relative z-10 px-4 sm:px-6 lg:px-14" style={{ paddingTop: 60, paddingBottom: 60, background: "linear-gradient(180deg,#040710,#070c18 40%,#040710)" }}>
-        <div className="max-w-screen-xl mx-auto">
+      {/* ════════════════════════════════
+          RESULTS
+      ════════════════════════════════ */}
+      <section style={{ position: "relative", zIndex: 10, padding: "clamp(40px,6vw,72px) clamp(16px,4vw,56px)", background: "linear-gradient(180deg,#040710,#070c18 40%,#040710)" }}>
+        <div style={{ maxWidth: 1280, margin: "0 auto" }}>
           <FadeIn>
-            <div className="text-center mb-8 sm:mb-12">
-              <div className="inline-flex px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-widest mb-4"
-                style={{ border: "1px solid rgba(0,200,255,0.25)", background: "rgba(0,200,255,0.07)", color: "#00c8ff" }}>Proof of Work</div>
-              <h2 className="text-3xl sm:text-4xl lg:text-5xl font-black text-white">Results That Speak</h2>
+            <div style={{ textAlign: "center", marginBottom: "clamp(24px,4vw,48px)" }}>
+              {PILL("Proof of Work")}
+              <h2 style={{ fontWeight: 900, fontSize: "clamp(1.6rem,4vw,3rem)", color: "#fff", margin: 0 }}>Results That Speak</h2>
             </div>
           </FadeIn>
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 sm:gap-5">
+
+          <div className="hp-results-grid">
             {RESULTS.map((r, i) => (
-              <FadeIn key={r.metric} d={i * 65}>
-                <div className="rounded-2xl p-5 sm:p-6 h-full transition-all duration-300 hover:-translate-y-1"
-                  style={{ background: "#0a1220", border: `1px solid ${r.color}14` }}
-                  onMouseEnter={e => (e.currentTarget as HTMLElement).style.borderColor = r.color + "40"}
-                  onMouseLeave={e => (e.currentTarget as HTMLElement).style.borderColor = r.color + "14"}>
-                  <div className="w-full h-20 sm:h-24 rounded-xl mb-4 sm:mb-5 relative overflow-hidden"
-                    style={{ background: `linear-gradient(135deg,${r.color}08,transparent)`, border: `1px solid ${r.color}0f` }}>
-                    <div className="absolute inset-0 opacity-[0.04]" style={{ backgroundImage: `radial-gradient(circle,${r.color} 1px,transparent 1px)`, backgroundSize: "18px 18px" }} />
+              <FadeIn key={r.metric} d={i * 55}>
+                <div style={{
+                  background: "#0a1220", borderRadius: 14,
+                  padding: "clamp(16px,3vw,24px)",
+                  border: `1px solid ${r.color}14`, height: "100%",
+                  gridColumn: i === 2 ? "1 / -1" : "auto",
+                  transition: "transform .25s, border-color .25s",
+                }}
+                  onMouseEnter={e => { (e.currentTarget as HTMLElement).style.borderColor=r.color+"38"; (e.currentTarget as HTMLElement).style.transform="translateY(-3px)"; }}
+                  onMouseLeave={e => { (e.currentTarget as HTMLElement).style.borderColor=r.color+"14"; (e.currentTarget as HTMLElement).style.transform="translateY(0)"; }}>
+                  <div style={{
+                    width: "100%", height: "clamp(48px,8vw,80px)", borderRadius: 10, marginBottom: 14,
+                    background: `linear-gradient(135deg,${r.color}07,transparent)`,
+                    border: `1px solid ${r.color}0f`, position: "relative", overflow: "hidden",
+                  }}>
+                    <div style={{ position: "absolute", inset: 0, opacity: 0.035,
+                      backgroundImage: `radial-gradient(circle,${r.color} 1px,transparent 1px)`, backgroundSize: "18px 18px" }} />
                   </div>
-                  <div className="text-[10px] font-black uppercase tracking-widest mb-1.5" style={{ color: r.color + "88" }}>{r.industry}</div>
-                  <div className="text-3xl sm:text-4xl font-black text-white mb-2" style={{ filter: `drop-shadow(0 0 10px ${r.color}30)` }}>{r.metric}</div>
-                  <p className="text-xs sm:text-sm text-white/48 leading-relaxed">{r.label}</p>
+                  <div style={{ fontSize: "0.6rem", fontWeight: 800, letterSpacing: "0.1em", textTransform: "uppercase", marginBottom: 6, color: r.color + "88" }}>{r.industry}</div>
+                  <div style={{ fontSize: "clamp(1.6rem,5vw,2.4rem)", fontWeight: 900, color: "#fff", marginBottom: 6, filter: `drop-shadow(0 0 8px ${r.color}28)` }}>{r.metric}</div>
+                  <p style={{ fontSize: "clamp(0.72rem,2vw,0.875rem)", color: "rgba(255,255,255,0.48)", lineHeight: 1.55, fontWeight: 500, margin: 0 }}>{r.label}</p>
                 </div>
               </FadeIn>
             ))}
@@ -246,23 +396,47 @@ export default function TechnologyPage() {
         </div>
       </section>
 
-      {/* CTA */}
-      <section className="relative z-10 py-16 sm:py-24 px-4 sm:px-6 text-center overflow-hidden" style={{ background: "#040710" }}>
-        <div className="absolute inset-0 pointer-events-none" style={{ background: "radial-gradient(ellipse 70% 55% at 50% 50%,rgba(0,200,255,0.07),transparent)" }} />
+      {/* ════════════════════════════════
+          CTA
+      ════════════════════════════════ */}
+      <section style={{ position: "relative", zIndex: 10, padding: "clamp(48px,8vw,96px) clamp(16px,4vw,56px)", textAlign: "center", overflow: "hidden", background: "#040710" }}>
+        <div style={{ position: "absolute", inset: 0, background: "radial-gradient(ellipse 65% 50% at 50% 50%,rgba(0,200,255,0.06),transparent)", pointerEvents: "none" }} />
         <FadeIn>
-          <h2 className="text-3xl sm:text-4xl lg:text-5xl font-black text-white mb-4 relative z-10">Let&apos;s Build Your AI System</h2>
-          <p className="text-white/40 text-sm sm:text-base max-w-md mx-auto mb-6 sm:mb-8 relative z-10">Book a 30-minute technical discovery call. We&apos;ll tell you exactly what we can build and what it costs — no pressure.</p>
-          <div className="flex flex-col sm:flex-row flex-wrap justify-center gap-3 relative z-10">
-            <Link href="/book-demo" className="px-7 sm:px-8 py-3.5 sm:py-4 rounded-xl font-black text-white text-sm hover:-translate-y-0.5 transition-all"
-              style={{ background: "linear-gradient(135deg,#00c8ff,#3b82f6)", boxShadow: "0 8px 26px rgba(0,200,255,0.3)" }}>Book Technical Demo →</Link>
-            <Link href="/contact" className="px-7 sm:px-8 py-3.5 sm:py-4 rounded-xl font-bold text-white/50 text-sm hover:text-white transition-all"
-              style={{ border: "1px solid rgba(255,255,255,0.12)" }}>Contact an Engineer</Link>
-          </div>
-          <div className="mt-6 sm:mt-8 relative z-10">
-            <Link href="/divisions/institute" className="text-xs text-white/22 hover:text-white/50 transition-colors underline underline-offset-4">
-              Looking for learning solutions? → Visit Institute Division
+          <h2 style={{ fontWeight: 900, fontSize: "clamp(1.7rem,4vw,3rem)", color: "#fff", marginBottom: 14, position: "relative", zIndex: 1 }}>
+            Let&apos;s Build Your AI System
+          </h2>
+          <p style={{ color: "rgba(255,255,255,0.45)", fontSize: "clamp(0.85rem,2vw,1rem)", maxWidth: 420, margin: "0 auto clamp(20px,4vw,32px)", lineHeight: 1.6, fontWeight: 500, position: "relative", zIndex: 1 }}>
+            Book a 30-minute technical discovery call. We&apos;ll tell you exactly what we can build and what it costs — no pressure.
+          </p>
+          <div style={{ display: "grid", gridTemplateColumns: "repeat(2,1fr)", gap: 10, maxWidth: 340, margin: "0 auto clamp(18px,3vw,28px)", position: "relative", zIndex: 1 }}
+            className="hp-cta-final">
+            <style>{`@media(min-width:480px){.hp-cta-final{display:flex;justify-content:center;max-width:none;}}`}</style>
+            <Link href="/book-demo" style={{
+              position: "relative", overflow: "hidden",
+              padding: "clamp(11px,2vw,15px) clamp(18px,3vw,30px)",
+              borderRadius: 10, fontWeight: 800, color: "#fff",
+              fontSize: "0.875rem", textDecoration: "none", textAlign: "center",
+              background: "linear-gradient(135deg,#00c8ff,#3b82f6)",
+              boxShadow: "0 6px 22px rgba(0,200,255,0.3)",
+            }}>
+              <span style={{ position: "absolute", inset: 0, background: "linear-gradient(105deg,transparent 35%,rgba(255,255,255,0.15) 50%,transparent 65%)", animation: "beam 2.8s linear infinite" }} />
+              <span style={{ position: "relative", zIndex: 1 }}>Book Technical Demo →</span>
             </Link>
+            <Link href="/contact" style={{
+              padding: "clamp(11px,2vw,15px) clamp(18px,3vw,30px)",
+              borderRadius: 10, fontWeight: 700, color: "rgba(255,255,255,0.55)",
+              fontSize: "0.875rem", textDecoration: "none", textAlign: "center",
+              border: "1px solid rgba(255,255,255,0.14)",
+              background: "rgba(255,255,255,0.02)",
+            }}>Contact an Engineer</Link>
           </div>
+          <Link href="/divisions/institute" style={{
+            fontSize: "0.75rem", color: "rgba(255,255,255,0.25)",
+            textDecoration: "underline", textUnderlineOffset: 4,
+            fontWeight: 600, position: "relative", zIndex: 1,
+          }}>
+            Looking for learning solutions? → Visit Institute Division
+          </Link>
         </FadeIn>
       </section>
     </main>
