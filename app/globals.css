@@ -16,7 +16,7 @@
   --font-mono: 'JetBrains Mono', 'Exo 2', monospace;
   --font-neon: 'Orbitron', sans-serif;
 
-  /* Neon palette — stronger but cleaner */
+  /* Neon palette */
   --void: #010307;
   --abyss: #040a15;
   --deep: #081120;
@@ -35,6 +35,10 @@
   --glow-violet: 0 0 40px rgba(192,132,252,0.38), 0 0 90px rgba(192,132,252,0.18);
   --glow-holo: 0 0 25px rgba(30,144,255,0.4), 0 0 60px rgba(0,240,255,0.2);
 
+  /* Navbar height variables — used for page padding */
+  --nav-h-mobile: 56px;   /* 3.5rem = h-14 */
+  --nav-h-desktop: 68px;  /* 4.25rem = sm:h-[4.25rem] */
+
   --section-v: clamp(80px, 12vw, 160px);
   --section-h: clamp(20px, 6vw, 80px);
 
@@ -47,7 +51,7 @@
 
 html {
   scroll-behavior: smooth;
-  font-size: 100%; /* Respect user font size preference */
+  font-size: 100%;
 }
 
 body {
@@ -57,7 +61,7 @@ body {
   font-size: clamp(15px, 2.2vw, 17px);
   line-height: 1.68;
   overflow-x: hidden;
-  cursor: none;
+  /* REMOVED: cursor: none — was hiding the cursor on mobile/touch devices */
   min-height: 100dvh;
   position: relative;
 }
@@ -67,7 +71,7 @@ body::before {
   content: '';
   position: fixed;
   inset: 0;
-  background: 
+  background:
     radial-gradient(ellipse at 15% 25%, rgba(0,240,255,0.06) 0%, transparent 45%),
     radial-gradient(ellipse at 85% 75%, rgba(192,132,252,0.05) 0%, transparent 50%);
   z-index: -2;
@@ -78,7 +82,7 @@ body::after {
   content: '';
   position: fixed;
   inset: 0;
-  background-image: 
+  background-image:
     linear-gradient(rgba(0,240,255,0.006) 1px, transparent 1px),
     linear-gradient(90deg, rgba(0,240,255,0.006) 1px, transparent 1px);
   background-size: 80px 80px;
@@ -89,11 +93,11 @@ body::after {
 }
 
 @keyframes grid-float {
-  0% { transform: translate(0, 0); }
+  0%   { transform: translate(0, 0); }
   100% { transform: translate(-80px, -80px); }
 }
 
-/* Typography – sharper, more neon-ready */
+/* Typography */
 .font-display { font-family: var(--font-display); }
 .font-neon { font-family: var(--font-neon); font-weight: 900; letter-spacing: -0.04em; }
 
@@ -102,7 +106,7 @@ h1 { font-size: clamp(3rem, 10vw, 9rem); }
 h2 { font-size: clamp(2.4rem, 7vw, 6rem); }
 h3 { font-size: clamp(1.6rem, 4.5vw, 3.2rem); }
 
-/* Gradients – stronger cyberpunk neon */
+/* Gradients */
 .text-gradient-neon {
   background: linear-gradient(80deg, #fff 0%, #00f0ff 30%, #1e90ff 55%, #c084fc 85%, #ff79cd 100%);
   -webkit-background-clip: text;
@@ -111,7 +115,7 @@ h3 { font-size: clamp(1.6rem, 4.5vw, 3.2rem); }
   filter: drop-shadow(0 0 12px rgba(0,240,255,0.6));
 }
 
-/* Glass – holographic / stronger edge neon */
+/* Glass */
 .glass {
   background: rgba(20, 36, 64, 0.48);
   backdrop-filter: blur(32px) saturate(180%);
@@ -145,7 +149,6 @@ h3 { font-size: clamp(1.6rem, 4.5vw, 3.2rem); }
   to   { opacity: 1; transform: translateY(0) scale(1); }
 }
 
-/* Keep / enhance your existing utilities: noise, shimmer, scanline, etc. */
 .scanline::after {
   background: linear-gradient(90deg, transparent, #00f0ff40, transparent);
   animation: scan 5s linear infinite;
@@ -163,10 +166,18 @@ h3 { font-size: clamp(1.6rem, 4.5vw, 3.2rem); }
   padding-inline: var(--section-h);
 }
 
-/* Mobile-first defaults + responsive overrides */
+/* ── Mobile-first responsive overrides ──────────────────── */
 @media (max-width: 640px) {
-  :root { --section-v: clamp(60px, 15vw, 100px); --section-h: 16px; }
-  h1 { font-size: clamp(2.6rem, 12vw, 4.8rem); }
+  :root {
+    --section-v: clamp(60px, 15vw, 100px);
+    --section-h: 16px;
+  }
+  h1 { font-size: clamp(2.2rem, 10vw, 4rem); }
+  h2 { font-size: clamp(1.8rem, 8vw, 3.2rem); }
+}
+
+@media (min-width: 641px) and (max-width: 1023px) {
+  h1 { font-size: clamp(2.8rem, 7vw, 5rem); }
 }
 
 @media (min-width: 768px) {
