@@ -1,0 +1,6 @@
+{
+  "version": 3,
+  "sources": [],
+  "sections": [
+    {"offset": {"line": 4, "column": 0}, "map": {"version":3,"sources":["file:///Users/funmishonubi/Downloads/astralearnia/app/technologies/layout.tsx"],"sourcesContent":["import type { ReactNode } from \"react\";\n\nexport default function TechnologyLayout({ children }: { children: ReactNode }) {\n  return <>{children}</>;\n}"],"names":[],"mappings":";;;;;;AAEe,SAAS,iBAAiB,EAAE,QAAQ,EAA2B;IAC5E,qBAAO;kBAAG;;AACZ"}}]
+}

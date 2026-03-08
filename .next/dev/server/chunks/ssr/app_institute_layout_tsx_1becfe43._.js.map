@@ -1,0 +1,6 @@
+{
+  "version": 3,
+  "sources": [],
+  "sections": [
+    {"offset": {"line": 4, "column": 0}, "map": {"version":3,"sources":["file:///Users/funmishonubi/Downloads/astralearnia/app/institute/layout.tsx"],"sourcesContent":["import type { ReactNode } from \"react\";\n\nexport default function InstituteLayout({ children }: { children: ReactNode }) {\n  return <>{children}</>;\n}"],"names":[],"mappings":";;;;;;AAEe,SAAS,gBAAgB,EAAE,QAAQ,EAA2B;IAC3E,qBAAO;kBAAG;;AACZ"}}]
+}
