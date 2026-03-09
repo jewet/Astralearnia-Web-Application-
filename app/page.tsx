@@ -55,7 +55,7 @@ const ANIM_LABEL: Record<AnimType, string> = {
   glitch: "Chaos & Glitch", kinetic: "Kinetic Typography", masked: "Masked Reveal",
 };
 
-// ─── Crystal shards for robot crystallize effect ──────────────────────────────
+// ─── Crystal shards ───────────────────────────────────────────────────────────
 const CRYSTAL_SHARDS: CrystalShard[] = [
   { tx: -190, ty: -130, r: 135,  color: "#a5f3fc", clip: "polygon(50% 0%,100% 50%,50% 100%,0% 50%)",             size: 52 },
   { tx:  170, ty: -100, r: -60,  color: "#93c5fd", clip: "polygon(0 0,100% 15%,85% 100%,15% 100%)",              size: 44 },
@@ -71,7 +71,7 @@ const CRYSTAL_SHARDS: CrystalShard[] = [
   { tx: -200, ty:  -20, r: -240, color: "#bae6fd", clip: "polygon(0 0,80% 0,100% 50%,80% 100%,0% 100%)",        size: 44 },
 ];
 
-// ─── Hero cycling headlines (6 captions) ─────────────────────────────────────
+// ─── Hero cycling headlines ───────────────────────────────────────────────────
 const HERO_ROTATIONS: HeroRotation[] = [
   {
     anim: "gravity", accent: "#22d3ee",
@@ -117,7 +117,7 @@ const HERO_ROTATIONS: HeroRotation[] = [
   },
 ];
 
-// ─── Division section cycling headlines (5 captions) ─────────────────────────
+// ─── Division section cycling headlines ──────────────────────────────────────
 const DIVISION_ROTATIONS: DivisionRotation[] = [
   { line: "One Company. Two Powerful Paths to Impact.", anim: "gravity",  accent: "#22d3ee" },
   { line: "Technology Builds. Institute Grows.",        anim: "kinetic",  accent: "#34d399" },
@@ -126,7 +126,7 @@ const DIVISION_ROTATIONS: DivisionRotation[] = [
   { line: "Intelligence at Scale. Heart at Centre.",    anim: "masked",   accent: "#e879f9" },
 ];
 
-// ─── TextAnimSlider messages (5 slides) ──────────────────────────────────────
+// ─── TextAnimSlider messages ──────────────────────────────────────────────────
 const ANIM_MESSAGES: AnimMessage[] = [
   {
     anim: "gravity",   eyebrow: "Who We Are",              tag: "Our Mission",          accent: "#22d3ee",
@@ -216,7 +216,38 @@ const SOLUTIONS_SLIDES: Array<{
 ];
 
 // ═══════════════════════════════════════════════════════════════════════════════
-// ROBOT INTRO — New concept: pull cards, crystallize, dissolve
+// ✅ FIX: useSectionVisible — callback ref so observer attaches when section
+//    actually mounts in DOM (after intro completes), not during the early-return
+//    intro phase when ref.current is null and the effect is a no-op.
+// ═══════════════════════════════════════════════════════════════════════════════
+function useSectionVisible(threshold = 0.15) {
+  const [visible, setVisible] = useState(false);
+  const obsRef = useRef<IntersectionObserver | null>(null);
+
+  const ref = useCallback(
+    (node: Element | null) => {
+      // Disconnect any previous observer on this hook instance
+      obsRef.current?.disconnect();
+      if (!node) return;
+      obsRef.current = new IntersectionObserver(
+        ([entry]) => {
+          if (entry.isIntersecting) {
+            setVisible(true);
+            obsRef.current?.disconnect();
+          }
+        },
+        { threshold }
+      );
+      obsRef.current.observe(node);
+    },
+    [threshold]
+  );
+
+  return { ref, visible };
+}
+
+// ═══════════════════════════════════════════════════════════════════════════════
+// ROBOT INTRO
 // ═══════════════════════════════════════════════════════════════════════════════
 function RobotIntro({ onComplete }: { onComplete: () => void }) {
   const [phase, setPhase] = useState<RobotPhase>("enter");
@@ -250,7 +281,6 @@ function RobotIntro({ onComplete }: { onComplete: () => void }) {
     return () => t.forEach(clearTimeout);
   }, [onComplete]);
 
-  // Robot transform per phase
   const robotX: Record<RobotPhase, string> = {
     enter:      "translateX(115vw)",
     center:     "translateX(0)",
@@ -288,7 +318,6 @@ function RobotIntro({ onComplete }: { onComplete: () => void }) {
       opacity: overlayFading ? 0 : 1,
       transition: overlayFading ? "opacity 0.7s ease 0.1s" : "none",
     }}>
-      {/* Stars */}
       <div style={{ position: "absolute", inset: 0, overflow: "hidden", pointerEvents: "none" }}>
         {starData.map((s, i) => (
           <div key={i} style={{
@@ -301,23 +330,20 @@ function RobotIntro({ onComplete }: { onComplete: () => void }) {
         ))}
       </div>
 
-      {/* Scanlines */}
       <div style={{
         position: "absolute", inset: 0, pointerEvents: "none", zIndex: 2,
         backgroundImage: "repeating-linear-gradient(0deg,transparent,transparent 2px,rgba(0,0,0,0.18) 2px,rgba(0,0,0,0.18) 4px)",
       }} />
 
-      {/* Ground line */}
       <div style={{
         position: "absolute", bottom: "24%", left: 0, right: 0, height: "2px",
         background: "linear-gradient(90deg,transparent,rgba(0,200,255,0.3),rgba(0,200,255,0.7),rgba(0,200,255,0.3),transparent)",
         boxShadow: "0 0 12px rgba(0,200,255,0.5)",
       }} />
 
-      {/* Brand header */}
       <div style={{
         position: "absolute", top: "10%", left: "50%", transform: "translateX(-50%)",
-        textAlign: "center", zIndex: 10, animation: "fadeInDown 0.8s ease forwards",
+        textAlign: "center", zIndex: 10, animation: "ri_fadeInDown 0.8s ease forwards",
       }}>
         <div style={{ fontSize: "clamp(1rem,3vw,1.8rem)", fontWeight: 900, letterSpacing: "0.3em", color: "rgba(0,200,255,0.85)", textTransform: "uppercase", fontFamily: "monospace" }}>
           ASTRALEARNIA
@@ -326,16 +352,11 @@ function RobotIntro({ onComplete }: { onComplete: () => void }) {
           INITIALISING INTELLIGENCE PLATFORM...
         </div>
         <div style={{ marginTop: 12, width: 200, height: 3, background: "rgba(255,255,255,0.1)", borderRadius: 2, overflow: "hidden", margin: "12px auto 0" }}>
-          <div style={{ height: "100%", borderRadius: 2, background: "linear-gradient(90deg,#00c8ff,#8040ff)", animation: "loadBar 5s ease forwards" }} />
+          <div style={{ height: "100%", borderRadius: 2, background: "linear-gradient(90deg,#00c8ff,#8040ff)", animation: "ri_loadBar 5s ease forwards" }} />
         </div>
       </div>
 
-      {/* ── Technology Division Card (slides from right) ── */}
-      {/*
-        FIX: Removed the `transition` shorthand property that was conflicting with
-        `transitionProperty` and `transitionDuration`. Now using only longhand
-        transition properties throughout to avoid the React rerender styling bug.
-      */}
+      {/* Technology Division Card */}
       <div style={{
         position: "absolute",
         bottom: "24%",
@@ -355,7 +376,7 @@ function RobotIntro({ onComplete }: { onComplete: () => void }) {
           padding: "clamp(10px,2vw,18px)",
           boxShadow: "0 0 40px rgba(0,200,255,0.35), inset 0 0 30px rgba(0,200,255,0.05)",
           backdropFilter: "blur(12px)",
-          animation: techCardVisible ? "cardFloat 3s ease-in-out infinite" : "none",
+          animation: techCardVisible ? "ri_cardFloat 3s ease-in-out infinite" : "none",
         }}>
           <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 8 }}>
             <div style={{ width: 28, height: 28, borderRadius: 8, background: "rgba(0,200,255,0.15)", border: "1px solid rgba(0,200,255,0.4)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 14 }}>⚡</div>
@@ -372,21 +393,16 @@ function RobotIntro({ onComplete }: { onComplete: () => void }) {
           </div>
           <div style={{ marginTop: 8, height: 2, borderRadius: 1, background: "linear-gradient(90deg,#00c8ff,transparent)", opacity: 0.6 }} />
         </div>
-        {/* Connection arm line */}
         <div style={{
           position: "absolute", top: "50%", right: "100%",
           height: 2, background: "linear-gradient(90deg,transparent,rgba(0,200,255,0.5))",
-          animation: techCardVisible ? "armExtend 0.5s ease forwards" : "none",
+          animation: techCardVisible ? "ri_armExtend 0.5s ease forwards" : "none",
           transformOrigin: "right center",
           width: "clamp(20px,5vw,60px)",
         }} />
       </div>
 
-      {/* ── Institute Division Card (slides from left) ── */}
-      {/*
-        FIX: Same fix applied here — removed `transition` shorthand, using only
-        longhand transitionProperty / transitionDuration / transitionTimingFunction.
-      */}
+      {/* Institute Division Card */}
       <div style={{
         position: "absolute",
         bottom: "24%",
@@ -406,7 +422,7 @@ function RobotIntro({ onComplete }: { onComplete: () => void }) {
           padding: "clamp(10px,2vw,18px)",
           boxShadow: "0 0 40px rgba(160,100,255,0.35), inset 0 0 30px rgba(160,100,255,0.05)",
           backdropFilter: "blur(12px)",
-          animation: instCardVisible ? "cardFloat 3.2s ease-in-out 0.4s infinite" : "none",
+          animation: instCardVisible ? "ri_cardFloat 3.2s ease-in-out 0.4s infinite" : "none",
         }}>
           <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 8 }}>
             <div style={{ width: 28, height: 28, borderRadius: 8, background: "rgba(160,100,255,0.15)", border: "1px solid rgba(160,100,255,0.4)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 14 }}>🎓</div>
@@ -423,17 +439,16 @@ function RobotIntro({ onComplete }: { onComplete: () => void }) {
           </div>
           <div style={{ marginTop: 8, height: 2, borderRadius: 1, background: "linear-gradient(90deg,transparent,rgba(160,100,255,0.5))", opacity: 0.6 }} />
         </div>
-        {/* Connection arm line */}
         <div style={{
           position: "absolute", top: "50%", left: "100%",
           height: 2, background: "linear-gradient(90deg,rgba(160,100,255,0.5),transparent)",
-          animation: instCardVisible ? "armExtend 0.5s ease forwards" : "none",
+          animation: instCardVisible ? "ri_armExtend 0.5s ease forwards" : "none",
           transformOrigin: "left center",
           width: "clamp(20px,5vw,60px)",
         }} />
       </div>
 
-      {/* ── Robot ── */}
+      {/* Robot */}
       <div style={{
         position: "absolute",
         bottom: "24%",
@@ -446,20 +461,18 @@ function RobotIntro({ onComplete }: { onComplete: () => void }) {
           ? "hue-rotate(200deg) saturate(4) brightness(1.8) drop-shadow(0 0 20px rgba(100,200,255,0.9))"
           : "drop-shadow(0 0 12px rgba(0,200,255,0.6))",
       }}>
-        {/* Showcase glow ring */}
         {phase === "showcase" && (
           <div style={{
             position: "absolute", inset: -20, borderRadius: "50%",
             background: "radial-gradient(circle, rgba(0,200,255,0.2) 0%, transparent 70%)",
-            animation: "showcaseGlow 1.5s ease-in-out infinite",
+            animation: "ri_showcaseGlow 1.5s ease-in-out infinite",
           }} />
         )}
-
         <svg viewBox="0 0 100 130" xmlns="http://www.w3.org/2000/svg" style={{ width: "100%" }}>
           <line x1="50" y1="12" x2="50" y2="2" stroke="#00c8ff" strokeWidth="3" strokeLinecap="round"/>
           <circle cx="50" cy="0" r="5" fill="#ff00ff"><animate attributeName="fill" values="#ff00ff;#00ffff;#ff00ff" dur="0.8s" repeatCount="indefinite"/></circle>
           <rect x="22" y="12" width="56" height="44" rx="10" fill="#0d2a3a" stroke="#00c8ff" strokeWidth="2"/>
-          <rect x="24" y="14" width="52" height="40" rx="9" fill="url(#hg)"/>
+          <rect x="24" y="14" width="52" height="40" rx="9" fill="url(#ri_hg)"/>
           <rect x="28" y="18" width="44" height="32" rx="5" fill="#041018" stroke="rgba(0,200,255,0.3)" strokeWidth="1"/>
           <circle cx="40" cy="32" r="7" fill="#000918" stroke="#00c8ff" strokeWidth="1.5"/>
           <circle cx="60" cy="32" r="7" fill="#000918" stroke="#00c8ff" strokeWidth="1.5"/>
@@ -470,14 +483,13 @@ function RobotIntro({ onComplete }: { onComplete: () => void }) {
           {[0,6,12,18,24].map(x => <line key={x} x1={37+x} y1="43" x2={37+x} y2="46" stroke="rgba(0,200,255,0.5)" strokeWidth="1"/>)}
           <rect x="40" y="56" width="20" height="8" rx="3" fill="#0a1f2e"/>
           <rect x="15" y="64" width="70" height="48" rx="8" fill="#0d2a3a" stroke="#00c8ff" strokeWidth="1.5"/>
-          <rect x="17" y="66" width="66" height="44" rx="7" fill="url(#bg)"/>
+          <rect x="17" y="66" width="66" height="44" rx="7" fill="url(#ri_bg)"/>
           <rect x="28" y="72" width="44" height="28" rx="5" fill="#041018" stroke="rgba(0,200,255,0.25)" strokeWidth="1"/>
           <circle cx="38" cy="82" r="5" fill="#00ff88"><animate attributeName="fill" values="#00ff88;#00ffcc;#00ff88" dur="2s" repeatCount="indefinite"/></circle>
           <circle cx="50" cy="82" r="5" fill="#ffaa00"><animate attributeName="fill" values="#ffaa00;#ffdd00;#ffaa00" dur="1.5s" begin="0.3s" repeatCount="indefinite"/></circle>
           <circle cx="62" cy="82" r="5" fill="#ff4444"><animate attributeName="fill" values="#ff4444;#ff8888;#ff4444" dur="1s" begin="0.6s" repeatCount="indefinite"/></circle>
           <rect x="30" y="93" width="40" height="4" rx="2" fill="#020c14"/>
-          <rect x="30" y="93" rx="2" height="4" fill="url(#pg)"><animate attributeName="width" values="0;40;20;40" dur="2s" repeatCount="indefinite"/></rect>
-          {/* Arms — right arm raises when reachRight, left when reachLeft */}
+          <rect x="30" y="93" rx="2" height="4" fill="url(#ri_pg)"><animate attributeName="width" values="0;40;20;40" dur="2s" repeatCount="indefinite"/></rect>
           <rect x="2" y="66" width="12" height="36" rx="6" fill="#0a1f2e" stroke="#00c8ff" strokeWidth="1">
             {(phase === "reachLeft" || phase === "cardLeft" || phase === "showcase") && (
               <animateTransform attributeName="transform" type="rotate" values="0 8 66;-40 8 66;-40 8 66" dur="0.4s" fill="freeze"/>
@@ -495,20 +507,19 @@ function RobotIntro({ onComplete }: { onComplete: () => void }) {
             <animateTransform attributeName="transform" type="rotate" values="0 67 112;-5 67 112;5 67 112;0 67 112" dur="0.5s" repeatCount="indefinite"/>
           </rect>
           <defs>
-            <linearGradient id="hg" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stopColor="#1a4a6a"/><stop offset="100%" stopColor="#0d2a3a"/></linearGradient>
-            <linearGradient id="bg" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stopColor="#1a3a50"/><stop offset="100%" stopColor="#0a1f2e"/></linearGradient>
-            <linearGradient id="pg" x1="0" y1="0" x2="1" y2="0"><stop offset="0%" stopColor="#00c8ff"/><stop offset="100%" stopColor="#8040ff"/></linearGradient>
+            <linearGradient id="ri_hg" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stopColor="#1a4a6a"/><stop offset="100%" stopColor="#0d2a3a"/></linearGradient>
+            <linearGradient id="ri_bg" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stopColor="#1a3a50"/><stop offset="100%" stopColor="#0a1f2e"/></linearGradient>
+            <linearGradient id="ri_pg" x1="0" y1="0" x2="1" y2="0"><stop offset="0%" stopColor="#00c8ff"/><stop offset="100%" stopColor="#8040ff"/></linearGradient>
           </defs>
         </svg>
 
-        {/* Speech bubble */}
         {(phase === "center" || phase === "reachRight") && (
           <div style={{
             position: "absolute", top: -50, left: "50%", transform: "translateX(-50%)",
             background: "rgba(0,20,40,0.95)", border: "1px solid rgba(0,200,255,0.5)",
             borderRadius: 8, padding: "6px 12px", whiteSpace: "nowrap",
             fontSize: 10, fontFamily: "monospace", color: "#00c8ff",
-            animation: "fadeInUp 0.3s ease",
+            animation: "ri_fadeInUp 0.3s ease",
           }}>
             {phase === "center" ? "Loading both divisions..." : "Pulling Technology →"}
           </div>
@@ -519,7 +530,7 @@ function RobotIntro({ onComplete }: { onComplete: () => void }) {
             background: "rgba(0,20,40,0.95)", border: "1px solid rgba(160,100,255,0.5)",
             borderRadius: 8, padding: "6px 12px", whiteSpace: "nowrap",
             fontSize: 10, fontFamily: "monospace", color: "#a08aff",
-            animation: "fadeInUp 0.3s ease",
+            animation: "ri_fadeInUp 0.3s ease",
           }}>
             ← Pulling Institute
           </div>
@@ -530,14 +541,14 @@ function RobotIntro({ onComplete }: { onComplete: () => void }) {
             background: "rgba(0,20,40,0.95)", border: "1px solid rgba(0,255,180,0.5)",
             borderRadius: 8, padding: "6px 14px", whiteSpace: "nowrap",
             fontSize: 10, fontFamily: "monospace", color: "#00ffb8",
-            animation: "fadeInUp 0.3s ease",
+            animation: "ri_fadeInUp 0.3s ease",
           }}>
             ✦ Astralearnia is ready!
           </div>
         )}
       </div>
 
-      {/* Crystal shards — scatter when crystallize */}
+      {/* Crystal shards */}
       {showShards && CRYSTAL_SHARDS.map((s, i) => (
         <div key={i} style={{
           position: "absolute",
@@ -549,7 +560,7 @@ function RobotIntro({ onComplete }: { onComplete: () => void }) {
           clipPath: s.clip,
           opacity: 0,
           zIndex: 13,
-          animation: `shardBurst ${0.3 + i * 0.03}s cubic-bezier(0.25,0.46,0.45,0.94) both`,
+          animation: `ri_shardBurst ${0.3 + i * 0.03}s cubic-bezier(0.25,0.46,0.45,0.94) both`,
           ["--tx" as string]: `${s.tx}px`,
           ["--ty" as string]: `${s.ty}px`,
           ["--r" as string]: `${s.r}deg`,
@@ -557,7 +568,6 @@ function RobotIntro({ onComplete }: { onComplete: () => void }) {
         } as CSSProperties} />
       ))}
 
-      {/* Skip button */}
       <button onClick={onComplete} style={{
         position: "absolute", bottom: 24, right: 24, zIndex: 20,
         background: "rgba(0,0,0,0.5)", border: "1px solid rgba(255,255,255,0.2)",
@@ -568,13 +578,13 @@ function RobotIntro({ onComplete }: { onComplete: () => void }) {
 
       <style>{`
         @keyframes twinkle { 0%,100%{opacity:0.3;transform:scale(1)} 50%{opacity:1;transform:scale(1.5)} }
-        @keyframes fadeInDown { from{opacity:0;transform:translate(-50%,-20px)} to{opacity:1;transform:translate(-50%,0)} }
-        @keyframes fadeInUp { from{opacity:0;transform:translate(-50%,10px)} to{opacity:1;transform:translate(-50%,0)} }
-        @keyframes loadBar { from{width:0%} to{width:100%} }
-        @keyframes cardFloat { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-8px)} }
-        @keyframes showcaseGlow { 0%,100%{opacity:0.5;transform:scale(1)} 50%{opacity:1;transform:scale(1.15)} }
-        @keyframes armExtend { from{width:0;opacity:0} to{opacity:1} }
-        @keyframes shardBurst {
+        @keyframes ri_fadeInDown { from{opacity:0;transform:translate(-50%,-20px)} to{opacity:1;transform:translate(-50%,0)} }
+        @keyframes ri_fadeInUp { from{opacity:0;transform:translate(-50%,10px)} to{opacity:1;transform:translate(-50%,0)} }
+        @keyframes ri_loadBar { from{width:0%} to{width:100%} }
+        @keyframes ri_cardFloat { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-8px)} }
+        @keyframes ri_showcaseGlow { 0%,100%{opacity:0.5;transform:scale(1)} 50%{opacity:1;transform:scale(1.15)} }
+        @keyframes ri_armExtend { from{width:0;opacity:0} to{opacity:1} }
+        @keyframes ri_shardBurst {
           0%   { opacity:0.9; transform:translateX(-50%) translateY(0) rotate(0deg) scale(1); }
           100% { opacity:0; transform:translateX(calc(-50% + var(--tx))) translateY(var(--ty)) rotate(var(--r)) scale(0.1); }
         }
@@ -584,7 +594,7 @@ function RobotIntro({ onComplete }: { onComplete: () => void }) {
 }
 
 // ═══════════════════════════════════════════════════════════════════════════════
-// ANIMATED LINE — per-animation-type word/letter effects (no animationDelay prop)
+// ANIMATED LINE
 // ═══════════════════════════════════════════════════════════════════════════════
 function AnimatedLine({
   text, anim, highlight = "", accent = "#22d3ee", visible,
@@ -654,7 +664,6 @@ function AnimatedLine({
       </span>
     );
   }
-  // masked
   return (
     <span style={{
       display: "inline-block",
@@ -667,27 +676,12 @@ function AnimatedLine({
   );
 }
 
-// AnimatedHeading wraps AnimatedLine for the slider
 function AnimatedHeading({ message, visible }: { message: AnimMessage; visible: boolean }) {
   return <AnimatedLine text={message.text} anim={message.anim} highlight={message.highlight} accent={message.accent} visible={visible} />;
 }
 
 // ═══════════════════════════════════════════════════════════════════════════════
-// IntersectionObserver hook for section header animations
-// ═══════════════════════════════════════════════════════════════════════════════
-function useSectionVisible(threshold = 0.15) {
-  const ref = useRef<HTMLDivElement>(null);
-  const [visible, setVisible] = useState(false);
-  useEffect(() => {
-    const obs = new IntersectionObserver(([e]) => { if (e.isIntersecting) { setVisible(true); obs.disconnect(); } }, { threshold });
-    if (ref.current) obs.observe(ref.current);
-    return () => obs.disconnect();
-  }, [threshold]);
-  return { ref, visible };
-}
-
-// ═══════════════════════════════════════════════════════════════════════════════
-// CYCLING HERO HEADLINE — 6 captions, animated per rotation
+// CYCLING HERO HEADLINE
 // ═══════════════════════════════════════════════════════════════════════════════
 function CyclingHeroHeadline() {
   const [idx, setIdx] = useState(0);
@@ -709,7 +703,6 @@ function CyclingHeroHeadline() {
       minHeight: "clamp(100px,18vw,240px)",
       display: "flex", flexDirection: "column", justifyContent: "center",
     }}>
-      {/* Line 1 — simple slide */}
       <span style={{
         display: "block", color: "#fff",
         opacity: visible ? 1 : 0, transition: "opacity 0.4s ease",
@@ -717,10 +710,6 @@ function CyclingHeroHeadline() {
       }}>
         {rotation.line1}
       </span>
-      {/* Line 2 — full animation engine */}
-      {/* FIX: replaced `background` shorthand with `backgroundImage` longhand to avoid
-          React rerender conflict with `backgroundClip` — mixing shorthand+longhand
-          on the same property causes styling bugs during rerenders in React/Turbopack */}
       <span style={{
         display: "block",
         backgroundImage: `linear-gradient(135deg,${rotation.accent},#a78bfa,${rotation.accent})`,
@@ -741,7 +730,7 @@ function CyclingHeroHeadline() {
 }
 
 // ═══════════════════════════════════════════════════════════════════════════════
-// CYCLING SECTION HEADING — for Division section
+// CYCLING SECTION HEADING
 // ═══════════════════════════════════════════════════════════════════════════════
 function CyclingSectionHeading({ className }: { className?: string }) {
   const [idx, setIdx] = useState(0);
@@ -763,8 +752,6 @@ function CyclingSectionHeading({ className }: { className?: string }) {
       minHeight: "clamp(60px,12vw,140px)",
       display: "flex", alignItems: "center", justifyContent: "center",
     }}>
-      {/* FIX: replaced `background` shorthand with `backgroundImage` longhand — same
-          reason as CyclingHeroHeadline: avoids React rerender conflict with backgroundClip */}
       <span style={{
         backgroundImage: `linear-gradient(135deg,${r.accent},#a78bfa)`,
         backgroundClip: "text", WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent",
@@ -809,7 +796,7 @@ function TextAnimSliderSection() {
   const ms = mediaStyles[msg.mediaAccent] ?? mediaStyles["#22d3ee"];
 
   return (
-    <section ref={ref} style={{
+    <section ref={ref as React.RefCallback<HTMLElement>} style={{
       position: "relative", background: "#030609",
       padding: "clamp(32px,5vw,72px) 0", overflow: "hidden",
       borderTop: "1px solid rgba(255,255,255,0.05)",
@@ -822,7 +809,6 @@ function TextAnimSliderSection() {
       }} />
       <div style={{ margin: "0 auto", width: "100%", maxWidth: 1280, padding: "0 clamp(16px,4vw,48px)", position: "relative", zIndex: 1 }}>
 
-        {/* Top bar */}
         <div style={{ display: "flex", alignItems: "center", flexWrap: "wrap", gap: 10, marginBottom: "clamp(24px,4vw,48px)" }}>
           <div style={{
             display: "inline-flex", alignItems: "center", gap: 8, padding: "5px 14px", borderRadius: 99,
@@ -845,10 +831,8 @@ function TextAnimSliderSection() {
           </div>
         </div>
 
-        {/* Two-column */}
         <div style={{ display: "grid", gridTemplateColumns: "1fr", gap: "clamp(28px,5vw,64px)", alignItems: "center" }}
           className="[grid-template-columns:1fr] lg:![grid-template-columns:1fr_1fr]">
-          {/* Left */}
           <div>
             <div key={`tag-${idx}`} style={{
               display: "inline-block", marginBottom: 14, padding: "3px 10px", borderRadius: 5,
@@ -901,7 +885,6 @@ function TextAnimSliderSection() {
             </div>
           </div>
 
-          {/* Right: Media */}
           <div key={`media-${idx}`} style={{
             position: "relative", borderRadius: 22, border: `1px solid ${ms.ring}`,
             background: "linear-gradient(145deg,#0d1622,#080c14)", overflow: "hidden", aspectRatio: "16/10",
@@ -992,7 +975,7 @@ function SolutionsCarousel() {
   const cc = colorCfg[slide.color];
 
   return (
-    <section ref={ref} className="relative bg-[#050810] py-8 sm:py-14 lg:py-20 overflow-hidden">
+    <section ref={ref as React.RefCallback<HTMLElement>} className="relative bg-[#050810] py-8 sm:py-14 lg:py-20 overflow-hidden">
       <div className="absolute inset-0 pointer-events-none" style={{ background: `radial-gradient(ellipse 60% 50% at 50% 50%, ${cc.glow.replace("0.35","0.07")}, transparent)`, transition: "background 0.8s ease" }} />
       <div className="mx-auto w-full max-w-screen-xl px-4 sm:px-6 lg:px-12 relative z-10">
         <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 mb-5 sm:mb-10">
@@ -1078,7 +1061,7 @@ function SolutionsCarousel() {
 }
 
 // ═══════════════════════════════════════════════════════════════════════════════
-// CONTACT SECTION — Full reach-out component
+// CONTACT SECTION
 // ═══════════════════════════════════════════════════════════════════════════════
 function ContactSection() {
   const { ref, visible } = useSectionVisible();
@@ -1122,13 +1105,12 @@ function ContactSection() {
   ];
 
   return (
-    <section ref={ref} id="contact" style={{ background: "#080c14", padding: "clamp(32px,5vw,72px) 0", position: "relative", overflow: "hidden", borderTop: "1px solid rgba(255,255,255,0.05)" }}>
+    <section ref={ref as React.RefCallback<HTMLElement>} id="contact" style={{ background: "#080c14", padding: "clamp(32px,5vw,72px) 0", position: "relative", overflow: "hidden", borderTop: "1px solid rgba(255,255,255,0.05)" }}>
       <div style={{ position: "absolute", inset: 0, background: "radial-gradient(ellipse 70% 50% at 50% 50%, rgba(0,200,255,0.06), transparent)", pointerEvents: "none" }} />
       <div style={{ position: "absolute", inset: 0, background: "radial-gradient(ellipse 40% 40% at 80% 80%, rgba(130,50,255,0.05), transparent)", pointerEvents: "none" }} />
 
       <div style={{ margin: "0 auto", width: "100%", maxWidth: 1280, padding: "0 clamp(16px,4vw,48px)", position: "relative", zIndex: 1 }}>
 
-        {/* Header */}
         <div style={{ textAlign: "center", marginBottom: "clamp(32px,5vw,64px)" }}>
           <div style={{ display: "inline-flex", alignItems: "center", gap: 8, padding: "5px 16px", borderRadius: 99, border: "1px solid rgba(255,255,255,0.18)", background: "rgba(255,255,255,0.04)", fontSize: "clamp(9px,1.1vw,11px)", fontWeight: 900, letterSpacing: "0.2em", textTransform: "uppercase" as const, color: "#fff", marginBottom: "clamp(16px,2.5vw,28px)", opacity: visible ? 1 : 0, animation: visible ? "sectionHeaderReveal 0.6s ease both" : "none" }}>
             <span style={{ width: 7, height: 7, borderRadius: "50%", background: "#22d3ee", boxShadow: "0 0 8px #22d3ee", animation: "dotPulse 1.4s ease-in-out infinite" }} />
@@ -1145,14 +1127,10 @@ function ContactSection() {
           </p>
         </div>
 
-        {/* Two-col layout */}
         <div style={{ display: "grid", gridTemplateColumns: "1fr", gap: "clamp(20px,4vw,48px)" }}
           className="lg:![grid-template-columns:5fr_7fr]">
 
-          {/* Left: info */}
           <div style={{ display: "flex", flexDirection: "column", gap: "clamp(12px,2vw,20px)" }}>
-
-            {/* Response time badge */}
             <div style={{ background: "rgba(0,200,255,0.07)", border: "1px solid rgba(0,200,255,0.2)", borderRadius: 14, padding: "clamp(14px,2.5vw,22px)", display: "flex", alignItems: "center", gap: 14 }}>
               <div style={{ width: 44, height: 44, borderRadius: "50%", background: "rgba(0,200,255,0.12)", border: "1px solid rgba(0,200,255,0.35)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 20, flexShrink: 0 }}>⚡</div>
               <div>
@@ -1161,7 +1139,6 @@ function ContactSection() {
               </div>
             </div>
 
-            {/* Contact info cards */}
             {CONTACT_INFO.map(c => (
               <a key={c.label} href={c.href} style={{ textDecoration: "none", display: "block" }}>
                 <div style={{ background: "rgba(13,22,34,0.7)", border: `1px solid ${c.accent}22`, borderRadius: 14, padding: "clamp(12px,2vw,18px)", display: "flex", alignItems: "center", gap: 12, transition: "all 0.3s ease", cursor: "pointer" }}
@@ -1177,7 +1154,6 @@ function ContactSection() {
               </a>
             ))}
 
-            {/* Division quick-links */}
             <div style={{ background: "rgba(13,22,34,0.5)", border: "1px solid rgba(255,255,255,0.08)", borderRadius: 14, padding: "clamp(14px,2.5vw,20px)" }}>
               <div style={{ fontSize: "clamp(0.7rem,1vw,0.8rem)", fontWeight: 900, color: "rgba(148,163,184,0.55)", letterSpacing: "0.18em", textTransform: "uppercase", marginBottom: 12, fontFamily: "monospace" }}>Explore Divisions</div>
               <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 10 }}>
@@ -1193,7 +1169,6 @@ function ContactSection() {
             </div>
           </div>
 
-          {/* Right: Form */}
           <div style={{ background: "rgba(13,22,34,0.7)", border: "1px solid rgba(255,255,255,0.1)", borderRadius: 22, padding: "clamp(18px,3vw,40px)", backdropFilter: "blur(12px)" }}>
             {status === "success" ? (
               <div style={{ textAlign: "center", padding: "clamp(24px,5vw,60px) 20px" }}>
@@ -1208,15 +1183,10 @@ function ContactSection() {
               </div>
             ) : (
               <div>
-                <h3 style={{ fontSize: "clamp(1rem,2.2vw,1.5rem)", fontWeight: 900, color: "#fff", marginBottom: "clamp(16px,3vw,28px)" }}>
-                  Tell us what you need
-                </h3>
+                <h3 style={{ fontSize: "clamp(1rem,2.2vw,1.5rem)", fontWeight: 900, color: "#fff", marginBottom: "clamp(16px,3vw,28px)" }}>Tell us what you need</h3>
 
-                {/* Division toggle */}
                 <div style={{ marginBottom: "clamp(14px,2.5vw,22px)" }}>
-                  <label style={{ display: "block", fontSize: "clamp(0.7rem,1.1vw,0.8rem)", fontWeight: 900, color: "rgba(148,163,184,0.7)", letterSpacing: "0.14em", textTransform: "uppercase", marginBottom: 8, fontFamily: "monospace" }}>
-                    Which division interests you?
-                  </label>
+                  <label style={{ display: "block", fontSize: "clamp(0.7rem,1.1vw,0.8rem)", fontWeight: 900, color: "rgba(148,163,184,0.7)", letterSpacing: "0.14em", textTransform: "uppercase", marginBottom: 8, fontFamily: "monospace" }}>Which division interests you?</label>
                   <div style={{ display: "grid", gridTemplateColumns: "repeat(3,1fr)", gap: 8 }}>
                     {(["technology","institute","both"] as DivisionChoice[]).map(d => (
                       <button key={d} onClick={() => update("division", d)} style={{
@@ -1232,33 +1202,38 @@ function ContactSection() {
                   </div>
                 </div>
 
-                {/* Name + Email */}
                 <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "clamp(8px,1.5vw,14px)", marginBottom: "clamp(10px,1.5vw,14px)" }}>
                   <div>
                     <label style={{ display: "block", fontSize: "clamp(0.68rem,1vw,0.78rem)", fontWeight: 900, color: "rgba(148,163,184,0.6)", letterSpacing: "0.12em", textTransform: "uppercase", marginBottom: 6, fontFamily: "monospace" }}>Full Name *</label>
-                    <input style={inputStyle("name")} value={form.name} onChange={e => update("name", e.target.value)} placeholder="Amara Osei" onFocus={e => { e.currentTarget.style.borderColor = "#22d3ee50"; e.currentTarget.style.boxShadow = "0 0 0 3px rgba(0,200,255,0.08)"; }} onBlur={e => { e.currentTarget.style.borderColor = errors.name ? "#f87171" : "rgba(255,255,255,0.12)"; e.currentTarget.style.boxShadow = "none"; }} />
+                    <input style={inputStyle("name")} value={form.name} onChange={e => update("name", e.target.value)} placeholder="Amara Osei"
+                      onFocus={e => { e.currentTarget.style.borderColor = "#22d3ee50"; e.currentTarget.style.boxShadow = "0 0 0 3px rgba(0,200,255,0.08)"; }}
+                      onBlur={e => { e.currentTarget.style.borderColor = errors.name ? "#f87171" : "rgba(255,255,255,0.12)"; e.currentTarget.style.boxShadow = "none"; }} />
                     {errors.name && <p style={{ fontSize: "0.72rem", color: "#f87171", fontWeight: 700, marginTop: 4 }}>{errors.name}</p>}
                   </div>
                   <div>
                     <label style={{ display: "block", fontSize: "clamp(0.68rem,1vw,0.78rem)", fontWeight: 900, color: "rgba(148,163,184,0.6)", letterSpacing: "0.12em", textTransform: "uppercase", marginBottom: 6, fontFamily: "monospace" }}>Email *</label>
-                    <input style={inputStyle("email")} value={form.email} onChange={e => update("email", e.target.value)} placeholder="you@company.com" type="email" onFocus={e => { e.currentTarget.style.borderColor = "#22d3ee50"; e.currentTarget.style.boxShadow = "0 0 0 3px rgba(0,200,255,0.08)"; }} onBlur={e => { e.currentTarget.style.borderColor = errors.email ? "#f87171" : "rgba(255,255,255,0.12)"; e.currentTarget.style.boxShadow = "none"; }} />
+                    <input style={inputStyle("email")} value={form.email} onChange={e => update("email", e.target.value)} placeholder="you@company.com" type="email"
+                      onFocus={e => { e.currentTarget.style.borderColor = "#22d3ee50"; e.currentTarget.style.boxShadow = "0 0 0 3px rgba(0,200,255,0.08)"; }}
+                      onBlur={e => { e.currentTarget.style.borderColor = errors.email ? "#f87171" : "rgba(255,255,255,0.12)"; e.currentTarget.style.boxShadow = "none"; }} />
                     {errors.email && <p style={{ fontSize: "0.72rem", color: "#f87171", fontWeight: 700, marginTop: 4 }}>{errors.email}</p>}
                   </div>
                 </div>
 
-                {/* Company + Subject */}
                 <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "clamp(8px,1.5vw,14px)", marginBottom: "clamp(10px,1.5vw,14px)" }}>
                   <div>
                     <label style={{ display: "block", fontSize: "clamp(0.68rem,1vw,0.78rem)", fontWeight: 900, color: "rgba(148,163,184,0.6)", letterSpacing: "0.12em", textTransform: "uppercase", marginBottom: 6, fontFamily: "monospace" }}>Company</label>
-                    <input style={inputStyle("company")} value={form.company} onChange={e => update("company", e.target.value)} placeholder="Your Organisation" onFocus={e => { e.currentTarget.style.borderColor = "#22d3ee50"; e.currentTarget.style.boxShadow = "0 0 0 3px rgba(0,200,255,0.08)"; }} onBlur={e => { e.currentTarget.style.borderColor = "rgba(255,255,255,0.12)"; e.currentTarget.style.boxShadow = "none"; }} />
+                    <input style={inputStyle("company")} value={form.company} onChange={e => update("company", e.target.value)} placeholder="Your Organisation"
+                      onFocus={e => { e.currentTarget.style.borderColor = "#22d3ee50"; e.currentTarget.style.boxShadow = "0 0 0 3px rgba(0,200,255,0.08)"; }}
+                      onBlur={e => { e.currentTarget.style.borderColor = "rgba(255,255,255,0.12)"; e.currentTarget.style.boxShadow = "none"; }} />
                   </div>
                   <div>
                     <label style={{ display: "block", fontSize: "clamp(0.68rem,1vw,0.78rem)", fontWeight: 900, color: "rgba(148,163,184,0.6)", letterSpacing: "0.12em", textTransform: "uppercase", marginBottom: 6, fontFamily: "monospace" }}>Subject</label>
-                    <input style={inputStyle("subject")} value={form.subject} onChange={e => update("subject", e.target.value)} placeholder="How can we help?" onFocus={e => { e.currentTarget.style.borderColor = "#22d3ee50"; e.currentTarget.style.boxShadow = "0 0 0 3px rgba(0,200,255,0.08)"; }} onBlur={e => { e.currentTarget.style.borderColor = "rgba(255,255,255,0.12)"; e.currentTarget.style.boxShadow = "none"; }} />
+                    <input style={inputStyle("subject")} value={form.subject} onChange={e => update("subject", e.target.value)} placeholder="How can we help?"
+                      onFocus={e => { e.currentTarget.style.borderColor = "#22d3ee50"; e.currentTarget.style.boxShadow = "0 0 0 3px rgba(0,200,255,0.08)"; }}
+                      onBlur={e => { e.currentTarget.style.borderColor = "rgba(255,255,255,0.12)"; e.currentTarget.style.boxShadow = "none"; }} />
                   </div>
                 </div>
 
-                {/* Message */}
                 <div style={{ marginBottom: "clamp(16px,2.5vw,24px)" }}>
                   <label style={{ display: "block", fontSize: "clamp(0.68rem,1vw,0.78rem)", fontWeight: 900, color: "rgba(148,163,184,0.6)", letterSpacing: "0.12em", textTransform: "uppercase", marginBottom: 6, fontFamily: "monospace" }}>Message *</label>
                   <textarea
@@ -1272,7 +1247,6 @@ function ContactSection() {
                   {errors.message && <p style={{ fontSize: "0.72rem", color: "#f87171", fontWeight: 700, marginTop: 4 }}>{errors.message}</p>}
                 </div>
 
-                {/* Submit */}
                 <button
                   onClick={handleSubmit}
                   disabled={status === "submitting"}
@@ -1286,13 +1260,8 @@ function ContactSection() {
                   }}
                 >
                   {status === "submitting" ? (
-                    <>
-                      <span style={{ width: 16, height: 16, borderRadius: "50%", border: "2px solid rgba(255,255,255,0.3)", borderTopColor: "#fff", animation: "spin 0.7s linear infinite", display: "inline-block" }} />
-                      Sending...
-                    </>
-                  ) : (
-                    <>Send Message →</>
-                  )}
+                    <><span style={{ width: 16, height: 16, borderRadius: "50%", border: "2px solid rgba(255,255,255,0.3)", borderTopColor: "#fff", animation: "contactSpin 0.7s linear infinite", display: "inline-block" }} />Sending...</>
+                  ) : <>Send Message →</>}
                 </button>
 
                 <p style={{ textAlign: "center", marginTop: 12, fontSize: "clamp(0.68rem,1vw,0.78rem)", color: "rgba(100,116,139,0.6)", fontWeight: 600 }}>
@@ -1306,7 +1275,7 @@ function ContactSection() {
 
       <style>{`
         @keyframes successPop { 0%{transform:scale(0) rotate(-20deg);opacity:0} 60%{transform:scale(1.15) rotate(5deg)} 100%{transform:scale(1) rotate(0);opacity:1} }
-        @keyframes spin { from{transform:rotate(0deg)} to{transform:rotate(360deg)} }
+        @keyframes contactSpin { from{transform:rotate(0deg)} to{transform:rotate(360deg)} }
         @keyframes dotPulse { 0%,100%{transform:scale(1);opacity:1} 50%{transform:scale(1.6);opacity:0.7} }
       `}</style>
     </section>
@@ -1317,16 +1286,13 @@ function ContactSection() {
 // MAIN HOME PAGE
 // ═══════════════════════════════════════════════════════════════════════════════
 export default function HomePage() {
-  // ─── All state hooks ──────────────────────────────────────────────────────
   const [introComplete, setIntroComplete] = useState(false);
   const [modalOpen, setModalOpen] = useState(false);
 
-  // ─── FIX: All useSectionVisible() calls hoisted to the top level of
-  //     HomePage — previously they were inside IIFE (() => { ... })()
-  //     blocks in JSX, which violated React's Rules of Hooks because hooks
-  //     must only be called at the top level of a React function, not inside
-  //     nested functions, callbacks, or IIFEs.
-  // ─────────────────────────────────────────────────────────────────────────
+  // ✅ All useSectionVisible hooks at top level (Rules of Hooks)
+  // ✅ With callback refs these now properly attach when sections mount
+  //    (after intro completes) instead of silently failing during the
+  //    early-return intro phase when DOM nodes don't exist yet.
   const divisionSection     = useSectionVisible();
   const problemSection      = useSectionVisible();
   const pillarsSection      = useSectionVisible();
@@ -1347,12 +1313,14 @@ export default function HomePage() {
         .hp-root { overflow-x:hidden; animation:pageReveal 0.8s ease both; }
         @keyframes pageReveal { from{opacity:0;transform:translateY(10px)} to{opacity:1;transform:translateY(0)} }
 
-        /* ── Divisions: 2-col on all screens, proper compact ── */
-        .hp-div-grid {
-          display:grid;
-          grid-template-columns:1fr 1fr;
-          gap:clamp(8px,2vw,28px);
-        }
+        /* ✅ Global keyframes used by all sections — defined here so they're
+           available the moment any section becomes visible, regardless of
+           which sub-component's style block has loaded. */
+        @keyframes sectionHeaderReveal { from{opacity:0;transform:translateY(28px) scale(0.97)} to{opacity:1;transform:translateY(0) scale(1)} }
+        @keyframes dotPulse { 0%,100%{transform:scale(1);opacity:1} 50%{transform:scale(1.6);opacity:0.7} }
+        @keyframes heroLine1 { from{opacity:0;transform:translateY(20px)} to{opacity:1;transform:translateY(0)} }
+
+        .hp-div-grid { display:grid; grid-template-columns:1fr 1fr; gap:clamp(8px,2vw,28px); }
         .hp-div-img { height:clamp(72px,14vw,208px); }
         .hp-div-body { padding:clamp(10px,2.5vw,40px); }
         .hp-div-h3 { font-size:clamp(0.9rem,2.5vw,2.5rem); font-weight:900; line-height:1.15; }
@@ -1360,40 +1328,31 @@ export default function HomePage() {
         .hp-div-feats { display:grid; grid-template-columns:1fr 1fr; gap:clamp(2px,0.6vw,12px); margin-bottom:clamp(8px,2vw,32px); }
         .hp-div-feat { font-size:clamp(0.58rem,1vw,0.88rem); font-weight:700; display:flex; align-items:center; gap:4px; color:rgba(203,213,225,0.85); }
 
-        /* ── Stats ── */
         .hp-stats { display:grid; grid-template-columns:repeat(3,1fr); gap:8px; }
         @media(min-width:500px){ .hp-stats { grid-template-columns:repeat(5,1fr); gap:14px; } }
         @media(min-width:1024px){ .hp-stats { display:flex; flex-wrap:wrap; gap:28px; } }
 
-        /* ── Hero buttons ── */
         .hp-hero-btns { display:grid; grid-template-columns:1fr 1fr; gap:10px; }
         @media(min-width:640px){ .hp-hero-btns { display:flex; flex-wrap:wrap; gap:14px; } }
 
-        /* ── Problem grid ── */
         .hp-problem-grid { display:grid; grid-template-columns:1fr; }
         @media(min-width:640px){ .hp-problem-grid { grid-template-columns:repeat(3,1fr); } }
 
-        /* ── Pillars ── */
         .hp-pillars-grid { display:grid; grid-template-columns:repeat(2,1fr); gap:clamp(6px,1.5vw,18px); }
         @media(min-width:1024px){ .hp-pillars-grid { grid-template-columns:repeat(4,1fr); } }
 
-        /* ── Solutions sub ── */
         .hp-sol-sub { display:grid; grid-template-columns:1fr 1fr; gap:clamp(8px,1.5vw,16px); }
         .hp-sol-sub-img { height:clamp(64px,12vw,160px); }
 
-        /* ── Testimonials ── */
         .hp-testi-grid { display:grid; grid-template-columns:1fr 1fr; gap:clamp(6px,1.5vw,20px); }
         @media(min-width:768px){ .hp-testi-grid { grid-template-columns:repeat(3,1fr); } }
 
-        /* ── Blog ── */
         .hp-blog-grid { display:grid; grid-template-columns:1fr 1fr; gap:clamp(6px,1.5vw,20px); }
         @media(min-width:1024px){ .hp-blog-grid { grid-template-columns:repeat(3,1fr); } }
 
-        /* ── CTA ── */
         .hp-cta-grid { display:grid; grid-template-columns:1fr 1fr; gap:clamp(8px,1.5vw,20px); max-width:900px; margin:0 auto; }
         @media(min-width:768px){ .hp-cta-grid { grid-template-columns:repeat(3,1fr); } }
 
-        /* ── Hero video ── */
         .hp-hero-vid { aspect-ratio:16/9; max-height:clamp(120px,30vw,400px); }
       `}</style>
 
@@ -1416,7 +1375,6 @@ export default function HomePage() {
               <span className="sm:hidden">Two Divisions. One Platform.</span>
             </div>
 
-            {/* CYCLING ANIMATED HEADLINES */}
             <CyclingHeroHeadline />
 
             <p className="text-sm sm:text-xl lg:text-2xl text-slate-300 max-w-3xl leading-relaxed mb-6 sm:mb-10 font-semibold" style={{ transition: "opacity 0.4s ease" }}>
@@ -1456,25 +1414,23 @@ export default function HomePage() {
           </div>
         </section>
 
-        {/* ★ Animated text slider (5-slide story) */}
+        {/* ★ Animated text slider */}
         <TextAnimSliderSection />
 
         {/* ═══════════════════════════════════════════════════════
             2. DIVISION BRIDGE — Cycling section headline
         ═══════════════════════════════════════════════════════ */}
-        <section id="divisions" ref={divisionSection.ref} className="relative bg-[#080c14] py-8 sm:py-14 lg:py-20 overflow-hidden">
+        <section id="divisions" ref={divisionSection.ref as React.RefCallback<HTMLElement>} className="relative bg-[#080c14] py-8 sm:py-14 lg:py-20 overflow-hidden">
           <div className="absolute inset-0 bg-[radial-gradient(ellipse_70%_50%_at_50%_50%,rgba(0,200,255,0.06),transparent)] pointer-events-none" />
           <div className="mx-auto w-full max-w-screen-xl px-4 sm:px-6 lg:px-12 relative z-10">
             <div className="text-center mb-6 sm:mb-10 lg:mb-14">
               <div className={`${pill} mb-4 sm:mb-6 mx-auto`} style={{ opacity: divisionSection.visible ? 1 : 0, animation: divisionSection.visible ? "sectionHeaderReveal 0.6s ease both" : "none" }}>Our Two Divisions</div>
-              {/* CYCLING ANIMATED SECTION HEADLINE */}
               <CyclingSectionHeading />
               <p className="text-xs sm:text-lg text-slate-400 max-w-2xl mx-auto leading-relaxed font-semibold mt-4" style={{ opacity: divisionSection.visible ? 1 : 0, animation: divisionSection.visible ? "sectionHeaderReveal 0.7s ease 0.3s both" : "none" }}>
                 Whether you need AI systems for your business or transformative learning for your people — Astralearnia has a dedicated division built specifically for it.
               </p>
             </div>
 
-            {/* ── Division cards: TRUE 2-col even on mobile ── */}
             <div className="hp-div-grid mb-8 sm:mb-8">
               {/* Technology */}
               <div className="group relative rounded-xl sm:rounded-2xl border border-cyan-400/20 hover:border-cyan-400/50 overflow-hidden bg-[#0a1020] transition-all duration-400 hover:shadow-[0_0_60px_rgba(0,200,255,0.18)] flex flex-col" style={{ opacity: divisionSection.visible ? 1 : 0, animation: divisionSection.visible ? "sectionHeaderReveal 0.7s ease 0.15s both" : "none" }}>
@@ -1495,7 +1451,7 @@ export default function HomePage() {
                     <span className="text-lg sm:text-4xl mt-0.5 sm:mt-1 shrink-0">⚡</span>
                   </div>
                   <p className="hp-div-p text-slate-300 mb-2 sm:mb-5 font-semibold flex-1">
-                    We design, build, and deploy custom AI systems that turn your organisation's data into decisions. From intelligent APIs to full automation pipelines — we are the technical backbone enterprises trust.
+                    We design, build, and deploy custom AI systems that turn your organisation&apos;s data into decisions. From intelligent APIs to full automation pipelines — we are the technical backbone enterprises trust.
                   </p>
                   <div className="hp-div-feats">
                     {["AI Model Dev","Decision Intel","API Platform","Data Automation","Enterprise Int.","Real-time AI"].map(f => (
@@ -1530,7 +1486,7 @@ export default function HomePage() {
                     <span className="text-lg sm:text-4xl mt-0.5 sm:mt-1 shrink-0">🎓</span>
                   </div>
                   <p className="hp-div-p text-slate-300 mb-2 sm:mb-5 font-semibold flex-1">
-                    We transform how people learn and grow. Our adaptive AI learning engine builds personalised pathways, measures skills in real time, and delivers certifications that matter in today's market.
+                    We transform how people learn and grow. Our adaptive AI learning engine builds personalised pathways, measures skills in real time, and delivers certifications that matter in today&apos;s market.
                   </p>
                   <div className="hp-div-feats">
                     {["Adaptive Paths","Corp Training","AI Certs","Skills Analytics","Instructor Tools","Dashboards"].map(f => (
@@ -1559,7 +1515,7 @@ export default function HomePage() {
         {/* ═══════════════════════════════════════════════════════
             3. PROBLEM → SOLUTION
         ═══════════════════════════════════════════════════════ */}
-        <section ref={problemSection.ref} className="relative bg-[#050810] py-8 sm:py-14 lg:py-20 overflow-hidden">
+        <section ref={problemSection.ref as React.RefCallback<HTMLElement>} className="relative bg-[#050810] py-8 sm:py-14 lg:py-20 overflow-hidden">
           <div className="mx-auto w-full max-w-screen-xl px-4 sm:px-6 lg:px-12 relative z-10">
             <div className="text-center mb-5 sm:mb-10">
               <div className={`${pill} mb-4 sm:mb-6 mx-auto`} style={{ opacity: problemSection.visible ? 1 : 0, animation: problemSection.visible ? "sectionHeaderReveal 0.6s ease both" : "none" }}>The Problem We Solve</div>
@@ -1592,7 +1548,7 @@ export default function HomePage() {
         {/* ═══════════════════════════════════════════════════════
             4. FOUR PILLARS
         ═══════════════════════════════════════════════════════ */}
-        <section ref={pillarsSection.ref} className="relative bg-[#080c14] py-8 sm:py-14 lg:py-18">
+        <section ref={pillarsSection.ref as React.RefCallback<HTMLElement>} className="relative bg-[#080c14] py-8 sm:py-14 lg:py-18">
           <div className="mx-auto w-full max-w-screen-xl px-4 sm:px-6 lg:px-12">
             <div className="text-center mb-5 sm:mb-10">
               <div className={`${pill} mb-4 sm:mb-6 mx-auto`} style={{ opacity: pillarsSection.visible ? 1 : 0, animation: pillarsSection.visible ? "sectionHeaderReveal 0.6s ease both" : "none" }}>Core Architecture</div>
@@ -1616,7 +1572,7 @@ export default function HomePage() {
         {/* ═══════════════════════════════════════════════════════
             5. SOLUTIONS GRID
         ═══════════════════════════════════════════════════════ */}
-        <section ref={solutionsSection.ref} className="relative bg-[#050810] py-8 sm:py-14 lg:py-20">
+        <section ref={solutionsSection.ref as React.RefCallback<HTMLElement>} className="relative bg-[#050810] py-8 sm:py-14 lg:py-20">
           <div className="absolute inset-0 bg-[radial-gradient(ellipse_60%_40%_at_80%_20%,rgba(120,40,255,0.08),transparent)] pointer-events-none" />
           <div className="mx-auto w-full max-w-screen-xl px-4 sm:px-6 lg:px-12 relative z-10">
             <div className="flex flex-col lg:flex-row lg:items-end justify-between gap-4 sm:gap-6 mb-5 sm:mb-10">
@@ -1681,7 +1637,7 @@ export default function HomePage() {
         {/* ═══════════════════════════════════════════════════════
             6. TESTIMONIALS
         ═══════════════════════════════════════════════════════ */}
-        <section ref={testimonialsSection.ref} className="relative bg-[#080c14] py-8 sm:py-12 lg:py-16 border-y border-white/5">
+        <section ref={testimonialsSection.ref as React.RefCallback<HTMLElement>} className="relative bg-[#080c14] py-8 sm:py-12 lg:py-16 border-y border-white/5">
           <div className="mx-auto w-full max-w-screen-xl px-4 sm:px-6 lg:px-12">
             <div className="text-center mb-6 sm:mb-8">
               <div className={`${pill} mb-3 sm:mb-5 mx-auto`} style={{ opacity: testimonialsSection.visible ? 1 : 0, animation: testimonialsSection.visible ? "sectionHeaderReveal 0.6s ease both" : "none" }}>Client Results</div>
@@ -1710,7 +1666,7 @@ export default function HomePage() {
         {/* ═══════════════════════════════════════════════════════
             7. BLOG
         ═══════════════════════════════════════════════════════ */}
-        <section ref={blogSection.ref} className="relative bg-[#050810] py-8 sm:py-14 lg:py-20">
+        <section ref={blogSection.ref as React.RefCallback<HTMLElement>} className="relative bg-[#050810] py-8 sm:py-14 lg:py-20">
           <div className="mx-auto w-full max-w-screen-xl px-4 sm:px-6 lg:px-12">
             <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 sm:gap-6 mb-5 sm:mb-10">
               <div>
@@ -1750,7 +1706,7 @@ export default function HomePage() {
         {/* ═══════════════════════════════════════════════════════
             8. FINAL CTA
         ═══════════════════════════════════════════════════════ */}
-        <section ref={ctaSection.ref} className="relative bg-[#080c14] py-8 sm:py-14 lg:py-20 overflow-hidden">
+        <section ref={ctaSection.ref as React.RefCallback<HTMLElement>} className="relative bg-[#080c14] py-8 sm:py-14 lg:py-20 overflow-hidden">
           <div className="absolute inset-0 pointer-events-none">
             <div className="absolute inset-0 bg-[radial-gradient(ellipse_80%_60%_at_50%_50%,rgba(0,200,255,0.1),transparent)]" />
             <div className="absolute inset-0 bg-[radial-gradient(ellipse_50%_40%_at_50%_100%,rgba(130,50,255,0.08),transparent)]" />
