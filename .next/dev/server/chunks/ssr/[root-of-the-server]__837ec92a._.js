@@ -1002,20 +1002,20 @@ const SECTIONS = [
                 href: "/terms"
             },
             {
-                label: "Security",
-                href: "/security"
-            },
-            {
-                label: "Compliance",
-                href: "/privacy"
-            },
-            {
                 label: "Cookie Policy",
                 href: "/cookies"
             },
             {
+                label: "Compliance",
+                href: "/compliance"
+            },
+            {
                 label: "Data Processing",
                 href: "/dpa"
+            },
+            {
+                label: "Security",
+                href: "/security"
             }
         ]
     }

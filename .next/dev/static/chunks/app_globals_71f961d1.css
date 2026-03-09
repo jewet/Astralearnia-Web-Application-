@@ -924,6 +924,10 @@ h3 {
   height: 1px;
 }
 
+.h-32 {
+  height: 8rem;
+}
+
 .max-h-\[240px\] {
   max-height: 240px;
 }
@@ -1504,6 +1508,10 @@ h3 {
   border-radius: .75rem;
 }
 
+.rounded-md {
+  border-radius: .375rem;
+}
+
 .rounded-b-2xl {
   border-bottom-right-radius: 16px;
   border-bottom-left-radius: 16px;
@@ -1517,6 +1525,10 @@ h3 {
 .rounded-t-2xl {
   border-top-left-radius: 16px;
   border-top-right-radius: 16px;
+}
+
+.rounded-bl-none {
+  border-bottom-left-radius: 0;
 }
 
 .border {
@@ -2753,6 +2765,11 @@ h3 {
   padding-bottom: 1.5rem;
 }
 
+.py-8 {
+  padding-top: 2rem;
+  padding-bottom: 2rem;
+}
+
 .pb-1 {
   padding-bottom: .25rem;
 }
@@ -2855,6 +2872,10 @@ h3 {
 
 .pt-8 {
   padding-top: 2rem;
+}
+
+.pt-14 {
+  padding-top: 3.5rem;
 }
 
 .text-left {
@@ -3083,6 +3104,10 @@ h3 {
 
 .uppercase {
   text-transform: uppercase;
+}
+
+.capitalize {
+  text-transform: capitalize;
 }
 
 .italic {
@@ -4465,6 +4490,10 @@ h3 {
     margin-top: .5rem;
   }
 
+  .sm\:mt-1 {
+    margin-top: .25rem;
+  }
+
   .sm\:block {
     display: block;
   }
@@ -4673,6 +4702,10 @@ h3 {
     border-radius: 0;
   }
 
+  .sm\:rounded-lg {
+    border-radius: .5rem;
+  }
+
   .sm\:rounded-l-2xl {
     border-top-left-radius: 16px;
     border-bottom-left-radius: 16px;
@@ -4814,6 +4847,16 @@ h3 {
     padding-bottom: 1.75rem;
   }
 
+  .sm\:py-12 {
+    padding-top: 3rem;
+    padding-bottom: 3rem;
+  }
+
+  .sm\:py-14 {
+    padding-top: 3.5rem;
+    padding-bottom: 3.5rem;
+  }
+
   .sm\:pb-12 {
     padding-bottom: 3rem;
   }
@@ -4864,6 +4907,18 @@ h3 {
 
   .sm\:pt-9 {
     padding-top: 2.25rem;
+  }
+
+  .sm\:pb-10 {
+    padding-bottom: 2.5rem;
+  }
+
+  .sm\:pt-18 {
+    padding-top: 72px;
+  }
+
+  .sm\:pt-7 {
+    padding-top: 1.75rem;
   }
 
   .sm\:text-left {
@@ -5027,6 +5082,10 @@ h3 {
     margin-bottom: 5rem;
   }
 
+  .lg\:mb-14 {
+    margin-bottom: 3.5rem;
+  }
+
   .lg\:block {
     display: block;
   }
@@ -5163,12 +5222,31 @@ h3 {
     padding-right: 2rem;
   }
 
+  .lg\:py-16 {
+    padding-top: 4rem;
+    padding-bottom: 4rem;
+  }
+
+  .lg\:py-18 {
+    padding-top: 72px;
+    padding-bottom: 72px;
+  }
+
+  .lg\:py-20 {
+    padding-top: 5rem;
+    padding-bottom: 5rem;
+  }
+
   .lg\:pb-20 {
     padding-bottom: 5rem;
   }
 
   .lg\:pt-32 {
     padding-top: 8rem;
+  }
+
+  .lg\:pt-24 {
+    padding-top: 6rem;
   }
 
   .lg\:text-right {
@@ -5221,6 +5299,10 @@ h3 {
 
   .lg\:\[grid-template-columns\:1fr_1fr\] {
     grid-template-columns: 1fr 1fr;
+  }
+
+  .lg\:\!\[grid-template-columns\:5fr_7fr\] {
+    grid-template-columns: 5fr 7fr !important;
   }
 }
 
