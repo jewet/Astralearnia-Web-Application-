@@ -14439,3 +14439,4 @@ It can also happen if the client has a browser extension installed which messes 
 [24:28:33.724] Browser WARN    Detected `scroll-behavior: smooth` on the `<html>` element. To disable smooth scrolling during route transitions, add `data-scroll-behavior="smooth"` to your <html> element. Learn more: https://nextjs.org/docs/messages/missing-data-scroll-behavior
 [24:29:20.326] Server  LOG     ○ Compiling /solutions ...
 [24:29:44.408] Server  LOG     ✓ Finished writing to filesystem cache in 13.4s
+[24:33:05.248] Browser INFO    %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold

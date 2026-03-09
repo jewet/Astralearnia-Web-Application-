@@ -1177,11 +1177,11 @@ function ContactSection() {
             <div style={{ background: "rgba(13,22,34,0.5)", border: "1px solid rgba(255,255,255,0.08)", borderRadius: 14, padding: "clamp(14px,2.5vw,20px)" }}>
               <div style={{ fontSize: "clamp(0.7rem,1vw,0.8rem)", fontWeight: 900, color: "rgba(148,163,184,0.55)", letterSpacing: "0.18em", textTransform: "uppercase", marginBottom: 12, fontFamily: "monospace" }}>Explore Divisions</div>
               <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 10 }}>
-                <Link href="/divisions/technology" style={{ textDecoration: "none", display: "block", background: "rgba(0,200,255,0.06)", border: "1px solid rgba(0,200,255,0.2)", borderRadius: 10, padding: "10px 12px", textAlign: "center" }}>
+                <Link href="/technologies" style={{ textDecoration: "none", display: "block", background: "rgba(0,200,255,0.06)", border: "1px solid rgba(0,200,255,0.2)", borderRadius: 10, padding: "10px 12px", textAlign: "center" }}>
                   <div style={{ fontSize: 20, marginBottom: 4 }}>⚡</div>
                   <div style={{ fontSize: "clamp(0.65rem,1vw,0.78rem)", fontWeight: 900, color: "#22d3ee" }}>Technology</div>
                 </Link>
-                <Link href="/divisions/institute" style={{ textDecoration: "none", display: "block", background: "rgba(160,100,255,0.06)", border: "1px solid rgba(160,100,255,0.2)", borderRadius: 10, padding: "10px 12px", textAlign: "center" }}>
+                <Link href="/institute" style={{ textDecoration: "none", display: "block", background: "rgba(160,100,255,0.06)", border: "1px solid rgba(160,100,255,0.2)", borderRadius: 10, padding: "10px 12px", textAlign: "center" }}>
                   <div style={{ fontSize: 20, marginBottom: 4 }}>🎓</div>
                   <div style={{ fontSize: "clamp(0.65rem,1vw,0.78rem)", fontWeight: 900, color: "#a78bfa" }}>Institute</div>
                 </Link>
