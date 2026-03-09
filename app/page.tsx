@@ -745,14 +745,19 @@ function CyclingHeroHeadline() {
 // CYCLING SECTION HEADING
 // ═══════════════════════════════════════════════════════════════════════════════
 function CyclingSectionHeading({ className }: { className?: string }) {
-  const [idx, setIdx] = useState(0);
+  const [idx, setIdx]         = useState(0);
+  const [animKey, setAnimKey] = useState(0);
   const [visible, setVisible] = useState(true);
   const r = DIVISION_ROTATIONS[idx];
 
   useEffect(() => {
     const t = setInterval(() => {
       setVisible(false);
-      setTimeout(() => { setIdx(p => (p + 1) % DIVISION_ROTATIONS.length); setVisible(true); }, 500);
+      setTimeout(() => {
+        setIdx(p => (p + 1) % DIVISION_ROTATIONS.length);
+        setAnimKey(k => k + 1);
+        setVisible(true);
+      }, 420);
     }, 5200);
     return () => clearInterval(t);
   }, []);
@@ -764,10 +769,12 @@ function CyclingSectionHeading({ className }: { className?: string }) {
       minHeight: "clamp(60px,12vw,140px)",
       display: "flex", alignItems: "center", justifyContent: "center",
     }}>
-      <span style={{
+      <span key={animKey} style={{
         backgroundImage: `linear-gradient(135deg,${r.accent},#a78bfa)`,
         backgroundClip: "text", WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent",
-        opacity: visible ? 1 : 0, transition: "opacity 0.35s ease",
+        opacity: visible ? 1 : 0,
+        transition: "opacity 0.38s ease",
+        display: "inline-block",
       }}>
         <AnimatedLine text={r.line} anim={r.anim} accent={r.accent} visible={visible} />
       </span>
@@ -1442,8 +1449,13 @@ export default function HomePage() {
                 <span style={{ width:7, height:7, borderRadius:"50%", background:"#22d3ee", boxShadow:"0 0 8px #22d3ee", animation:"dotPulse 1.4s ease-in-out infinite", flexShrink:0, display:"inline-block" }} />
                 ◈ Our Two Divisions
               </div>
-              <CyclingSectionHeading />
-              <p className="text-xs sm:text-lg text-slate-400 max-w-2xl mx-auto leading-relaxed font-semibold mt-4" style={{ opacity: divisionSection.visible ? 1 : 0, animation: divisionSection.visible ? "sectionHeaderReveal 0.7s ease 0.3s both" : "none" }}>
+              <h2 className="text-3xl sm:text-5xl lg:text-6xl font-black tracking-tight leading-tight mt-2 mb-3" style={{ opacity: divisionSection.visible ? 1 : 0, animation: divisionSection.visible ? "sectionHeaderReveal 0.75s cubic-bezier(0.22,1,0.36,1) 0.1s both" : "none" }}>
+                Two Divisions.{" "}
+                <span style={{ background: "linear-gradient(135deg,#22d3ee,#a78bfa,#e879f9)", WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent", backgroundClip: "text" }}>
+                  One Platform.
+                </span>
+              </h2>
+              <p className="text-xs sm:text-lg text-slate-400 max-w-2xl mx-auto leading-relaxed font-semibold mt-4" style={{ opacity: divisionSection.visible ? 1 : 0, animation: divisionSection.visible ? "sectionHeaderReveal 0.7s ease 0.25s both" : "none" }}>
                 Whether you need AI systems for your business or transformative learning for your people — Astralearnia has a dedicated division built specifically for it.
               </p>
             </div>

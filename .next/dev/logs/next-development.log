@@ -14422,3 +14422,7 @@ It can also happen if the client has a browser extension installed which messes 
 [24:01:55.051] Server  LOG     ✓ Compiled in 23ms
 [24:01:57.494] Browser INFO    %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
 [24:02:03.363] Server  LOG     ✓ Finished filesystem cache database compaction in 32.9s
+[24:12:27.503] Server  LOG     ✓ Compiled in 2.5s
+[24:12:42.028] Browser INFO    %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
+[24:15:42.334] Server  LOG     ✓ Compiled in 1343ms
+[24:15:49.854] Browser INFO    %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
