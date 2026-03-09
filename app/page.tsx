@@ -1486,7 +1486,7 @@ export default function HomePage() {
                     ))}
                   </div>
                   <div style={{ display:"flex", flexDirection:"column", gap:"clamp(7px,1vw,10px)" }}>
-                    <Link href="/divisions/technology" className={`${btnCyan} w-full`}>Explore Technology →</Link>
+                    <Link href="/technologies" className={`${btnCyan} w-full`}>Explore Technology →</Link>
                     <button onClick={() => setModalOpen(true)} className={`${btnGhost} w-full`}>Compare Divisions</button>
                   </div>
                 </div>
@@ -1517,7 +1517,7 @@ export default function HomePage() {
                     ))}
                   </div>
                   <div style={{ display:"flex", flexDirection:"column", gap:"clamp(7px,1vw,10px)" }}>
-                    <Link href="/divisions/institute" className={`${btnViolet} w-full`}>Explore Institute →</Link>
+                    <Link href="/institute" className={`${btnViolet} w-full`}>Explore Institute →</Link>
                     <button onClick={() => setModalOpen(true)} className={`${btnGhost} w-full`}>Compare Divisions</button>
                   </div>
                 </div>
