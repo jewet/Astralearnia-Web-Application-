@@ -253,6 +253,14 @@ function RobotIntro({ onComplete }: { onComplete: () => void }) {
   const [phase, setPhase] = useState<RobotPhase>("enter");
   const [starData, setStarData] = useState<StarData[]>([]);
   const [showShards, setShowShards] = useState(false);
+  const [isMobile, setIsMobile] = useState(false);
+
+  useEffect(() => {
+    const checkMobile = () => setIsMobile(window.innerWidth < 640);
+    checkMobile();
+    window.addEventListener("resize", checkMobile);
+    return () => window.removeEventListener("resize", checkMobile);
+  }, []);
 
   useEffect(() => {
     setStarData(Array.from({ length: 55 }, () => ({
@@ -359,17 +367,19 @@ function RobotIntro({ onComplete }: { onComplete: () => void }) {
       {/* Technology Division Card */}
       <div style={{
         position: "absolute",
-        bottom: "24%",
-        right: techCardVisible ? "clamp(24px,12vw,180px)" : "-340px",
-        transitionProperty: techCardVisible ? "right, opacity, filter" : "none",
-        transitionDuration: "0.7s, 0.5s, 0.3s",
-        transitionTimingFunction: "cubic-bezier(0.34,1.56,0.64,1), ease, ease",
+        bottom: isMobile ? (techCardVisible ? "3%" : "-200px") : "24%",
+        right: isMobile
+          ? (techCardVisible ? "calc(50% + 6px)" : "100vw")
+          : (techCardVisible ? "clamp(24px,12vw,180px)" : "-340px"),
+        transitionProperty: "right, bottom, opacity, filter",
+        transitionDuration: "0.7s, 0.7s, 0.5s, 0.3s",
+        transitionTimingFunction: "cubic-bezier(0.34,1.56,0.64,1), cubic-bezier(0.34,1.56,0.64,1), ease, ease",
         opacity: (phase === "crystallize" || phase === "fadeOut") ? 0 : (techCardVisible ? 1 : 0),
         zIndex: 11,
         filter: isCrystal ? "brightness(1.5) saturate(3) hue-rotate(180deg)" : "none",
       }}>
         <div style={{
-          width: "clamp(160px,22vw,260px)",
+          width: isMobile ? "calc(46vw - 8px)" : "clamp(160px,22vw,260px)",
           background: "rgba(0,20,40,0.95)",
           border: "1.5px solid rgba(0,200,255,0.55)",
           borderRadius: 16,
@@ -405,17 +415,19 @@ function RobotIntro({ onComplete }: { onComplete: () => void }) {
       {/* Institute Division Card */}
       <div style={{
         position: "absolute",
-        bottom: "24%",
-        left: instCardVisible ? "clamp(24px,12vw,180px)" : "-340px",
-        transitionProperty: instCardVisible ? "left, opacity, filter" : "none",
-        transitionDuration: "0.7s, 0.5s, 0.3s",
-        transitionTimingFunction: "cubic-bezier(0.34,1.56,0.64,1), ease, ease",
+        bottom: isMobile ? (instCardVisible ? "3%" : "-200px") : "24%",
+        left: isMobile
+          ? (instCardVisible ? "4px" : "-100vw")
+          : (instCardVisible ? "clamp(24px,12vw,180px)" : "-340px"),
+        transitionProperty: "left, bottom, opacity, filter",
+        transitionDuration: "0.7s, 0.7s, 0.5s, 0.3s",
+        transitionTimingFunction: "cubic-bezier(0.34,1.56,0.64,1), cubic-bezier(0.34,1.56,0.64,1), ease, ease",
         opacity: (phase === "crystallize" || phase === "fadeOut") ? 0 : (instCardVisible ? 1 : 0),
         zIndex: 11,
         filter: isCrystal ? "brightness(1.5) saturate(3) hue-rotate(240deg)" : "none",
       }}>
         <div style={{
-          width: "clamp(160px,22vw,260px)",
+          width: isMobile ? "calc(46vw - 8px)" : "clamp(160px,22vw,260px)",
           background: "rgba(15,8,30,0.95)",
           border: "1.5px solid rgba(160,100,255,0.55)",
           borderRadius: 16,
@@ -812,13 +824,14 @@ function TextAnimSliderSection() {
         <div style={{ display: "flex", alignItems: "center", flexWrap: "wrap", gap: 10, marginBottom: "clamp(24px,4vw,48px)" }}>
           <div style={{
             display: "inline-flex", alignItems: "center", gap: 8, padding: "5px 14px", borderRadius: 99,
-            border: "1px solid rgba(255,255,255,0.18)", background: "rgba(255,255,255,0.04)",
+            border: `1px solid ${msg.accent}40`, background: `${msg.accent}08`,
             fontSize: "clamp(9px,1.1vw,11px)", fontWeight: 900, letterSpacing: "0.2em", textTransform: "uppercase" as const, color: "#fff",
             opacity: sectionVisible ? 1 : 0,
             animation: sectionVisible ? "sectionHeaderReveal 0.6s ease both" : "none",
+            transition: "border-color 0.5s ease, background 0.5s ease",
           }}>
-            <span style={{ width: 7, height: 7, borderRadius: "50%", background: msg.accent, boxShadow: `0 0 8px ${msg.accent}`, animation: "dotPulse 1.4s ease-in-out infinite", flexShrink: 0 }} />
-            {msg.eyebrow}
+            <span style={{ width: 7, height: 7, borderRadius: "50%", background: msg.accent, boxShadow: `0 0 10px ${msg.accent}`, animation: "dotPulse 1.4s ease-in-out infinite", flexShrink: 0 }} />
+            ◈ {msg.eyebrow}
           </div>
           <div style={{
             padding: "4px 10px", borderRadius: 6, border: `1px solid ${msg.accent}35`, background: `${msg.accent}10`,
@@ -1320,13 +1333,14 @@ export default function HomePage() {
         @keyframes dotPulse { 0%,100%{transform:scale(1);opacity:1} 50%{transform:scale(1.6);opacity:0.7} }
         @keyframes heroLine1 { from{opacity:0;transform:translateY(20px)} to{opacity:1;transform:translateY(0)} }
 
-        .hp-div-grid { display:grid; grid-template-columns:1fr 1fr; gap:clamp(8px,2vw,28px); }
-        .hp-div-img { height:clamp(72px,14vw,208px); }
-        .hp-div-body { padding:clamp(10px,2.5vw,40px); }
-        .hp-div-h3 { font-size:clamp(0.9rem,2.5vw,2.5rem); font-weight:900; line-height:1.15; }
-        .hp-div-p { font-size:clamp(0.65rem,1.4vw,1.05rem); line-height:1.6; }
-        .hp-div-feats { display:grid; grid-template-columns:1fr 1fr; gap:clamp(2px,0.6vw,12px); margin-bottom:clamp(8px,2vw,32px); }
-        .hp-div-feat { font-size:clamp(0.58rem,1vw,0.88rem); font-weight:700; display:flex; align-items:center; gap:4px; color:rgba(203,213,225,0.85); }
+        .hp-div-grid { display:grid; grid-template-columns:1fr; gap:clamp(12px,2vw,24px); }
+        @media(min-width:640px){ .hp-div-grid { grid-template-columns:1fr 1fr; } }
+        .hp-div-card { display:flex; flex-direction:column; padding:clamp(18px,3vw,36px); position:relative; overflow:hidden; }
+        .hp-div-h3 { font-size:clamp(1.9rem,4.5vw,3.4rem); font-weight:900; line-height:1.0; letter-spacing:-0.03em; margin-bottom:clamp(6px,1vw,10px); }
+        .hp-div-tagline { font-size:clamp(0.62rem,1.1vw,0.8rem); font-weight:900; letter-spacing:0.1em; text-transform:uppercase; font-family:monospace; margin-bottom:clamp(10px,1.8vw,18px); }
+        .hp-div-p { font-size:clamp(0.78rem,1.3vw,0.98rem); line-height:1.65; font-weight:600; margin-bottom:clamp(14px,2vw,22px); flex:1; }
+        .hp-div-feats { display:grid; grid-template-columns:1fr 1fr; gap:clamp(5px,0.8vw,11px); margin-bottom:clamp(14px,2.5vw,24px); }
+        .hp-div-feat { font-size:clamp(0.62rem,1vw,0.84rem); font-weight:700; display:flex; align-items:center; gap:5px; color:rgba(203,213,225,0.85); }
 
         .hp-stats { display:grid; grid-template-columns:repeat(3,1fr); gap:8px; }
         @media(min-width:500px){ .hp-stats { grid-template-columns:repeat(5,1fr); gap:14px; } }
@@ -1424,7 +1438,10 @@ export default function HomePage() {
           <div className="absolute inset-0 bg-[radial-gradient(ellipse_70%_50%_at_50%_50%,rgba(0,200,255,0.06),transparent)] pointer-events-none" />
           <div className="mx-auto w-full max-w-screen-xl px-4 sm:px-6 lg:px-12 relative z-10">
             <div className="text-center mb-6 sm:mb-10 lg:mb-14">
-              <div className={`${pill} mb-4 sm:mb-6 mx-auto`} style={{ opacity: divisionSection.visible ? 1 : 0, animation: divisionSection.visible ? "sectionHeaderReveal 0.6s ease both" : "none" }}>Our Two Divisions</div>
+              <div className={`${pill} mb-4 sm:mb-6 mx-auto`} style={{ opacity: divisionSection.visible ? 1 : 0, animation: divisionSection.visible ? "sectionHeaderReveal 0.6s ease both" : "none" }}>
+                <span style={{ width:7, height:7, borderRadius:"50%", background:"#22d3ee", boxShadow:"0 0 8px #22d3ee", animation:"dotPulse 1.4s ease-in-out infinite", flexShrink:0, display:"inline-block" }} />
+                ◈ Our Two Divisions
+              </div>
               <CyclingSectionHeading />
               <p className="text-xs sm:text-lg text-slate-400 max-w-2xl mx-auto leading-relaxed font-semibold mt-4" style={{ opacity: divisionSection.visible ? 1 : 0, animation: divisionSection.visible ? "sectionHeaderReveal 0.7s ease 0.3s both" : "none" }}>
                 Whether you need AI systems for your business or transformative learning for your people — Astralearnia has a dedicated division built specifically for it.
@@ -1433,81 +1450,78 @@ export default function HomePage() {
 
             <div className="hp-div-grid mb-8 sm:mb-8">
               {/* Technology */}
-              <div className="group relative rounded-xl sm:rounded-2xl border border-cyan-400/20 hover:border-cyan-400/50 overflow-hidden bg-[#0a1020] transition-all duration-400 hover:shadow-[0_0_60px_rgba(0,200,255,0.18)] flex flex-col" style={{ opacity: divisionSection.visible ? 1 : 0, animation: divisionSection.visible ? "sectionHeaderReveal 0.7s ease 0.15s both" : "none" }}>
-                <div className="hp-div-img w-full bg-gradient-to-br from-cyan-900/25 to-blue-900/15 border-b border-cyan-400/15 flex items-center justify-center relative overflow-hidden">
-                  <div className="text-center text-slate-700 pointer-events-none select-none">
-                    <div className="text-xl sm:text-5xl mb-1 text-cyan-400/20">🖼</div>
-                    <p className="text-[8px] sm:text-xs font-black uppercase tracking-widest">Technology Division</p>
+              <div className="group relative rounded-2xl border border-cyan-400/25 hover:border-cyan-400/55 bg-[#060e1a] transition-all duration-500 hover:shadow-[0_0_70px_rgba(0,200,255,0.22)]" style={{ opacity: divisionSection.visible ? 1 : 0, animation: divisionSection.visible ? "sectionHeaderReveal 0.7s ease 0.15s both" : "none" }}>
+                <div className="absolute top-0 left-0 right-0 h-[2px] rounded-t-2xl bg-gradient-to-r from-transparent via-cyan-400 to-transparent opacity-50 group-hover:opacity-100 transition-opacity duration-500" />
+                <div className="absolute inset-0 rounded-2xl pointer-events-none" style={{ background:"radial-gradient(ellipse 80% 60% at 10% 10%,rgba(0,200,255,0.05),transparent)" }} />
+                <div className="hp-div-card">
+                  <div style={{ display:"flex", alignItems:"flex-start", justifyContent:"space-between", marginBottom:"clamp(16px,2.5vw,28px)" }}>
+                    <div className="inline-flex px-3 py-1 rounded-lg bg-cyan-400/10 border border-cyan-400/20 text-cyan-300 text-[10px] font-black uppercase tracking-widest">Division 01</div>
+                    <div style={{ width:"clamp(48px,5.5vw,68px)", height:"clamp(48px,5.5vw,68px)", borderRadius:"50%", background:"rgba(0,200,255,0.1)", border:"2px solid rgba(0,200,255,0.35)", display:"flex", alignItems:"center", justifyContent:"center", fontSize:"clamp(22px,3vw,32px)", boxShadow:"0 0 30px rgba(0,200,255,0.25)", flexShrink:0, transition:"box-shadow 0.3s ease" }}>⚡</div>
                   </div>
-                  <div className="absolute inset-0 bg-gradient-to-t from-[#0a1020] via-[#0a1020]/20 to-transparent" />
-                  <div className="absolute top-0 left-0 right-0 h-[2px] bg-gradient-to-r from-transparent via-cyan-400 to-transparent opacity-60 group-hover:opacity-100 transition-opacity" />
-                </div>
-                <div className="hp-div-body flex flex-col flex-1">
-                  <div className="flex items-start justify-between mb-2 sm:mb-4">
-                    <div>
-                      <div className="inline-flex px-1.5 sm:px-3 py-0.5 sm:py-1 rounded-md sm:rounded-lg bg-cyan-400/10 border border-cyan-400/20 text-cyan-300 text-[7px] sm:text-xs font-black uppercase tracking-widest mb-1.5 sm:mb-3">Division 01</div>
-                      <h3 className="hp-div-h3 text-white leading-tight">Astralearnia<br />Technology</h3>
-                    </div>
-                    <span className="text-lg sm:text-4xl mt-0.5 sm:mt-1 shrink-0">⚡</span>
-                  </div>
-                  <p className="hp-div-p text-slate-300 mb-2 sm:mb-5 font-semibold flex-1">
-                    We design, build, and deploy custom AI systems that turn your organisation&apos;s data into decisions. From intelligent APIs to full automation pipelines — we are the technical backbone enterprises trust.
+                  <h3 className="hp-div-h3 text-white">
+                    Astralearnia<br />
+                    <span style={{ background:"linear-gradient(135deg,#22d3ee,#60a5fa)", WebkitBackgroundClip:"text", WebkitTextFillColor:"transparent", backgroundClip:"text" }}>Technology</span>
+                  </h3>
+                  <p className="hp-div-tagline" style={{ color:"rgba(0,200,255,0.8)" }}>AI Systems. Built to Scale.</p>
+                  <p className="hp-div-p text-slate-300">
+                    Custom AI models, intelligent automation, and enterprise APIs that turn data into decisions — deployed in under 48 hours.
                   </p>
                   <div className="hp-div-feats">
-                    {["AI Model Dev","Decision Intel","API Platform","Data Automation","Enterprise Int.","Real-time AI"].map(f => (
+                    {["AI Model Dev","Decision Intel","API Platform","Automation","Robotics","Real-time AI"].map(f => (
                       <div key={f} className="hp-div-feat">
-                        <span className="w-1 h-1 sm:w-1.5 sm:h-1.5 rounded-full bg-cyan-400 shrink-0" />{f}
+                        <span style={{ width:5, height:5, borderRadius:"50%", background:"#22d3ee", flexShrink:0, display:"inline-block" }} />{f}
                       </div>
                     ))}
                   </div>
-                  <div className="flex flex-col gap-1.5 sm:gap-2">
-                    <Link href="/divisions/technology" className={`${btnCyan} w-full text-xs sm:text-base`}>Explore Technology →</Link>
-                    <button onClick={() => setModalOpen(true)} className={`${btnGhost} w-full text-xs sm:text-base`}>Compare Divisions</button>
+                  <div style={{ display:"flex", flexDirection:"column", gap:"clamp(7px,1vw,10px)" }}>
+                    <Link href="/divisions/technology" className={`${btnCyan} w-full`}>Explore Technology →</Link>
+                    <button onClick={() => setModalOpen(true)} className={`${btnGhost} w-full`}>Compare Divisions</button>
                   </div>
                 </div>
               </div>
 
               {/* Institute */}
-              <div className="group relative rounded-xl sm:rounded-2xl border border-violet-400/20 hover:border-violet-400/50 overflow-hidden bg-[#0e0a1a] transition-all duration-400 hover:shadow-[0_0_60px_rgba(160,80,255,0.18)] flex flex-col" style={{ opacity: divisionSection.visible ? 1 : 0, animation: divisionSection.visible ? "sectionHeaderReveal 0.7s ease 0.25s both" : "none" }}>
-                <div className="hp-div-img w-full bg-gradient-to-br from-violet-900/25 to-fuchsia-900/15 border-b border-violet-400/15 flex items-center justify-center relative overflow-hidden">
-                  <div className="text-center text-slate-700 pointer-events-none select-none">
-                    <div className="text-xl sm:text-5xl mb-1 text-violet-400/20">🖼</div>
-                    <p className="text-[8px] sm:text-xs font-black uppercase tracking-widest">Institute Division</p>
+              <div className="group relative rounded-2xl border border-violet-400/25 hover:border-violet-400/55 bg-[#090614] transition-all duration-500 hover:shadow-[0_0_70px_rgba(160,80,255,0.22)]" style={{ opacity: divisionSection.visible ? 1 : 0, animation: divisionSection.visible ? "sectionHeaderReveal 0.7s ease 0.25s both" : "none" }}>
+                <div className="absolute top-0 left-0 right-0 h-[2px] rounded-t-2xl bg-gradient-to-r from-transparent via-violet-400 to-transparent opacity-50 group-hover:opacity-100 transition-opacity duration-500" />
+                <div className="absolute inset-0 rounded-2xl pointer-events-none" style={{ background:"radial-gradient(ellipse 80% 60% at 10% 10%,rgba(160,80,255,0.06),transparent)" }} />
+                <div className="hp-div-card">
+                  <div style={{ display:"flex", alignItems:"flex-start", justifyContent:"space-between", marginBottom:"clamp(16px,2.5vw,28px)" }}>
+                    <div className="inline-flex px-3 py-1 rounded-lg bg-violet-400/10 border border-violet-400/20 text-violet-300 text-[10px] font-black uppercase tracking-widest">Division 02</div>
+                    <div style={{ width:"clamp(48px,5.5vw,68px)", height:"clamp(48px,5.5vw,68px)", borderRadius:"50%", background:"rgba(160,80,255,0.1)", border:"2px solid rgba(160,80,255,0.35)", display:"flex", alignItems:"center", justifyContent:"center", fontSize:"clamp(22px,3vw,32px)", boxShadow:"0 0 30px rgba(160,80,255,0.25)", flexShrink:0, transition:"box-shadow 0.3s ease" }}>🎓</div>
                   </div>
-                  <div className="absolute inset-0 bg-gradient-to-t from-[#0e0a1a] via-[#0e0a1a]/20 to-transparent" />
-                  <div className="absolute top-0 left-0 right-0 h-[2px] bg-gradient-to-r from-transparent via-violet-400 to-transparent opacity-60 group-hover:opacity-100 transition-opacity" />
-                </div>
-                <div className="hp-div-body flex flex-col flex-1">
-                  <div className="flex items-start justify-between mb-2 sm:mb-4">
-                    <div>
-                      <div className="inline-flex px-1.5 sm:px-3 py-0.5 sm:py-1 rounded-md sm:rounded-lg bg-violet-400/10 border border-violet-400/20 text-violet-300 text-[7px] sm:text-xs font-black uppercase tracking-widest mb-1.5 sm:mb-3">Division 02</div>
-                      <h3 className="hp-div-h3 text-white leading-tight">Astralearnia<br />Institute</h3>
-                    </div>
-                    <span className="text-lg sm:text-4xl mt-0.5 sm:mt-1 shrink-0">🎓</span>
-                  </div>
-                  <p className="hp-div-p text-slate-300 mb-2 sm:mb-5 font-semibold flex-1">
-                    We transform how people learn and grow. Our adaptive AI learning engine builds personalised pathways, measures skills in real time, and delivers certifications that matter in today&apos;s market.
+                  <h3 className="hp-div-h3 text-white">
+                    Astralearnia<br />
+                    <span style={{ background:"linear-gradient(135deg,#a78bfa,#e879f9)", WebkitBackgroundClip:"text", WebkitTextFillColor:"transparent", backgroundClip:"text" }}>Institute</span>
+                  </h3>
+                  <p className="hp-div-tagline" style={{ color:"rgba(167,139,250,0.8)" }}>Learn. Adapt. Evolve.</p>
+                  <p className="hp-div-p text-slate-300">
+                    Adaptive AI learning paths, real-time skills analytics, and certifications — personalised for every team member from day one.
                   </p>
                   <div className="hp-div-feats">
                     {["Adaptive Paths","Corp Training","AI Certs","Skills Analytics","Instructor Tools","Dashboards"].map(f => (
                       <div key={f} className="hp-div-feat">
-                        <span className="w-1 h-1 sm:w-1.5 sm:h-1.5 rounded-full bg-violet-400 shrink-0" />{f}
+                        <span style={{ width:5, height:5, borderRadius:"50%", background:"#a78bfa", flexShrink:0, display:"inline-block" }} />{f}
                       </div>
                     ))}
                   </div>
-                  <div className="flex flex-col gap-1.5 sm:gap-2">
-                    <Link href="/divisions/institute" className={`${btnViolet} w-full text-xs sm:text-base`}>Explore Institute →</Link>
-                    <button onClick={() => setModalOpen(true)} className={`${btnGhost} w-full text-xs sm:text-base`}>Compare Divisions</button>
+                  <div style={{ display:"flex", flexDirection:"column", gap:"clamp(7px,1vw,10px)" }}>
+                    <Link href="/divisions/institute" className={`${btnViolet} w-full`}>Explore Institute →</Link>
+                    <button onClick={() => setModalOpen(true)} className={`${btnGhost} w-full`}>Compare Divisions</button>
                   </div>
                 </div>
               </div>
             </div>
 
-            <div className="text-center">
-              <p className="text-slate-400 text-xs sm:text-base mb-3 sm:mb-4 font-semibold">Not sure which division fits your needs?</p>
-              <button onClick={() => setModalOpen(true)} className="inline-flex items-center justify-center gap-2 sm:gap-3 px-4 sm:px-10 py-2.5 sm:py-4 rounded-xl bg-gradient-to-r from-cyan-400/10 via-white/5 to-violet-400/10 border-2 border-white/20 hover:border-white/40 text-white font-black text-sm sm:text-lg tracking-wide hover:bg-white/8 transition-all duration-300 hover:-translate-y-0.5 w-full sm:w-auto">
-                ✦ Help Me Choose My Division
-              </button>
+            <div className="text-center mt-8 sm:mt-10">
+              <div className="flex flex-col sm:flex-row items-center justify-center gap-3 sm:gap-4 mb-4">
+                <Link href="/book-demo" className={`${btnCyan} w-full sm:w-auto px-8 py-4 text-base`}>
+                  ◈ Deploy AI Today →
+                </Link>
+                <button onClick={() => setModalOpen(true)} className="inline-flex items-center justify-center gap-2 px-8 py-4 rounded-xl bg-gradient-to-r from-cyan-400/10 via-white/5 to-violet-400/10 border-2 border-white/20 hover:border-white/40 text-white font-black text-base tracking-wide hover:bg-white/8 transition-all duration-300 hover:-translate-y-0.5 w-full sm:w-auto">
+                  ✦ Help Me Choose My Division
+                </button>
+              </div>
+              <p className="text-slate-500 text-xs font-semibold tracking-[0.2em] uppercase">Two Divisions. One Platform. Infinite Impact.</p>
             </div>
           </div>
         </section>
