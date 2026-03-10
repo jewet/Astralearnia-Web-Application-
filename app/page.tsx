@@ -216,9 +216,7 @@ const SOLUTIONS_SLIDES: Array<{
 ];
 
 // ═══════════════════════════════════════════════════════════════════════════════
-// ✅ FIX: useSectionVisible — callback ref so observer attaches when section
-//    actually mounts in DOM (after intro completes), not during the early-return
-//    intro phase when ref.current is null and the effect is a no-op.
+// useSectionVisible — callback ref so observer attaches when section mounts
 // ═══════════════════════════════════════════════════════════════════════════════
 function useSectionVisible(threshold = 0.15) {
   const [visible, setVisible] = useState(false);
@@ -226,7 +224,6 @@ function useSectionVisible(threshold = 0.15) {
 
   const ref = useCallback(
     (node: Element | null) => {
-      // Disconnect any previous observer on this hook instance
       obsRef.current?.disconnect();
       if (!node) return;
       obsRef.current = new IntersectionObserver(
@@ -317,6 +314,9 @@ function RobotIntro({ onComplete }: { onComplete: () => void }) {
   const instCardVisible = ["cardLeft","showcase","crystallize","fadeOut"].includes(phase);
   const overlayFading = phase === "fadeOut";
 
+  // ─── Card width: side-by-side on mobile, fixed size on desktop ───────────
+  const cardWidth = isMobile ? "calc(50vw - 8px)" : "clamp(160px,22vw,260px)";
+
   return (
     <div style={{
       position: "fixed", inset: 0, zIndex: 99999,
@@ -364,22 +364,30 @@ function RobotIntro({ onComplete }: { onComplete: () => void }) {
         </div>
       </div>
 
-      {/* Technology Division Card */}
+      {/* ─── Technology Division Card ─────────────────────────────────────────
+          Mobile: card sits in RIGHT half of screen (left: 50% + gap) at the
+          SAME bottom as the robot (24%) so they appear truly side-by-side.
+          Desktop: keep original `right` positioning.
+      ─────────────────────────────────────────────────────────────────────── */}
       <div style={{
         position: "absolute",
-        bottom: isMobile ? (techCardVisible ? "3%" : "-200px") : "24%",
-        right: isMobile
-          ? (techCardVisible ? "calc(50% + 6px)" : "100vw")
-          : (techCardVisible ? "clamp(24px,12vw,180px)" : "-340px"),
-        transitionProperty: "right, bottom, opacity, filter",
-        transitionDuration: "0.7s, 0.7s, 0.5s, 0.3s",
-        transitionTimingFunction: "cubic-bezier(0.34,1.56,0.64,1), cubic-bezier(0.34,1.56,0.64,1), ease, ease",
+        bottom: "24%",
+        // Mobile → use `left` so the card sits in the RIGHT half of the screen,
+        // at same vertical level as the robot. Off-screen = slide right.
+        // Desktop → use `right` as before.
+        ...(isMobile
+          ? { left: techCardVisible ? "calc(50% + 4px)" : "110vw" }
+          : { right: techCardVisible ? "clamp(24px,12vw,180px)" : "-340px" }
+        ),
+        transitionProperty: isMobile ? "left, opacity, filter" : "right, bottom, opacity, filter",
+        transitionDuration: isMobile ? "0.7s, 0.5s, 0.3s" : "0.7s, 0.7s, 0.5s, 0.3s",
+        transitionTimingFunction: isMobile ? "cubic-bezier(0.34,1.56,0.64,1), ease, ease" : "cubic-bezier(0.34,1.56,0.64,1), cubic-bezier(0.34,1.56,0.64,1), ease, ease",
         opacity: (phase === "crystallize" || phase === "fadeOut") ? 0 : (techCardVisible ? 1 : 0),
         zIndex: 11,
         filter: isCrystal ? "brightness(1.5) saturate(3) hue-rotate(180deg)" : "none",
       }}>
         <div style={{
-          width: isMobile ? "calc(46vw - 8px)" : "clamp(160px,22vw,260px)",
+          width: cardWidth,
           background: "rgba(0,20,40,0.95)",
           border: "1.5px solid rgba(0,200,255,0.55)",
           borderRadius: 16,
@@ -389,7 +397,7 @@ function RobotIntro({ onComplete }: { onComplete: () => void }) {
           animation: techCardVisible ? "ri_cardFloat 3s ease-in-out infinite" : "none",
         }}>
           <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 8 }}>
-            <div style={{ width: 28, height: 28, borderRadius: 8, background: "rgba(0,200,255,0.15)", border: "1px solid rgba(0,200,255,0.4)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 14 }}>⚡</div>
+            <div style={{ width: 28, height: 28, borderRadius: 8, background: "rgba(0,200,255,0.15)", border: "1px solid rgba(0,200,255,0.4)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 14, flexShrink: 0 }}>⚡</div>
             <div>
               <div style={{ fontSize: "clamp(6px,0.9vw,9px)", color: "rgba(0,200,255,0.6)", fontWeight: 900, letterSpacing: "0.2em", textTransform: "uppercase", fontFamily: "monospace" }}>Division 01</div>
               <div style={{ fontSize: "clamp(9px,1.4vw,13px)", color: "#fff", fontWeight: 900, lineHeight: 1.2 }}>Astralearnia Technology</div>
@@ -403,31 +411,38 @@ function RobotIntro({ onComplete }: { onComplete: () => void }) {
           </div>
           <div style={{ marginTop: 8, height: 2, borderRadius: 1, background: "linear-gradient(90deg,#00c8ff,transparent)", opacity: 0.6 }} />
         </div>
-        <div style={{
-          position: "absolute", top: "50%", right: "100%",
-          height: 2, background: "linear-gradient(90deg,transparent,rgba(0,200,255,0.5))",
-          animation: techCardVisible ? "ri_armExtend 0.5s ease forwards" : "none",
-          transformOrigin: "right center",
-          width: "clamp(20px,5vw,60px)",
-        }} />
+        {/* Arm line — only shown on desktop */}
+        {!isMobile && (
+          <div style={{
+            position: "absolute", top: "50%", right: "100%",
+            height: 2, background: "linear-gradient(90deg,transparent,rgba(0,200,255,0.5))",
+            animation: techCardVisible ? "ri_armExtend 0.5s ease forwards" : "none",
+            transformOrigin: "right center",
+            width: "clamp(20px,5vw,60px)",
+          }} />
+        )}
       </div>
 
-      {/* Institute Division Card */}
+      {/* ─── Institute Division Card ──────────────────────────────────────────
+          Mobile: card sits in LEFT half (left: 4px) at the SAME bottom as the
+          robot (24%) so both cards appear side-by-side flanking the robot.
+          Desktop: keep original `left` positioning with clamp offset.
+      ─────────────────────────────────────────────────────────────────────── */}
       <div style={{
         position: "absolute",
-        bottom: isMobile ? (instCardVisible ? "3%" : "-200px") : "24%",
+        bottom: "24%",
         left: isMobile
-          ? (instCardVisible ? "4px" : "-100vw")
+          ? (instCardVisible ? "4px" : "-110vw")
           : (instCardVisible ? "clamp(24px,12vw,180px)" : "-340px"),
-        transitionProperty: "left, bottom, opacity, filter",
-        transitionDuration: "0.7s, 0.7s, 0.5s, 0.3s",
-        transitionTimingFunction: "cubic-bezier(0.34,1.56,0.64,1), cubic-bezier(0.34,1.56,0.64,1), ease, ease",
+        transitionProperty: isMobile ? "left, opacity, filter" : "left, bottom, opacity, filter",
+        transitionDuration: isMobile ? "0.7s, 0.5s, 0.3s" : "0.7s, 0.7s, 0.5s, 0.3s",
+        transitionTimingFunction: isMobile ? "cubic-bezier(0.34,1.56,0.64,1), ease, ease" : "cubic-bezier(0.34,1.56,0.64,1), cubic-bezier(0.34,1.56,0.64,1), ease, ease",
         opacity: (phase === "crystallize" || phase === "fadeOut") ? 0 : (instCardVisible ? 1 : 0),
         zIndex: 11,
         filter: isCrystal ? "brightness(1.5) saturate(3) hue-rotate(240deg)" : "none",
       }}>
         <div style={{
-          width: isMobile ? "calc(46vw - 8px)" : "clamp(160px,22vw,260px)",
+          width: cardWidth,
           background: "rgba(15,8,30,0.95)",
           border: "1.5px solid rgba(160,100,255,0.55)",
           borderRadius: 16,
@@ -437,7 +452,7 @@ function RobotIntro({ onComplete }: { onComplete: () => void }) {
           animation: instCardVisible ? "ri_cardFloat 3.2s ease-in-out 0.4s infinite" : "none",
         }}>
           <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 8 }}>
-            <div style={{ width: 28, height: 28, borderRadius: 8, background: "rgba(160,100,255,0.15)", border: "1px solid rgba(160,100,255,0.4)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 14 }}>🎓</div>
+            <div style={{ width: 28, height: 28, borderRadius: 8, background: "rgba(160,100,255,0.15)", border: "1px solid rgba(160,100,255,0.4)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 14, flexShrink: 0 }}>🎓</div>
             <div>
               <div style={{ fontSize: "clamp(6px,0.9vw,9px)", color: "rgba(160,100,255,0.6)", fontWeight: 900, letterSpacing: "0.2em", textTransform: "uppercase", fontFamily: "monospace" }}>Division 02</div>
               <div style={{ fontSize: "clamp(9px,1.4vw,13px)", color: "#fff", fontWeight: 900, lineHeight: 1.2 }}>Astralearnia Institute</div>
@@ -451,13 +466,16 @@ function RobotIntro({ onComplete }: { onComplete: () => void }) {
           </div>
           <div style={{ marginTop: 8, height: 2, borderRadius: 1, background: "linear-gradient(90deg,transparent,rgba(160,100,255,0.5))", opacity: 0.6 }} />
         </div>
-        <div style={{
-          position: "absolute", top: "50%", left: "100%",
-          height: 2, background: "linear-gradient(90deg,rgba(160,100,255,0.5),transparent)",
-          animation: instCardVisible ? "ri_armExtend 0.5s ease forwards" : "none",
-          transformOrigin: "left center",
-          width: "clamp(20px,5vw,60px)",
-        }} />
+        {/* Arm line — only shown on desktop */}
+        {!isMobile && (
+          <div style={{
+            position: "absolute", top: "50%", left: "100%",
+            height: 2, background: "linear-gradient(90deg,rgba(160,100,255,0.5),transparent)",
+            animation: instCardVisible ? "ri_armExtend 0.5s ease forwards" : "none",
+            transformOrigin: "left center",
+            width: "clamp(20px,5vw,60px)",
+          }} />
+        )}
       </div>
 
       {/* Robot */}
@@ -1309,10 +1327,6 @@ export default function HomePage() {
   const [introComplete, setIntroComplete] = useState(false);
   const [modalOpen, setModalOpen] = useState(false);
 
-  // ✅ All useSectionVisible hooks at top level (Rules of Hooks)
-  // ✅ With callback refs these now properly attach when sections mount
-  //    (after intro completes) instead of silently failing during the
-  //    early-return intro phase when DOM nodes don't exist yet.
   const divisionSection     = useSectionVisible();
   const problemSection      = useSectionVisible();
   const pillarsSection      = useSectionVisible();
@@ -1333,9 +1347,6 @@ export default function HomePage() {
         .hp-root { overflow-x:hidden; animation:pageReveal 0.8s ease both; }
         @keyframes pageReveal { from{opacity:0;transform:translateY(10px)} to{opacity:1;transform:translateY(0)} }
 
-        /* ✅ Global keyframes used by all sections — defined here so they're
-           available the moment any section becomes visible, regardless of
-           which sub-component's style block has loaded. */
         @keyframes sectionHeaderReveal { from{opacity:0;transform:translateY(28px) scale(0.97)} to{opacity:1;transform:translateY(0) scale(1)} }
         @keyframes dotPulse { 0%,100%{transform:scale(1);opacity:1} 50%{transform:scale(1.6);opacity:0.7} }
         @keyframes heroLine1 { from{opacity:0;transform:translateY(20px)} to{opacity:1;transform:translateY(0)} }
