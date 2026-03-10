@@ -365,23 +365,20 @@ function RobotIntro({ onComplete }: { onComplete: () => void }) {
       </div>
 
       {/* ─── Technology Division Card ─────────────────────────────────────────
-          Mobile: card sits in RIGHT half of screen (left: 50% + gap) at the
-          SAME bottom as the robot (24%) so they appear truly side-by-side.
-          Desktop: keep original `right` positioning.
+          Mobile: RIGHT half (left: 50%+4px), sits BELOW the robot (bottom 4%)
+          so both cards appear side-by-side underneath the centered robot.
+          Desktop: keep original `right` positioning at bottom 24%.
       ─────────────────────────────────────────────────────────────────────── */}
       <div style={{
         position: "absolute",
-        bottom: "24%",
-        // Mobile → use `left` so the card sits in the RIGHT half of the screen,
-        // at same vertical level as the robot. Off-screen = slide right.
-        // Desktop → use `right` as before.
+        bottom: isMobile ? "4%" : "24%",
         ...(isMobile
           ? { left: techCardVisible ? "calc(50% + 4px)" : "110vw" }
           : { right: techCardVisible ? "clamp(24px,12vw,180px)" : "-340px" }
         ),
-        transitionProperty: isMobile ? "left, opacity, filter" : "right, bottom, opacity, filter",
-        transitionDuration: isMobile ? "0.7s, 0.5s, 0.3s" : "0.7s, 0.7s, 0.5s, 0.3s",
-        transitionTimingFunction: isMobile ? "cubic-bezier(0.34,1.56,0.64,1), ease, ease" : "cubic-bezier(0.34,1.56,0.64,1), cubic-bezier(0.34,1.56,0.64,1), ease, ease",
+        transitionProperty: isMobile ? "left, bottom, opacity, filter" : "right, bottom, opacity, filter",
+        transitionDuration: "0.7s, 0.7s, 0.5s, 0.3s",
+        transitionTimingFunction: "cubic-bezier(0.34,1.56,0.64,1), cubic-bezier(0.34,1.56,0.64,1), ease, ease",
         opacity: (phase === "crystallize" || phase === "fadeOut") ? 0 : (techCardVisible ? 1 : 0),
         zIndex: 11,
         filter: isCrystal ? "brightness(1.5) saturate(3) hue-rotate(180deg)" : "none",
@@ -424,19 +421,19 @@ function RobotIntro({ onComplete }: { onComplete: () => void }) {
       </div>
 
       {/* ─── Institute Division Card ──────────────────────────────────────────
-          Mobile: card sits in LEFT half (left: 4px) at the SAME bottom as the
-          robot (24%) so both cards appear side-by-side flanking the robot.
-          Desktop: keep original `left` positioning with clamp offset.
+          Mobile: LEFT half (left: 4px), sits BELOW the robot (bottom 4%)
+          so both cards appear side-by-side underneath the centered robot.
+          Desktop: keep original `left` positioning at bottom 24%.
       ─────────────────────────────────────────────────────────────────────── */}
       <div style={{
         position: "absolute",
-        bottom: "24%",
+        bottom: isMobile ? "4%" : "24%",
         left: isMobile
           ? (instCardVisible ? "4px" : "-110vw")
           : (instCardVisible ? "clamp(24px,12vw,180px)" : "-340px"),
-        transitionProperty: isMobile ? "left, opacity, filter" : "left, bottom, opacity, filter",
-        transitionDuration: isMobile ? "0.7s, 0.5s, 0.3s" : "0.7s, 0.7s, 0.5s, 0.3s",
-        transitionTimingFunction: isMobile ? "cubic-bezier(0.34,1.56,0.64,1), ease, ease" : "cubic-bezier(0.34,1.56,0.64,1), cubic-bezier(0.34,1.56,0.64,1), ease, ease",
+        transitionProperty: isMobile ? "left, bottom, opacity, filter" : "left, bottom, opacity, filter",
+        transitionDuration: "0.7s, 0.7s, 0.5s, 0.3s",
+        transitionTimingFunction: "cubic-bezier(0.34,1.56,0.64,1), cubic-bezier(0.34,1.56,0.64,1), ease, ease",
         opacity: (phase === "crystallize" || phase === "fadeOut") ? 0 : (instCardVisible ? 1 : 0),
         zIndex: 11,
         filter: isCrystal ? "brightness(1.5) saturate(3) hue-rotate(240deg)" : "none",
@@ -1117,10 +1114,44 @@ function ContactSection() {
     return Object.keys(e).length === 0;
   };
 
-  const handleSubmit = () => {
+  const handleSubmit = async () => {
     if (!validate()) return;
     setStatus("submitting");
-    setTimeout(() => setStatus("success"), 2200);
+
+    // Split "Full Name" into firstName / lastName for the API route
+    const nameParts  = form.name.trim().split(/\s+/);
+    const firstName  = nameParts[0] ?? form.name;
+    const lastName   = nameParts.slice(1).join(" ") || "-";
+
+    // Map form division ("both" | "" → "general") to API union
+    const divisionMap: Record<string, "technology" | "institute" | "general"> = {
+      technology: "technology",
+      institute:  "institute",
+      both:       "general",
+      "":         "general",
+    };
+
+    try {
+      const res = await fetch("/api/contact", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          firstName,
+          lastName,
+          email:        form.email,
+          organization: form.company  || undefined,
+          division:     divisionMap[form.division] ?? "general",
+          reason:       form.subject  || "General Enquiry",
+          message:      form.message,
+          source:       typeof window !== "undefined" ? window.location.href : undefined,
+        }),
+      });
+
+      if (!res.ok) throw new Error("Server error");
+      setStatus("success");
+    } catch {
+      setStatus("error");
+    }
   };
 
   const update = (k: keyof ContactForm, v: string) => {
@@ -1217,6 +1248,18 @@ function ContactSection() {
                 </p>
                 <button onClick={() => { setStatus("idle"); setForm({ name:"",email:"",company:"",division:"",subject:"",message:"" }); }} style={{ padding: "10px 24px", borderRadius: 10, background: "rgba(255,255,255,0.06)", border: "1px solid rgba(255,255,255,0.2)", color: "#fff", fontWeight: 900, fontSize: "0.9rem", cursor: "pointer", letterSpacing: "0.05em" }}>
                   Send Another Message
+                </button>
+              </div>
+            ) : status === "error" ? (
+              <div style={{ textAlign: "center", padding: "clamp(24px,5vw,60px) 20px" }}>
+                <div style={{ width: 72, height: 72, borderRadius: "50%", background: "rgba(248,113,113,0.12)", border: "2px solid rgba(248,113,113,0.4)", display: "flex", alignItems: "center", justifyContent: "center", margin: "0 auto 20px", fontSize: 32 }}>✕</div>
+                <h3 style={{ fontSize: "clamp(1.2rem,3vw,2rem)", fontWeight: 900, color: "#fff", marginBottom: 10 }}>Something went wrong</h3>
+                <p style={{ fontSize: "clamp(0.82rem,1.4vw,1rem)", color: "rgba(148,163,184,0.8)", lineHeight: 1.65, fontWeight: 600, maxWidth: "28rem", margin: "0 auto 24px" }}>
+                  We couldn&apos;t send your message. Please try again or email us at{" "}
+                  <a href="mailto:hello@astralearnia.com" style={{ color: "#22d3ee" }}>hello@astralearnia.com</a>
+                </p>
+                <button onClick={() => setStatus("idle")} style={{ padding: "10px 24px", borderRadius: 10, background: "rgba(255,255,255,0.06)", border: "1px solid rgba(255,255,255,0.2)", color: "#fff", fontWeight: 900, fontSize: "0.9rem", cursor: "pointer", letterSpacing: "0.05em" }}>
+                  Try Again
                 </button>
               </div>
             ) : (

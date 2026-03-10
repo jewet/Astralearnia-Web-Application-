@@ -78,3 +78,25 @@ It can also happen if the client has a browser extension installed which messes 
                   ...
 
 [09:36:28.218] Server  LOG     ✓ Compiled in 10.2s
+[09:56:19.953] Browser INFO    %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
+[09:56:32.448] Browser INFO    %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
+[10:14:02.469] Server  LOG     ✓ Compiled in 2.6s
+[10:14:44.236] Browser INFO    %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
+[10:17:49.292] Server  LOG     ○ Compiling /api/contact ...
+[10:17:51.204] Server  ERROR   RESEND_API_KEY is not set
+[10:22:08.460] Server  LOG       Reload env: .env
+[10:22:42.786] Server  LOG       Reload env: .env
+[10:22:44.246] Server  LOG     ✓ Compiled in 1285ms
+[10:22:46.054] Server  LOG       Reload env: .env
+[10:22:48.592] Server  LOG       Reload env: .env
+[10:22:52.037] Server  LOG       Reload env: .env
+[10:23:01.974] Server  LOG       Reload env: .env
+[10:23:03.151] Server  LOG       Reload env: .env
+[10:23:18.634] Server  LOG       Reload env: .env
+[10:23:20.135] Server  LOG       Reload env: .env
+[10:23:25.456] Server  LOG       Reload env: .env
+[10:23:30.008] Server  LOG       Reload env: .env
+[10:23:34.917] Server  LOG       Reload env: .env
+[10:23:39.603] Server  LOG       Reload env: .env
+[10:23:43.381] Server  LOG       Reload env: .env
+[10:24:00.185] Server  LOG       Reload env: .env
