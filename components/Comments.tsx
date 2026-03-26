@@ -196,7 +196,7 @@ export default function Comments({ slug }: { slug: string }) {
             </Field>
             <Field label="Email" hint="(optional, not displayed)">
               <input type="email" value={email} onChange={e => setEmail(e.target.value)}
-                placeholder="you@example.com" maxLength={120}
+                placeholder="jewettswift@example.com" maxLength={120}
                 style={inputBase} onFocus={focus} onBlur={blur} />
             </Field>
           </div>
