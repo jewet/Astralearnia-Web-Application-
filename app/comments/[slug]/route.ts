@@ -1,5 +1,5 @@
 // app/api/comments/[slug]/route.ts
-import { getRequestContext } from "@cloudflare/next-on-pages";
+import { getCloudflareContext } from "@opennextjs/cloudflare";
 import { NextResponse } from "next/server";
 
 export const runtime = "edge";
@@ -14,7 +14,7 @@ export async function GET(_req: Request, { params }: Params) {
   }
 
   try {
-    const { env } = getRequestContext() as unknown as { env: CloudflareEnv };
+   const { env } = await getCloudflareContext() as unknown as { env: CloudflareEnv };
 
     const { results } = await env.DB.prepare(
       `SELECT id, name, message, created_at

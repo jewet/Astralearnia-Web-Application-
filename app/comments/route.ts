@@ -1,5 +1,5 @@
 // app/api/comments/route.ts
-import { getRequestContext } from "@cloudflare/next-on-pages";
+import { getCloudflareContext } from "@opennextjs/cloudflare";
 import { NextResponse } from "next/server";
 
 export const runtime = "edge";
@@ -36,8 +36,7 @@ export async function POST(req: Request) {
   }
 
   try {
-    const { env } = getRequestContext() as unknown as { env: CloudflareEnv };
-
+     const { env } = await getCloudflareContext() as unknown as { env: CloudflareEnv };
     await env.DB.prepare(
       `INSERT INTO comments (slug, name, email, message)
        VALUES (?, ?, ?, ?)`
