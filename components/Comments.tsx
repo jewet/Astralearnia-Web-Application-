@@ -9,6 +9,14 @@ interface Comment {
   created_at: string;
 }
 
+interface CommentsResponse {
+  comments: Comment[];
+}
+
+interface PostCommentResponse {
+  error?: string;
+}
+
 function timeAgo(dateStr: string) {
   const diff = Date.now() - new Date(dateStr + "Z").getTime();
   const mins = Math.floor(diff / 60_000);
@@ -78,7 +86,7 @@ export default function Comments({ slug }: { slug: string }) {
 
   useEffect(() => {
     fetch(`/api/comments/${slug}`)
-      .then(r => r.json())
+      .then(r => r.json() as Promise<CommentsResponse>)
       .then(data => setComments(data.comments ?? []))
       .catch(() => {})
       .finally(() => setLoading(false));
@@ -95,7 +103,7 @@ export default function Comments({ slug }: { slug: string }) {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ slug, name, email, message }),
       });
-      const data = await res.json();
+      const data = await res.json() as PostCommentResponse;
       if (!res.ok) throw new Error(data.error ?? "Failed");
       setSubmitted(true);
       setName(""); setEmail(""); setMessage("");
