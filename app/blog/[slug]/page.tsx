@@ -6,9 +6,13 @@
 //     Both generateMetadata and the default export MUST await it.
 //     Not awaiting is why every slug showed "Article not found" —
 //     params.slug resolved to a Promise object, not the slug string.
+//
+// ❌  REMOVED: export const runtime = "edge"
+//     Edge runtime and generateStaticParams cannot be used together.
+//     Next.js will throw a build error if both are present.
+//     Without it, the page uses the default Node.js runtime and
+//     static pre-rendering works as expected.
 // ─────────────────────────────────────────────────────────────────────────────
-
-export const runtime = "edge";
 
 import type { Metadata } from "next";
 import { BLOG_POSTS, getPostBySlug } from "@/lib/blog-data";
