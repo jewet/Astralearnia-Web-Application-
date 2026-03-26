@@ -3,6 +3,7 @@
 import Link  from "next/link";
 import Image from "next/image";
 import { BLOG_POSTS, getPostBySlug } from "@/lib/blog-data";
+import Comments from "@/components/Comments";
 
 const SITE_URL = "https://astralearnia.com";
 
@@ -41,13 +42,11 @@ function InlineVideo({ thumb, title, duration, url, caption }: {
 
   return (
     <figure className="my-8 sm:my-10 group">
-     
       <Wrapper {...wrapperProps}>
         <div className="relative w-full rounded-2xl overflow-hidden border border-white/[0.1] cursor-pointer"
           style={{ aspectRatio: "16/9", boxShadow: "0 0 50px rgba(0,200,255,0.08)" }}>
           <Image src={thumb} alt={title} fill className="object-cover opacity-55 group-hover:opacity-70 group-hover:scale-105 transition-all duration-500"
             sizes="(max-width: 1024px) 100vw, 672px" />
-          {/* dark overlay */}
           <div className="absolute inset-0 bg-gradient-to-t from-[#050810]/75 via-[#050810]/30 to-transparent" />
           <div className="absolute inset-0 bg-gradient-to-tr from-cyan-400/[0.04] to-violet-400/[0.04] group-hover:from-cyan-400/[0.09] group-hover:to-violet-400/[0.09] transition-all duration-400" />
 
@@ -249,6 +248,10 @@ export default function BlogPostClient({ slug }: { slug: string }) {
               </p>
             );
           })}
+
+          {/* ══ COMMENTS ══ */}
+          <Comments slug={slug} />
+
         </div>
 
         {/* ══════════════════════════════════════════════════

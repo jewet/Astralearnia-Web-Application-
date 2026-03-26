@@ -344,6 +344,24 @@ type RouteHandlerConfig<Route extends AppRouteHandlerRoutes = AppRouteHandlerRou
   type __Unused = __Check
 }
 
+// Validate ../../../app/comments/[slug]/route.ts
+{
+  type __IsExpected<Specific extends RouteHandlerConfig<"/comments/[slug]">> = Specific
+  const handler = {} as typeof import("../../../app/comments/[slug]/route.js")
+  type __Check = __IsExpected<typeof handler>
+  // @ts-ignore
+  type __Unused = __Check
+}
+
+// Validate ../../../app/comments/route.ts
+{
+  type __IsExpected<Specific extends RouteHandlerConfig<"/comments">> = Specific
+  const handler = {} as typeof import("../../../app/comments/route.js")
+  type __Check = __IsExpected<typeof handler>
+  // @ts-ignore
+  type __Unused = __Check
+}
+
 
 
 
