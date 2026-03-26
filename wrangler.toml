@@ -2,6 +2,8 @@ name = "astralearnia"
 compatibility_date = "2024-09-23"
 compatibility_flags = ["nodejs_compat"]
 
+pages_build_output_dir = ".open-next/cloudflare"
+
 [[d1_databases]]
 binding = "DB"
 database_name = "astralearnia-comments"

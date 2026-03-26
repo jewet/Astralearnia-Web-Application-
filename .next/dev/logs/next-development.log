@@ -1,0 +1,24 @@
+[00:00:07.043] Server  ERROR   (node:56093) [DEP0040] DeprecationWarning: The `punycode` module is deprecated. Please use a userland alternative instead.
+(Use `node --trace-deprecation ...` to show where the warning was created)
+[00:00:08.281] Server  ERROR   Unhandled Rejection: Error: Unsupported macOS version: The Cloudflare Workers runtime cannot run on the current version of macOS (12.6.0). The minimum requirement is macOS 13.5.0+. See https://github.com/cloudflare/workerd?tab=readme-ov-file#running-workerd If you cannot upgrade your version of macOS, you could try running in a DevContainer setup with a supported version of Linux (glibc 2.35+ required).
+[00:00:09.699] Server  ERROR   ✘ [ERROR] Failed to write to log file Error: EACCES: permission denied, open '/Users/funmishonubi/Library/Preferences/.wrangler/logs/wrangler-2026-03-26_10-58-06_611.log'
+
+      at ignore-listed frames {
+    errno: -13,
+    code: 'EACCES',
+    syscall: 'open',
+    path:
+  '/Users/funmishonubi/Library/Preferences/.wrangler/logs/wrangler-2026-03-26_10-58-06_611.log'
+  }
+
+
+[00:00:09.700] Server  ERROR   ✘ [ERROR] Would have written: 
+
+  --- 2026-03-26T10:58:07.330Z debug
+  🪵  Writing logs to
+  "/Users/funmishonubi/Library/Preferences/.wrangler/logs/wrangler-2026-03-26_10-58-06_611.log"
+  ---
+  
+
+
+[00:00:10.281] Server  LOG     ✓ Ready in 8.6s
