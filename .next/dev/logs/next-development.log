@@ -44,3 +44,5 @@
 [11:23:31.893] Server  LOG     ✓ Compiled in 1653ms
 [11:23:36.706] Server  LOG     ✓ Compiled in 1027ms
 [12:27:35.063] Server  LOG     ✓ Compiled in 5.4s
+[12:56:16.181] Server  LOG     ✓ Compiled in 6ms
+[12:56:35.154] Server  LOG     ✓ Finished filesystem cache database compaction in 15.2s
