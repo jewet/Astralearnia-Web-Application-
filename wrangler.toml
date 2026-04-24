@@ -1,8 +1,11 @@
 name = "astralearnia"
-compatibility_date = "2024-09-23"
-compatibility_flags = ["nodejs_compat"]
-
+compatibility_date = "2024-12-30"
+compatibility_flags = ["nodejs_compat", "global_fetch_strictly_public"]
 pages_build_output_dir = ".open-next/cloudflare"
+
+[assets]
+directory = ".open-next/cloudflare"
+binding = "ASSETS"
 
 [[d1_databases]]
 binding = "DB"
