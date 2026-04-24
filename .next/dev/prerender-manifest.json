@@ -1,11 +1,1 @@
-{
-  "version": 4,
-  "routes": {},
-  "dynamicRoutes": {},
-  "notFoundRoutes": [],
-  "preview": {
-    "previewModeId": "a2bd069a13c67243b9a374207e8699aa",
-    "previewModeSigningKey": "fb419f0fae44017270236311a013206c93035fa16f6db46521163003a9b467c0",
-    "previewModeEncryptionKey": "c051d758a419d2feaacd9e755c1b94f61babbcef4658d9a4031cb2e4da1d4324"
-  }
-}
+{"version":4,"routes":{"/blog/why-decision-intelligence-beats-dashboards":{},"/blog/africa-ai-skills-gap-2026":{},"/blog/fine-tuning-llms-on-proprietary-data":{},"/blog/roi-of-adaptive-learning-corporate":{},"/blog/api-first-ai-architecture":{},"/blog/prompt-engineering-enterprise":{},"/blog/complete-guide-ai-agents-2026":{}},"dynamicRoutes":{"/blog/[slug]":{"dataRoute":null,"dataRouteRegex":null,"fallback":null,"fallbackRevalidate":false,"fallbackSourceRoute":"/blog/[slug]","routeRegex":"^\\/blog\\/([^/]+?)(?:\\/)?$","allowHeader":[]}},"notFoundRoutes":[],"preview":{"previewModeId":"da666a75742c08cd43a78200286c98a0","previewModeSigningKey":"63e9da1d3a818d118368110b39fa6e0c1292b91cf3ce9cfee4bf9f5306709ad6","previewModeEncryptionKey":"eced49668a612a8ac2b1699ecb1557ed59b02d98870dd758a81e1f6ee39a7983"}}

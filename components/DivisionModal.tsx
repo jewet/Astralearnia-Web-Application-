@@ -20,7 +20,7 @@ const tech = {
   features: ["Custom AI & LLM Development","Decision Intelligence Suite","Intelligence API Platform","Data Pipeline Automation","Enterprise Integrations","AI Governance & Security","Robotics & Automation","Cybersecurity AI","Embedded AI Systems","Blockchain Intelligence"],
   stats: [["<48h","Deployment"],["99.9%","API Uptime"],["200+","Clients"]],
   cta: "Explore Technology",
-  href: "/divisions/technology",
+  href: "/technologies",
 };
 
 const institute = {
@@ -36,7 +36,7 @@ const institute = {
   features: ["Adaptive Learning Paths","Corporate Training Programmes","AI Skill Certifications","Skills Gap Analytics","Instructor & Admin Tools","LMS & HRIS Integration","Progress Dashboards","White-label Platform"],
   stats: [["12K+","Learners"],["94%","Pass Rate"],["300+","Clients"]],
   cta: "Explore Institute",
-  href: "/divisions/institute",
+  href: "/institute",
 };
 
 export function DivisionModal({ open, onClose }: Props) {

@@ -20,12 +20,12 @@ const SECTIONS = [
     label: "Divisions",
     accent: "rgba(0,200,255,0.6)",
     links: [
-      { label: "Technology Division", href: "/divisions/technology" },
-      { label: "Institute Division",  href: "/divisions/institute"  },
-      { label: "Compare Divisions",   href: "/#divisions"           },
-      { label: "AI Models",           href: "/divisions/technology/ai-models"      },
-      { label: "Data Pipelines",      href: "/divisions/technology/data-pipelines" },
-      { label: "AI Security",         href: "/divisions/technology/ai-security"    },
+      { label: "Technology Division", href: "/technologies" },
+      { label: "Institute Division",  href: "/institute"  },
+      { label: "Compare Divisions",   href: "/"           },
+      { label: "AI Models",           href: "/technologies/ai-models"      },
+      { label: "Data Pipelines",      href: "/technologies/data-pipelines" },
+      { label: "AI Security",         href: "/technologies/ai-security"    },
     ],
   },
   {
@@ -36,10 +36,10 @@ const SECTIONS = [
       { label: "AI Solutions",   href: "/solutions"                              },
       { label: "API & SDK",      href: "/api-docs"                               },
       { label: "Integrations",   href: "/solutions"                              },
-      { label: "Individuals",    href: "/divisions/institute/individuals"        },
-      { label: "Enterprise",     href: "/divisions/institute/enterprise"         },
-      { label: "Certifications", href: "/divisions/institute/certifications"     },
-      { label: "Skills Analytics",href: "/divisions/institute/skills-analytics"  },
+      { label: "Individuals",    href: "/institute/individuals"        },
+      { label: "Enterprise",     href: "/institute/enterprise"         },
+      { label: "Certifications", href: "/institute/certifications"     },
+      { label: "Skills Analytics",href: "/institute/skills-analytics"  },
     ],
   },
   {
@@ -292,7 +292,7 @@ export function Footer() {
 
           {/* Division pills */}
           <div style={{ display:"flex", gap:8, justifyContent:"center", flexWrap:"wrap" }}>
-            <Link href="/divisions/technology" style={{
+            <Link href="/technologies" style={{
               display:"inline-flex", alignItems:"center", gap:6,
               fontSize:"0.6rem", fontWeight:800, letterSpacing:"0.14em", textTransform:"uppercase",
               padding:"6px 14px", borderRadius:20,
@@ -306,7 +306,7 @@ export function Footer() {
               <span style={{ width:5, height:5, borderRadius:"50%", background:"#00c8ff", boxShadow:"0 0 5px #00c8ff", flexShrink:0, animation:"_ft_pulse 2s infinite" }} />
               ⚡ Technology Division
             </Link>
-            <Link href="/divisions/institute" style={{
+            <Link href="/institute" style={{
               display:"inline-flex", alignItems:"center", gap:6,
               fontSize:"0.6rem", fontWeight:800, letterSpacing:"0.14em", textTransform:"uppercase",
               padding:"6px 14px", borderRadius:20,

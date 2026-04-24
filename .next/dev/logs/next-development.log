@@ -1,24 +1,74 @@
-[00:00:07.043] Server  ERROR   (node:56093) [DEP0040] DeprecationWarning: The `punycode` module is deprecated. Please use a userland alternative instead.
+[00:00:24.829] Server  ERROR   (node:26172) [DEP0040] DeprecationWarning: The `punycode` module is deprecated. Please use a userland alternative instead.
 (Use `node --trace-deprecation ...` to show where the warning was created)
-[00:00:08.281] Server  ERROR   Unhandled Rejection: Error: Unsupported macOS version: The Cloudflare Workers runtime cannot run on the current version of macOS (12.6.0). The minimum requirement is macOS 13.5.0+. See https://github.com/cloudflare/workerd?tab=readme-ov-file#running-workerd If you cannot upgrade your version of macOS, you could try running in a DevContainer setup with a supported version of Linux (glibc 2.35+ required).
-[00:00:09.699] Server  ERROR   ✘ [ERROR] Failed to write to log file Error: EACCES: permission denied, open '/Users/funmishonubi/Library/Preferences/.wrangler/logs/wrangler-2026-03-26_10-58-06_611.log'
+[00:00:28.559] Server  ERROR   Unhandled Rejection: Error: Unsupported macOS version: The Cloudflare Workers runtime cannot run on the current version of macOS (12.6.0). The minimum requirement is macOS 13.5.0+. See https://github.com/cloudflare/workerd?tab=readme-ov-file#running-workerd If you cannot upgrade your version of macOS, you could try running in a DevContainer setup with a supported version of Linux (glibc 2.35+ required).
+[00:00:35.072] Server  ERROR   ✘ [ERROR] Failed to write to log file Error: EACCES: permission denied, open '/Users/funmishonubi/Library/Preferences/.wrangler/logs/wrangler-2026-04-24_11-10-29_381.log'
 
       at ignore-listed frames {
     errno: -13,
     code: 'EACCES',
     syscall: 'open',
     path:
-  '/Users/funmishonubi/Library/Preferences/.wrangler/logs/wrangler-2026-03-26_10-58-06_611.log'
+  '/Users/funmishonubi/Library/Preferences/.wrangler/logs/wrangler-2026-04-24_11-10-29_381.log'
   }
 
 
-[00:00:09.700] Server  ERROR   ✘ [ERROR] Would have written: 
+[00:00:35.075] Server  ERROR   ✘ [ERROR] Would have written: 
 
-  --- 2026-03-26T10:58:07.330Z debug
+  --- 2026-04-24T11:10:31.593Z debug
   🪵  Writing logs to
-  "/Users/funmishonubi/Library/Preferences/.wrangler/logs/wrangler-2026-03-26_10-58-06_611.log"
+  "/Users/funmishonubi/Library/Preferences/.wrangler/logs/wrangler-2026-04-24_11-10-29_381.log"
   ---
   
 
 
-[00:00:10.281] Server  LOG     ✓ Ready in 8.6s
+[00:00:39.149] Server  LOG     ✓ Ready in 30.8s
+[00:00:42.848] Server  LOG     ○ Compiling / ...
+[00:01:18.598] Browser INFO    %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
+[00:01:38.738] Server  LOG     ✓ Finished filesystem cache database compaction in 32.2s
+[00:01:40.374] Server  LOG     ✓ Finished writing to filesystem cache in 16.5s
+[00:01:40.910] Browser INFO    %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
+[00:02:10.651] Browser INFO    %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
+[00:02:12.325] Browser ERROR   A tree hydrated but some attributes of the server rendered HTML didn't match the client properties. This won't be patched up. This can happen if a SSR-ed Client Component used:
+
+- A server/client branch `if (typeof window !== 'undefined')`.
+- Variable input such as `Date.now()` or `Math.random()` which changes each time it's called.
+- Date formatting in a user's locale which doesn't match the server.
+- External changing data without sending a snapshot of it along with the HTML.
+- Invalid HTML tag nesting.
+
+It can also happen if the client has a browser extension installed which messes with the HTML before React loaded.
+
+%s%s https://react.dev/link/hydration-mismatch 
+
+  ...
+    <HotReload globalError={[...]} webSocket={WebSocket} staticIndicatorState={{pathname:null, ...}}>
+      <AppDevOverlayErrorBoundary globalError={[...]}>
+        <ReplaySsrOnlyErrors>
+        <DevRootHTTPAccessFallbackBoundary>
+          <HTTPAccessFallbackBoundary notFound={<NotAllowedRootHTTPFallbackError>}>
+            <HTTPAccessFallbackErrorBoundary pathname="/technology" notFound={<NotAllowedRootHTTPFallbackError>} ...>
+              <RedirectBoundary>
+                <RedirectErrorBoundary router={{...}}>
+                  <Head>
+                  <__next_root_layout_boundary__>
+                    <SegmentViewNode type="layout" pagePath="layout.tsx">
+                      <SegmentTrieNode>
+                      <link>
+                      <script>
+                      <script>
+                      <script>
+                      <RootLayout>
+                        <html lang="en" suppressHydrationWarning={true}>
+                          <head>
+                          <body
+-                           data-new-gr-c-s-check-loaded="14.1285.0"
+-                           data-gr-ext-installed=""
+                          >
+                  ...
+
+[00:02:48.988] Browser WARN    Detected `scroll-behavior: smooth` on the `<html>` element. To disable smooth scrolling during route transitions, add `data-scroll-behavior="smooth"` to your <html> element. Learn more: https://nextjs.org/docs/messages/missing-data-scroll-behavior
+[00:03:40.678] Server  LOG     ✓ Compiled in 7.6s
+[00:03:52.270] Server  LOG     ✓ Compiled in 5.3s
+[00:04:04.335] Server  LOG     ✓ Compiled in 9s
+[00:04:08.880] Server  LOG     ✓ Compiled in 4.2s
+[00:04:26.854] Server  LOG     ✓ Compiled in 4.6s

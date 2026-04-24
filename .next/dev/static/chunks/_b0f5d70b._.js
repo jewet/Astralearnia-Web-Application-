@@ -51,7 +51,7 @@ const tech = {
         ]
     ],
     cta: "Explore Technology",
-    href: "/divisions/technology"
+    href: "/technologies"
 };
 const institute = {
     color: "#a855f7",
@@ -88,7 +88,7 @@ const institute = {
         ]
     ],
     cta: "Explore Institute",
-    href: "/divisions/institute"
+    href: "/institute"
 };
 function DivisionModal({ open, onClose }) {
     _s();

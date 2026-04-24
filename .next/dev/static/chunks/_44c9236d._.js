@@ -903,27 +903,27 @@ const SECTIONS = [
         links: [
             {
                 label: "Technology Division",
-                href: "/divisions/technology"
+                href: "/technologies"
             },
             {
                 label: "Institute Division",
-                href: "/divisions/institute"
+                href: "/institute"
             },
             {
                 label: "Compare Divisions",
-                href: "/#divisions"
+                href: "/"
             },
             {
                 label: "AI Models",
-                href: "/divisions/technology/ai-models"
+                href: "/technologies/ai-models"
             },
             {
                 label: "Data Pipelines",
-                href: "/divisions/technology/data-pipelines"
+                href: "/technologies/data-pipelines"
             },
             {
                 label: "AI Security",
-                href: "/divisions/technology/ai-security"
+                href: "/technologies/ai-security"
             }
         ]
     },
@@ -946,19 +946,19 @@ const SECTIONS = [
             },
             {
                 label: "Individuals",
-                href: "/divisions/institute/individuals"
+                href: "/institute/individuals"
             },
             {
                 label: "Enterprise",
-                href: "/divisions/institute/enterprise"
+                href: "/institute/enterprise"
             },
             {
                 label: "Certifications",
-                href: "/divisions/institute/certifications"
+                href: "/institute/certifications"
             },
             {
                 label: "Skills Analytics",
-                href: "/divisions/institute/skills-analytics"
+                href: "/institute/skills-analytics"
             }
         ]
     },
@@ -1397,7 +1397,7 @@ function Footer() {
                                 },
                                 children: [
                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$pnpm$2f$next$40$16$2e$1$2e$6_react$2d$dom$40$18$2e$3$2e$1_react$40$18$2e$3$2e$1_$5f$react$40$18$2e$3$2e$1$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$pnpm$2f$next$40$16$2e$1$2e$6_react$2d$dom$40$18$2e$3$2e$1_react$40$18$2e$3$2e$1_$5f$react$40$18$2e$3$2e$1$2f$node_modules$2f$next$2f$dist$2f$client$2f$app$2d$dir$2f$link$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["default"], {
-                                        href: "/divisions/technology",
+                                        href: "/technologies",
                                         style: {
                                             display: "inline-flex",
                                             alignItems: "center",
@@ -1446,7 +1446,7 @@ function Footer() {
                                         columnNumber: 13
                                     }, this),
                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$pnpm$2f$next$40$16$2e$1$2e$6_react$2d$dom$40$18$2e$3$2e$1_react$40$18$2e$3$2e$1_$5f$react$40$18$2e$3$2e$1$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$pnpm$2f$next$40$16$2e$1$2e$6_react$2d$dom$40$18$2e$3$2e$1_react$40$18$2e$3$2e$1_$5f$react$40$18$2e$3$2e$1$2f$node_modules$2f$next$2f$dist$2f$client$2f$app$2d$dir$2f$link$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["default"], {
-                                        href: "/divisions/institute",
+                                        href: "/institute",
                                         style: {
                                             display: "inline-flex",
                                             alignItems: "center",
