@@ -7,7 +7,7 @@ import Link from "next/link";
 import { useState } from "react";
 
 const SKILL_DIST = [
-  { label:"Technical",   pct:38, col:"#00c8ff" },
+  { label:"Technicals",   pct:38, col:"#00c8ff" },
   { label:"Leadership",  pct:22, col:"#7c5cff" },
   { label:"Data & AI",   pct:19, col:"#a855f7" },
   { label:"Soft Skills", pct:13, col:"#22d3a5" },
@@ -37,7 +37,7 @@ const GAP_DATA = [
 ];
 
 const FEATURES = [
-  { icon:"🗺", title:"Org-Wide Skills Map",     accent:"#00c8ff", body:"Live heatmap of every team, department and individual. Know gaps before they become liabilities." },
+  { icon:"🗺", title:"Org-Wide Skills Map",     accent:"#00c8ff", body:"Live heatmaps of every team, department and individual. Know gaps before they become liabilities." },
   { icon:"📉", title:"Gap Analysis Engine",      accent:"#7c5cff", body:"Compare skills against role requirements and benchmarks. Target training where ROI is highest." },
   { icon:"📈", title:"Growth Tracking",          accent:"#22d3a5", body:"Measure skill velocity over time. Set targets, get alerts when teams fall behind growth curves." },
   { icon:"🔮", title:"Predictive Insights",      accent:"#a855f7", body:"AI flags skills critical in 12 months from industry signals. Upskill proactively, not reactively." },
