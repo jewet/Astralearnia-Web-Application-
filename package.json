@@ -2,13 +2,14 @@
   "name": "astralearnia",
   "version": "0.1.0",
   "private": true,
-  "scripts": {
-    "dev": "next dev",
-    "build": "next build",
-    "start": "next start",
-    "lint": "next lint",
-    "type-check": "tsc --noEmit"
-  },
+"scripts": {
+  "dev": "next dev",
+  "build": "next build",
+  "start": "next start",
+  "lint": "next lint",
+  "type-check": "tsc --noEmit",
+  "pages:build": "npx @opennextjs/cloudflare build && cp .open-next/worker.js .open-next/cloudflare/_worker.js"
+},
 "dependencies": {
   "clsx": "^2.1.1",
   "framer-motion": "^11.2.10",
