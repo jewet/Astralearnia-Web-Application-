@@ -31,7 +31,6 @@ const pill = `inline-flex items-center gap-2 px-3 sm:px-4 py-1 sm:py-1.5 rounded
   border border-white/20 bg-white/5
   text-white text-[10px] sm:text-xs font-black uppercase tracking-[0.18em]`;
 
-// ── Button height reduced by ~2px (py-3→py-2.5, sm:py-3.5→sm:py-3) ──────────
 const btnCyan = `inline-flex items-center justify-center gap-2
   px-4 sm:px-6 py-2.5 sm:py-3 rounded-xl font-black text-sm sm:text-base tracking-wide text-white
   bg-gradient-to-r from-cyan-400 via-blue-500 to-violet-600
@@ -238,13 +237,15 @@ function useSectionVisible(threshold = 0.15) {
 }
 
 // ═══════════════════════════════════════════════════════════════════════════════
-// ROBOT INTRO
+// ROBOT INTRO — FIX: timer useEffect uses [] deps so timers run exactly once
 // ═══════════════════════════════════════════════════════════════════════════════
 function RobotIntro({ onComplete }: { onComplete: () => void }) {
   const [phase, setPhase] = useState<RobotPhase>("enter");
   const [starData, setStarData] = useState<StarData[]>([]);
   const [showShards, setShowShards] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
+  const onCompleteRef = useRef(onComplete);
+  onCompleteRef.current = onComplete;
 
   useEffect(() => {
     const checkMobile = () => setIsMobile(window.innerWidth < 640);
@@ -264,6 +265,7 @@ function RobotIntro({ onComplete }: { onComplete: () => void }) {
     })));
   }, []);
 
+  // ✅ FIX: empty deps — timers fire once on mount, onCompleteRef always has latest callback
   useEffect(() => {
     const t: ReturnType<typeof setTimeout>[] = [
       setTimeout(() => setPhase("center"),      200),
@@ -275,10 +277,10 @@ function RobotIntro({ onComplete }: { onComplete: () => void }) {
       setTimeout(() => setPhase("crystallize"), 4600),
       setTimeout(() => setShowShards(true),     4850),
       setTimeout(() => setPhase("fadeOut"),     5400),
-      setTimeout(() => onComplete(),            6200),
+      setTimeout(() => onCompleteRef.current(), 6200),
     ];
     return () => t.forEach(clearTimeout);
-  }, [onComplete]);
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
   const robotX: Record<RobotPhase, string> = {
     enter: "translateX(115vw)", center: "translateX(0)", reachRight: "translateX(0) rotate(5deg)",
@@ -408,7 +410,7 @@ function RobotIntro({ onComplete }: { onComplete: () => void }) {
         <div key={i} style={{ position:"absolute", bottom:"calc(24% + 60px)", left:"50%", width:s.size, height:s.size, background:s.color, clipPath:s.clip, opacity:0, zIndex:13, animation:`ri_shardBurst ${0.3+i*0.03}s cubic-bezier(0.25,0.46,0.45,0.94) both`, ["--tx" as string]:`${s.tx}px`, ["--ty" as string]:`${s.ty}px`, ["--r" as string]:`${s.r}deg`, boxShadow:`0 0 8px ${s.color}` } as CSSProperties} />
       ))}
 
-      <button onClick={onComplete} style={{ position:"absolute", bottom:24, right:24, zIndex:20, background:"rgba(0,0,0,0.5)", border:"1px solid rgba(255,255,255,0.2)", color:"rgba(255,255,255,0.5)", padding:"6px 14px", borderRadius:6, fontSize:11, fontFamily:"monospace", fontWeight:700, cursor:"pointer", letterSpacing:"0.12em" }}>SKIP ›</button>
+      <button onClick={() => onCompleteRef.current()} style={{ position:"absolute", bottom:24, right:24, zIndex:20, background:"rgba(0,0,0,0.5)", border:"1px solid rgba(255,255,255,0.2)", color:"rgba(255,255,255,0.5)", padding:"6px 14px", borderRadius:6, fontSize:11, fontFamily:"monospace", fontWeight:700, cursor:"pointer", letterSpacing:"0.12em" }}>SKIP ›</button>
 
       <style>{`
         @keyframes twinkle { 0%,100%{opacity:0.3;transform:scale(1)} 50%{opacity:1;transform:scale(1.5)} }
@@ -498,128 +500,49 @@ function CyclingSectionHeading({ className }: { className?: string }) {
 }
 
 // ═══════════════════════════════════════════════════════════════════════════════
-// HERO VIDEO PANEL — real video + floating metric cards
+// HERO VIDEO PANEL
 // ═══════════════════════════════════════════════════════════════════════════════
 function HeroVideoPanel() {
-  const [playing, setPlaying] = useState(false);
   const videoRef = useRef<HTMLVideoElement>(null);
-
-  const handlePlay = () => {
-    if (videoRef.current) {
-      videoRef.current.play();
-      setPlaying(true);
-    }
-  };
-
   return (
     <div style={{ position:"relative", width:"100%" }}>
-      {/* ── Main video card ── */}
-      <div style={{
-        position:"relative", borderRadius:20, overflow:"hidden",
-        border:"1px solid rgba(0,200,255,0.2)",
-        boxShadow:"0 0 80px rgba(0,200,255,0.12), 0 0 160px rgba(0,200,255,0.05)",
-        aspectRatio:"16/10", background:"#060e18",
-      }}>
-        {/* Actual video — Pexels free tech/AI video */}
-        <video
-          ref={videoRef}
-          autoPlay
-          muted
-          loop
-          playsInline
-          poster="https://images.unsplash.com/photo-1677442135703-1787eea5ce01?w=1280&q=80&fit=crop"
-          style={{ width:"100%", height:"100%", objectFit:"cover", display:"block" }}
-        >
-          <source
-            src="https://videos.pexels.com/video-files/3048527/3048527-hd_1920_1080_24fps.mp4"
-            type="video/mp4"
-          />
+      <div style={{ position:"relative", borderRadius:20, overflow:"hidden", border:"1px solid rgba(0,200,255,0.2)", boxShadow:"0 0 80px rgba(0,200,255,0.12), 0 0 160px rgba(0,200,255,0.05)", aspectRatio:"16/10", background:"#060e18" }}>
+        <video ref={videoRef} autoPlay muted loop playsInline poster="https://images.unsplash.com/photo-1677442135703-1787eea5ce01?w=1280&q=80&fit=crop" style={{ width:"100%", height:"100%", objectFit:"cover", display:"block" }}>
+          <source src="https://videos.pexels.com/video-files/3048527/3048527-hd_1920_1080_24fps.mp4" type="video/mp4" />
         </video>
-
-        {/* Dark gradient overlay */}
         <div style={{ position:"absolute", inset:0, background:"linear-gradient(to top, rgba(5,8,16,0.65) 0%, rgba(5,8,16,0.1) 55%, transparent 100%)", pointerEvents:"none" }} />
-        {/* Subtle cyan tint overlay */}
         <div style={{ position:"absolute", inset:0, background:"linear-gradient(135deg, rgba(0,200,255,0.04) 0%, transparent 60%)", pointerEvents:"none" }} />
-
-        {/* ◉ LIVE badge top-left */}
-        <div style={{
-          position:"absolute", top:14, left:14, display:"flex", alignItems:"center", gap:6,
-          background:"rgba(0,0,0,0.65)", backdropFilter:"blur(10px)",
-          border:"1px solid rgba(0,255,130,0.35)", borderRadius:8,
-          padding:"5px 10px", zIndex:4,
-        }}>
+        <div style={{ position:"absolute", top:14, left:14, display:"flex", alignItems:"center", gap:6, background:"rgba(0,0,0,0.65)", backdropFilter:"blur(10px)", border:"1px solid rgba(0,255,130,0.35)", borderRadius:8, padding:"5px 10px", zIndex:4 }}>
           <span style={{ width:7, height:7, borderRadius:"50%", background:"#00ff88", boxShadow:"0 0 8px #00ff88", animation:"heroPulse 1.4s ease-in-out infinite", flexShrink:0, display:"inline-block" }} />
           <span style={{ fontSize:10, fontWeight:900, color:"#00ff88", fontFamily:"monospace", letterSpacing:"0.18em" }}>LIVE</span>
         </div>
-
-        {/* ⚡ Deploy card — top-right */}
-        <div style={{
-          position:"absolute", top:14, right:14,
-          background:"rgba(0,10,20,0.75)", backdropFilter:"blur(12px)",
-          border:"1px solid rgba(0,200,255,0.3)", borderRadius:12,
-          padding:"8px 12px", zIndex:4, display:"flex", alignItems:"center", gap:8,
-          animation:"heroCardFloat 4s ease-in-out infinite",
-        }}>
+        <div style={{ position:"absolute", top:14, right:14, background:"rgba(0,10,20,0.75)", backdropFilter:"blur(12px)", border:"1px solid rgba(0,200,255,0.3)", borderRadius:12, padding:"8px 12px", zIndex:4, display:"flex", alignItems:"center", gap:8, animation:"heroCardFloat 4s ease-in-out infinite" }}>
           <div style={{ width:30, height:30, borderRadius:8, background:"rgba(0,200,255,0.15)", border:"1px solid rgba(0,200,255,0.3)", display:"flex", alignItems:"center", justifyContent:"center", fontSize:14, flexShrink:0 }}>⚡</div>
           <div>
             <div style={{ fontSize:9, color:"rgba(0,200,255,0.6)", fontWeight:900, letterSpacing:"0.2em", textTransform:"uppercase", fontFamily:"monospace" }}>Deploy Time</div>
             <div style={{ fontSize:13, fontWeight:900, color:"#fff", lineHeight:1.2 }}>&lt; 48 Hours</div>
           </div>
         </div>
-
-        {/* Bottom bar — stats */}
-        <div style={{
-          position:"absolute", bottom:0, left:0, right:0,
-          background:"linear-gradient(to top, rgba(5,8,16,0.92) 0%, transparent 100%)",
-          padding:"20px 16px 16px", display:"flex", alignItems:"flex-end", justifyContent:"space-between", zIndex:4,
-        }}>
-          {/* ROI card */}
-          <div style={{
-            background:"rgba(0,10,20,0.75)", backdropFilter:"blur(12px)",
-            border:"1px solid rgba(167,139,250,0.3)", borderRadius:12, padding:"8px 14px",
-            animation:"heroCardFloat 4.5s ease-in-out 0.5s infinite",
-          }}>
-            <div style={{ fontSize:9, color:"rgba(167,139,250,0.7)", fontWeight:900, letterSpacing:"0.2em", textTransform:"uppercase", fontFamily:"monospace" }}>Avg. ROI</div>
-            <div style={{ fontSize:20, fontWeight:900, color:"#fff" }}>3.2<span style={{ fontSize:13, color:"#a78bfa" }}>×</span></div>
-          </div>
-
-          {/* Learners card */}
-          <div style={{
-            background:"rgba(0,10,20,0.75)", backdropFilter:"blur(12px)",
-            border:"1px solid rgba(52,211,153,0.3)", borderRadius:12, padding:"8px 14px",
-            animation:"heroCardFloat 3.8s ease-in-out 1s infinite",
-          }}>
-            <div style={{ fontSize:9, color:"rgba(52,211,153,0.7)", fontWeight:900, letterSpacing:"0.2em", textTransform:"uppercase", fontFamily:"monospace" }}>Learners</div>
-            <div style={{ fontSize:20, fontWeight:900, color:"#fff" }}>12<span style={{ fontSize:13, color:"#34d399" }}>K+</span></div>
-          </div>
-
-          {/* Orgs card */}
-          <div style={{
-            background:"rgba(0,10,20,0.75)", backdropFilter:"blur(12px)",
-            border:"1px solid rgba(0,200,255,0.3)", borderRadius:12, padding:"8px 14px",
-            animation:"heroCardFloat 5s ease-in-out 0.2s infinite",
-          }}>
-            <div style={{ fontSize:9, color:"rgba(0,200,255,0.7)", fontWeight:900, letterSpacing:"0.2em", textTransform:"uppercase", fontFamily:"monospace" }}>Enterprises</div>
-            <div style={{ fontSize:20, fontWeight:900, color:"#fff" }}>500<span style={{ fontSize:13, color:"#22d3ee" }}>+</span></div>
-          </div>
+        <div style={{ position:"absolute", bottom:0, left:0, right:0, background:"linear-gradient(to top, rgba(5,8,16,0.92) 0%, transparent 100%)", padding:"20px 16px 16px", display:"flex", alignItems:"flex-end", justifyContent:"space-between", zIndex:4 }}>
+          {[
+            { label:"Avg. ROI", val:"3.2×", valColor:"#a78bfa", border:"rgba(167,139,250,0.3)", labelColor:"rgba(167,139,250,0.7)", delay:"0.5s", dur:"4.5s" },
+            { label:"Learners", val:"12K+", valColor:"#34d399", border:"rgba(52,211,153,0.3)", labelColor:"rgba(52,211,153,0.7)", delay:"1s", dur:"3.8s" },
+            { label:"Enterprises", val:"500+", valColor:"#22d3ee", border:"rgba(0,200,255,0.3)", labelColor:"rgba(0,200,255,0.7)", delay:"0.2s", dur:"5s" },
+          ].map(c => (
+            <div key={c.label} style={{ background:"rgba(0,10,20,0.75)", backdropFilter:"blur(12px)", border:`1px solid ${c.border}`, borderRadius:12, padding:"8px 14px", animation:`heroCardFloat ${c.dur} ease-in-out ${c.delay} infinite` }}>
+              <div style={{ fontSize:9, color:c.labelColor, fontWeight:900, letterSpacing:"0.2em", textTransform:"uppercase", fontFamily:"monospace" }}>{c.label}</div>
+              <div style={{ fontSize:20, fontWeight:900, color:"#fff" }}>{c.val.replace("×","")}<span style={{ fontSize:13, color:c.valColor }}>{c.val.includes("×")?"×":c.val.includes("K")?"K+":"+"}</span></div>
+            </div>
+          ))}
         </div>
-
-        {/* Progress bar at very bottom */}
         <div style={{ position:"absolute", bottom:0, left:0, right:0, height:2, background:"rgba(0,200,255,0.15)", zIndex:5 }}>
           <div style={{ height:"100%", background:"linear-gradient(90deg,#00c8ff,#8040ff)", animation:"heroProgress 8s linear infinite" }} />
         </div>
       </div>
-
-      {/* ── Division badges below video ── */}
       <div style={{ display:"flex", gap:10, marginTop:12, justifyContent:"center" }}>
-        <div style={{ display:"flex", alignItems:"center", gap:6, padding:"5px 12px", borderRadius:99, background:"rgba(0,200,255,0.08)", border:"1px solid rgba(0,200,255,0.2)", fontSize:11, fontWeight:900, color:"rgba(0,200,255,0.8)" }}>
-          <span style={{ fontSize:12 }}>⚡</span> Technology Division
-        </div>
-        <div style={{ display:"flex", alignItems:"center", gap:6, padding:"5px 12px", borderRadius:99, background:"rgba(167,139,250,0.08)", border:"1px solid rgba(167,139,250,0.2)", fontSize:11, fontWeight:900, color:"rgba(167,139,250,0.8)" }}>
-          <span style={{ fontSize:12 }}>🎓</span> Institute Division
-        </div>
+        <div style={{ display:"flex", alignItems:"center", gap:6, padding:"5px 12px", borderRadius:99, background:"rgba(0,200,255,0.08)", border:"1px solid rgba(0,200,255,0.2)", fontSize:11, fontWeight:900, color:"rgba(0,200,255,0.8)" }}><span style={{ fontSize:12 }}>⚡</span> Technology Division</div>
+        <div style={{ display:"flex", alignItems:"center", gap:6, padding:"5px 12px", borderRadius:99, background:"rgba(167,139,250,0.08)", border:"1px solid rgba(167,139,250,0.2)", fontSize:11, fontWeight:900, color:"rgba(167,139,250,0.8)" }}><span style={{ fontSize:12 }}>🎓</span> Institute Division</div>
       </div>
-
       <style>{`
         @keyframes heroPulse { 0%,100%{opacity:1;transform:scale(1)} 50%{opacity:0.6;transform:scale(1.4)} }
         @keyframes heroCardFloat { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-5px)} }
@@ -663,8 +586,7 @@ function TextAnimSliderSection() {
       <div style={{ margin:"0 auto", width:"100%", maxWidth:1280, padding:"0 clamp(16px,4vw,48px)", position:"relative", zIndex:1 }}>
         <div style={{ display:"flex", alignItems:"center", flexWrap:"wrap", gap:10, marginBottom:"clamp(24px,4vw,48px)" }}>
           <div style={{ display:"inline-flex", alignItems:"center", gap:8, padding:"5px 14px", borderRadius:99, border:`1px solid ${msg.accent}40`, background:`${msg.accent}08`, fontSize:"clamp(9px,1.1vw,11px)", fontWeight:900, letterSpacing:"0.2em", textTransform:"uppercase" as const, color:"#fff", opacity:sectionVisible?1:0, animation:sectionVisible?"sectionHeaderReveal 0.6s ease both":"none", transition:"border-color 0.5s ease, background 0.5s ease" }}>
-            <span style={{ width:7, height:7, borderRadius:"50%", background:msg.accent, boxShadow:`0 0 10px ${msg.accent}`, animation:"dotPulse 1.4s ease-in-out infinite", flexShrink:0 }} />
-            ◈ {msg.eyebrow}
+            <span style={{ width:7, height:7, borderRadius:"50%", background:msg.accent, boxShadow:`0 0 10px ${msg.accent}`, animation:"dotPulse 1.4s ease-in-out infinite", flexShrink:0 }} />◈ {msg.eyebrow}
           </div>
           <div style={{ padding:"4px 10px", borderRadius:6, border:`1px solid ${msg.accent}35`, background:`${msg.accent}10`, fontSize:"clamp(8px,1vw,10px)", fontWeight:900, letterSpacing:"0.18em", textTransform:"uppercase" as const, color:msg.accent, fontFamily:"monospace", transition:"all 0.4s ease", opacity:sectionVisible?1:0, animation:sectionVisible?"sectionHeaderReveal 0.6s ease 0.1s both":"none" }}>◈ {ANIM_LABEL[msg.anim]}</div>
         </div>
@@ -772,8 +694,7 @@ function SolutionsCarousel() {
               <span className="w-1.5 h-1.5 rounded-full animate-pulse shrink-0" style={{ background:cc.primary }} />Technology Division — Solutions
             </div>
             <h2 className="text-2xl sm:text-4xl md:text-5xl lg:text-6xl font-black tracking-tight leading-tight" style={{ opacity:visible?1:0, animation:visible?"sectionHeaderReveal 0.7s ease 0.1s both":"none" }}>
-              What We{" "}
-              <span style={{ background:`linear-gradient(135deg,${cc.primary},#a78bfa)`, WebkitBackgroundClip:"text", WebkitTextFillColor:"transparent", backgroundClip:"text", transition:"all 0.5s ease" }}>Build & Deploy</span>
+              What We{" "}<span style={{ background:`linear-gradient(135deg,${cc.primary},#a78bfa)`, WebkitBackgroundClip:"text", WebkitTextFillColor:"transparent", backgroundClip:"text", transition:"all 0.5s ease" }}>Build & Deploy</span>
             </h2>
           </div>
           <Link href="/solutions" className={`${btnGhost} w-full sm:w-auto shrink-0`}>All Solutions →</Link>
@@ -961,11 +882,14 @@ function ContactSection() {
 }
 
 // ═══════════════════════════════════════════════════════════════════════════════
-// MAIN HOME PAGE
+// MAIN HOME PAGE — FIX: useCallback stabilises onComplete reference
 // ═══════════════════════════════════════════════════════════════════════════════
 export default function HomePage() {
   const [introComplete, setIntroComplete] = useState(false);
   const [modalOpen, setModalOpen] = useState(false);
+
+  // ✅ FIX: stable reference — won't cause RobotIntro to re-run timers
+  const handleIntroComplete = useCallback(() => setIntroComplete(true), []);
 
   const divisionSection     = useSectionVisible();
   const problemSection      = useSectionVisible();
@@ -977,7 +901,7 @@ export default function HomePage() {
 
   const heroSub = HERO_ROTATIONS[0].sub;
 
-  if (!introComplete) return <RobotIntro onComplete={() => setIntroComplete(true)} />;
+  if (!introComplete) return <RobotIntro onComplete={handleIntroComplete} />;
 
   return (
     <>
@@ -998,72 +922,50 @@ export default function HomePage() {
         .hp-div-p { font-size:clamp(0.78rem,1.3vw,0.98rem); line-height:1.65; font-weight:600; margin-bottom:clamp(14px,2vw,22px); flex:1; }
         .hp-div-feats { display:grid; grid-template-columns:1fr 1fr; gap:clamp(5px,0.8vw,11px); margin-bottom:clamp(14px,2.5vw,24px); }
         .hp-div-feat { font-size:clamp(0.62rem,1vw,0.84rem); font-weight:700; display:flex; align-items:center; gap:5px; color:rgba(203,213,225,0.85); }
-
         .hp-stats { display:grid; grid-template-columns:repeat(3,1fr); gap:8px; }
         @media(min-width:500px){ .hp-stats { grid-template-columns:repeat(5,1fr); gap:14px; } }
         @media(min-width:1024px){ .hp-stats { display:flex; flex-wrap:wrap; gap:28px; } }
-
         .hp-hero-btns { display:grid; grid-template-columns:1fr 1fr; gap:10px; }
         @media(min-width:640px){ .hp-hero-btns { display:flex; flex-wrap:wrap; gap:12px; } }
-
-        /* ── NEW: 2-column hero grid ── */
         .hp-hero-grid { display:grid; grid-template-columns:1fr; gap:clamp(28px,5vw,56px); align-items:center; }
         @media(min-width:1024px){ .hp-hero-grid { grid-template-columns:1fr 1fr; } }
-
         .hp-problem-grid { display:grid; grid-template-columns:1fr; }
         @media(min-width:640px){ .hp-problem-grid { grid-template-columns:repeat(3,1fr); } }
-
         .hp-pillars-grid { display:grid; grid-template-columns:repeat(2,1fr); gap:clamp(6px,1.5vw,18px); }
         @media(min-width:1024px){ .hp-pillars-grid { grid-template-columns:repeat(4,1fr); } }
-
         .hp-sol-sub { display:grid; grid-template-columns:1fr 1fr; gap:clamp(8px,1.5vw,16px); }
         .hp-sol-sub-img { height:clamp(64px,12vw,160px); }
-
         .hp-testi-grid { display:grid; grid-template-columns:1fr 1fr; gap:clamp(6px,1.5vw,20px); }
         @media(min-width:768px){ .hp-testi-grid { grid-template-columns:repeat(3,1fr); } }
-
         .hp-blog-grid { display:grid; grid-template-columns:1fr 1fr; gap:clamp(6px,1.5vw,20px); }
         @media(min-width:1024px){ .hp-blog-grid { grid-template-columns:repeat(3,1fr); } }
-
         .hp-cta-grid { display:grid; grid-template-columns:1fr 1fr; gap:clamp(8px,1.5vw,20px); max-width:900px; margin:0 auto; }
         @media(min-width:768px){ .hp-cta-grid { grid-template-columns:repeat(3,1fr); } }
       `}</style>
 
       <main className="hp-root bg-[#050810] text-white font-sans antialiased">
 
-        {/* ═══════════════════════════════════════════════════════
-            1. HERO — 2-column: Left text | Right video
-        ═══════════════════════════════════════════════════════ */}
+        {/* ═══════════════════ 1. HERO ═══════════════════ */}
         <section className="relative min-h-[100dvh] flex items-center overflow-hidden">
-          {/* Backgrounds */}
           <div className="absolute inset-0 pointer-events-none">
             <div className="absolute inset-0 bg-[radial-gradient(ellipse_100%_70%_at_50%_-5%,rgba(0,180,255,0.22),transparent)]" />
             <div className="absolute inset-0 bg-[radial-gradient(ellipse_60%_50%_at_85%_80%,rgba(130,50,255,0.15),transparent)]" />
             <div className="absolute inset-0 opacity-[0.035]" style={{ backgroundImage:`linear-gradient(rgba(0,220,255,1) 1px,transparent 1px),linear-gradient(90deg,rgba(0,220,255,1) 1px,transparent 1px)`, backgroundSize:"80px 80px" }} />
           </div>
-
           <div className="relative z-10 mx-auto w-full max-w-screen-xl px-4 sm:px-6 lg:px-12 pt-20 sm:pt-24 lg:pt-0 pb-10 sm:pb-12 lg:py-0">
             <div className="hp-hero-grid">
-
-              {/* ── LEFT: Text content ── */}
               <div>
                 <div className={`${pill} mb-4 sm:mb-6`}>
                   <span className="w-1.5 h-1.5 sm:w-2 sm:h-2 rounded-full bg-cyan-400 animate-pulse shrink-0" />
                   <span className="hidden sm:inline">Two Divisions. One Unified Intelligence Platform.</span>
                   <span className="sm:hidden">Two Divisions. One Platform.</span>
                 </div>
-
                 <CyclingHeroHeadline />
-
-                <p className="text-sm sm:text-lg lg:text-xl text-slate-300 leading-relaxed mb-5 sm:mb-7 font-semibold max-w-xl">
-                  {heroSub}
-                </p>
-
+                <p className="text-sm sm:text-lg lg:text-xl text-slate-300 leading-relaxed mb-5 sm:mb-7 font-semibold max-w-xl">{heroSub}</p>
                 <div className="hp-hero-btns mb-5 sm:mb-8">
                   <Link href="/book-demo" className={`${btnCyan} text-center`}>Book a Free Demo →</Link>
                   <button onClick={() => setModalOpen(true)} className={`${btnGhost} text-center`}>Explore Divisions ↓</button>
                 </div>
-
                 <div className="hp-stats border-t border-white/10 pt-4 sm:pt-6">
                   {[
                     { val:"500+",  label:"Enterprises" },
@@ -1079,12 +981,7 @@ export default function HomePage() {
                   ))}
                 </div>
               </div>
-
-              {/* ── RIGHT: Real video with floating cards ── */}
-              <div className="w-full">
-                <HeroVideoPanel />
-              </div>
-
+              <div className="w-full"><HeroVideoPanel /></div>
             </div>
           </div>
         </section>
@@ -1092,9 +989,7 @@ export default function HomePage() {
         {/* ★ Animated text slider */}
         <TextAnimSliderSection />
 
-        {/* ═══════════════════════════════════════════════════════
-            2. DIVISION BRIDGE
-        ═══════════════════════════════════════════════════════ */}
+        {/* ═══════════════════ 2. DIVISION BRIDGE ═══════════════════ */}
         <section id="divisions" ref={divisionSection.ref as React.RefCallback<HTMLElement>} className="relative bg-[#080c14] py-8 sm:py-14 lg:py-20 overflow-hidden">
           <div className="absolute inset-0 bg-[radial-gradient(ellipse_70%_50%_at_50%_50%,rgba(0,200,255,0.06),transparent)] pointer-events-none" />
           <div className="mx-auto w-full max-w-screen-xl px-4 sm:px-6 lg:px-12 relative z-10">
@@ -1110,7 +1005,6 @@ export default function HomePage() {
               </p>
             </div>
             <div className="hp-div-grid mb-8 sm:mb-8">
-              {/* Technology */}
               <div className="group relative rounded-2xl border border-cyan-400/25 hover:border-cyan-400/55 bg-[#060e1a] transition-all duration-500 hover:shadow-[0_0_70px_rgba(0,200,255,0.22)]" style={{ opacity:divisionSection.visible?1:0, animation:divisionSection.visible?"sectionHeaderReveal 0.7s ease 0.15s both":"none" }}>
                 <div className="absolute top-0 left-0 right-0 h-[2px] rounded-t-2xl bg-gradient-to-r from-transparent via-cyan-400 to-transparent opacity-50 group-hover:opacity-100 transition-opacity duration-500" />
                 <div className="absolute inset-0 rounded-2xl pointer-events-none" style={{ background:"radial-gradient(ellipse 80% 60% at 10% 10%,rgba(0,200,255,0.05),transparent)" }} />
@@ -1129,7 +1023,6 @@ export default function HomePage() {
                   </div>
                 </div>
               </div>
-              {/* Institute */}
               <div className="group relative rounded-2xl border border-violet-400/25 hover:border-violet-400/55 bg-[#090614] transition-all duration-500 hover:shadow-[0_0_70px_rgba(160,80,255,0.22)]" style={{ opacity:divisionSection.visible?1:0, animation:divisionSection.visible?"sectionHeaderReveal 0.7s ease 0.25s both":"none" }}>
                 <div className="absolute top-0 left-0 right-0 h-[2px] rounded-t-2xl bg-gradient-to-r from-transparent via-violet-400 to-transparent opacity-50 group-hover:opacity-100 transition-opacity duration-500" />
                 <div className="absolute inset-0 rounded-2xl pointer-events-none" style={{ background:"radial-gradient(ellipse 80% 60% at 10% 10%,rgba(160,80,255,0.06),transparent)" }} />
@@ -1159,9 +1052,7 @@ export default function HomePage() {
           </div>
         </section>
 
-        {/* ═══════════════════════════════════════════════════════
-            3. PROBLEM → SOLUTION
-        ═══════════════════════════════════════════════════════ */}
+        {/* ═══════════════════ 3. PROBLEM → SOLUTION ═══════════════════ */}
         <section ref={problemSection.ref as React.RefCallback<HTMLElement>} className="relative bg-[#050810] py-8 sm:py-14 lg:py-20 overflow-hidden">
           <div className="mx-auto w-full max-w-screen-xl px-4 sm:px-6 lg:px-12 relative z-10">
             <div className="text-center mb-5 sm:mb-10">
@@ -1180,9 +1071,7 @@ export default function HomePage() {
           </div>
         </section>
 
-        {/* ═══════════════════════════════════════════════════════
-            4. FOUR PILLARS
-        ═══════════════════════════════════════════════════════ */}
+        {/* ═══════════════════ 4. FOUR PILLARS ═══════════════════ */}
         <section ref={pillarsSection.ref as React.RefCallback<HTMLElement>} className="relative bg-[#080c14] py-8 sm:py-14 lg:py-18">
           <div className="mx-auto w-full max-w-screen-xl px-4 sm:px-6 lg:px-12">
             <div className="text-center mb-5 sm:mb-10">
@@ -1202,9 +1091,7 @@ export default function HomePage() {
           </div>
         </section>
 
-        {/* ═══════════════════════════════════════════════════════
-            5. SOLUTIONS GRID
-        ═══════════════════════════════════════════════════════ */}
+        {/* ═══════════════════ 5. SOLUTIONS GRID ═══════════════════ */}
         <section ref={solutionsSection.ref as React.RefCallback<HTMLElement>} className="relative bg-[#050810] py-8 sm:py-14 lg:py-20">
           <div className="absolute inset-0 bg-[radial-gradient(ellipse_60%_40%_at_80%_20%,rgba(120,40,255,0.08),transparent)] pointer-events-none" />
           <div className="mx-auto w-full max-w-screen-xl px-4 sm:px-6 lg:px-12 relative z-10">
@@ -1248,9 +1135,7 @@ export default function HomePage() {
         {/* ★ Solutions Carousel */}
         <SolutionsCarousel />
 
-        {/* ═══════════════════════════════════════════════════════
-            6. TESTIMONIALS
-        ═══════════════════════════════════════════════════════ */}
+        {/* ═══════════════════ 6. TESTIMONIALS ═══════════════════ */}
         <section ref={testimonialsSection.ref as React.RefCallback<HTMLElement>} className="relative bg-[#080c14] py-8 sm:py-12 lg:py-16 border-y border-white/5">
           <div className="mx-auto w-full max-w-screen-xl px-4 sm:px-6 lg:px-12">
             <div className="text-center mb-6 sm:mb-8">
@@ -1267,9 +1152,7 @@ export default function HomePage() {
           </div>
         </section>
 
-        {/* ═══════════════════════════════════════════════════════
-            7. BLOG
-        ═══════════════════════════════════════════════════════ */}
+        {/* ═══════════════════ 7. BLOG ═══════════════════ */}
         <section ref={blogSection.ref as React.RefCallback<HTMLElement>} className="relative bg-[#050810] py-8 sm:py-14 lg:py-20">
           <div className="mx-auto w-full max-w-screen-xl px-4 sm:px-6 lg:px-12">
             <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 sm:gap-6 mb-5 sm:mb-10">
@@ -1301,9 +1184,7 @@ export default function HomePage() {
         {/* ★ Contact Section */}
         <ContactSection />
 
-        {/* ═══════════════════════════════════════════════════════
-            8. FINAL CTA
-        ═══════════════════════════════════════════════════════ */}
+        {/* ═══════════════════ 8. FINAL CTA ═══════════════════ */}
         <section ref={ctaSection.ref as React.RefCallback<HTMLElement>} className="relative bg-[#080c14] py-8 sm:py-14 lg:py-20 overflow-hidden">
           <div className="absolute inset-0 pointer-events-none">
             <div className="absolute inset-0 bg-[radial-gradient(ellipse_80%_60%_at_50%_50%,rgba(0,200,255,0.1),transparent)]" />

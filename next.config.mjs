@@ -7,7 +7,14 @@
 // ─────────────────────────────────────────────────────────────────────────────
 import { initOpenNextCloudflareForDev } from "@opennextjs/cloudflare";
 
-initOpenNextCloudflareForDev();
+// Only run in dev, and silently skip if macOS version is too old
+if (process.env.NODE_ENV === "development") {
+  try {
+    initOpenNextCloudflareForDev();
+  } catch {
+    // macOS 12.6 doesn't support workerd — safe to ignore locally
+  }
+}
 
 /** @type {import('next').NextConfig} */
 const nextConfig = {
