@@ -2,26 +2,26 @@
   "name": "astralearnia",
   "version": "0.1.0",
   "private": true,
-"scripts": {
-  "dev": "next dev",
-  "build": "next build",
-  "start": "next start",
-  "lint": "next lint",
-  "type-check": "tsc --noEmit",
-  "pages:build": "npx @opennextjs/cloudflare build && cp .open-next/worker.js .open-next/_worker.js"
-},
-"dependencies": {
-  "clsx": "^2.1.1",
-  "framer-motion": "^11.2.10",
-  "lucide-react": "^0.381.0",
-  "next": "^16.2.3",
-  "react": "^18.3.0",
-  "react-dom": "^18.3.0",
-  "tailwind-merge": "^2.3.0"
-},
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "next lint",
+    "type-check": "tsc --noEmit",
+    "pages:build": "npx @opennextjs/cloudflare build && cp .open-next/worker.js .open-next/_worker.js"
+  },
+  "dependencies": {
+    "@opennextjs/cloudflare": "^1.19.4",
+    "clsx": "^2.1.1",
+    "framer-motion": "^11.2.10",
+    "lucide-react": "^0.381.0",
+    "next": "^16.2.3",
+    "react": "^18.3.0",
+    "react-dom": "^18.3.0",
+    "tailwind-merge": "^2.3.0"
+  },
   "devDependencies": {
     "@cloudflare/workers-types": "^4.20260317.1",
-    "@opennextjs/cloudflare": "^1.19.1",
     "@types/node": "^20.14.2",
     "@types/react": "^18.3.3",
     "@types/react-dom": "^18.3.0",
