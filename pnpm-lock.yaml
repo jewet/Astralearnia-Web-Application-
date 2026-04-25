@@ -8,9 +8,6 @@ importers:
 
   .:
     dependencies:
-      '@opennextjs/cloudflare':
-        specifier: ^1.19.4
-        version: 1.19.4(next@16.2.4(@babel/core@7.29.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(wrangler@4.85.0(@cloudflare/workers-types@4.20260425.1))
       clsx:
         specifier: ^2.1.1
         version: 2.1.1
@@ -36,6 +33,9 @@ importers:
       '@cloudflare/workers-types':
         specifier: ^4.20260317.1
         version: 4.20260425.1
+      '@opennextjs/cloudflare':
+        specifier: ^1.19.1
+        version: 1.19.4(next@16.2.4(@babel/core@7.29.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(wrangler@4.85.0(@cloudflare/workers-types@4.20260425.1))
       '@types/node':
         specifier: ^20.14.2
         version: 20.19.39
