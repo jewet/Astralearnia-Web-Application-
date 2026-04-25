@@ -13,7 +13,6 @@ initOpenNextCloudflareForDev();
 const nextConfig = {
   experimental: {
     optimizePackageImports: ["lucide-react", "framer-motion"],
-    turbopack: false,
   },
   images: {
     formats: ["image/avif", "image/webp"],
