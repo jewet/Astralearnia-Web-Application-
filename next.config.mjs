@@ -5,7 +5,6 @@
 // If you already have a next.config.js, MERGE the `images` key into it —
 // do not replace the entire file.
 // ─────────────────────────────────────────────────────────────────────────────
-
 import { initOpenNextCloudflareForDev } from "@opennextjs/cloudflare";
 
 initOpenNextCloudflareForDev();
@@ -14,6 +13,7 @@ initOpenNextCloudflareForDev();
 const nextConfig = {
   experimental: {
     optimizePackageImports: ["lucide-react", "framer-motion"],
+    turbopack: false,
   },
   images: {
     formats: ["image/avif", "image/webp"],
