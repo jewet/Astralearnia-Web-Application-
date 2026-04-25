@@ -34,7 +34,7 @@
  *      and follow the DNS steps to verify it (just a few TXT records in Cloudflare DNS)
  */
 
-export const runtime = "edge";
+
 
 import { NextRequest, NextResponse } from "next/server";
 

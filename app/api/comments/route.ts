@@ -2,7 +2,7 @@
 import { getCloudflareContext } from "@opennextjs/cloudflare";
 import { NextResponse } from "next/server";
 
-export const runtime = "edge";
+
 
 interface CommentBody {
   slug: string;
