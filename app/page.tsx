@@ -967,6 +967,8 @@ export default function HomePage() {
   const [introComplete, setIntroComplete] = useState(false);
   const [modalOpen, setModalOpen] = useState(false);
 
+  const handleIntroComplete = useCallback(() => setIntroComplete(true), []);
+
   const divisionSection     = useSectionVisible();
   const problemSection      = useSectionVisible();
   const pillarsSection      = useSectionVisible();
@@ -977,7 +979,7 @@ export default function HomePage() {
 
   const heroSub = HERO_ROTATIONS[0].sub;
 
-  if (!introComplete) return <RobotIntro onComplete={() => setIntroComplete(true)} />;
+  if (!introComplete) return <RobotIntro onComplete={handleIntroComplete} />;
 
   return (
     <>
