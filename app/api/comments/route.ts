@@ -36,7 +36,7 @@ export async function POST(req: Request) {
   }
 
   try {
-     const { env } = await getCloudflareContext() as unknown as { env: CloudflareEnv };
+     const { env } = await getCloudflareContext({ async: true });
     await env.DB.prepare(
       `INSERT INTO comments (slug, name, email, message)
        VALUES (?, ?, ?, ?)`

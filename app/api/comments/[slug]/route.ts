@@ -11,7 +11,7 @@ export async function GET(_req: Request, { params }: Params) {
   }
 
   try {
-    const { env } = await getCloudflareContext() as unknown as { env: CloudflareEnv };
+    const { env } = await getCloudflareContext({ async: true });
 
     const { results } = await env.DB.prepare(
       `SELECT id, name, message, created_at
