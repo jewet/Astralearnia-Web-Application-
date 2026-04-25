@@ -430,7 +430,7 @@ export default function TechnologyPage() {
               background: "rgba(255,255,255,0.02)",
             }}>Contact an Engineer</Link>
           </div>
-          <Link href="/divisions/institute" style={{
+          <Link href="/institute" style={{
             fontSize: "0.75rem", color: "rgba(255,255,255,0.25)",
             textDecoration: "underline", textUnderlineOffset: 4,
             fontWeight: 600, position: "relative", zIndex: 1,

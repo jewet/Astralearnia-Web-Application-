@@ -4,16 +4,22 @@
 //
 // If you already have a next.config.js, MERGE the `images` key into it —
 // do not replace the entire file.
+//
+// Cloudflare local dev is OPTIONAL.
+// Normal `pnpm run dev` runs standard Next.js locally.
+// Use `USE_CLOUDFLARE_DEV=true pnpm run dev` only when needed.
+//
+// This prevents macOS 12.6 / workerd crashes while keeping deployment support.
 // ─────────────────────────────────────────────────────────────────────────────
+
 import { initOpenNextCloudflareForDev } from "@opennextjs/cloudflare";
 
-// Only run in dev, and silently skip if macOS version is too old
-if (process.env.NODE_ENV === "development") {
-  try {
-    initOpenNextCloudflareForDev();
-  } catch {
-    // macOS 12.6 doesn't support workerd — safe to ignore locally
-  }
+// Only enable Cloudflare local runtime when explicitly requested
+if (
+  process.env.NODE_ENV === "development" &&
+  process.env.USE_CLOUDFLARE_DEV === "true"
+) {
+  initOpenNextCloudflareForDev();
 }
 
 /** @type {import('next').NextConfig} */
@@ -21,8 +27,10 @@ const nextConfig = {
   experimental: {
     optimizePackageImports: ["lucide-react", "framer-motion"],
   },
+
   images: {
     formats: ["image/avif", "image/webp"],
+
     remotePatterns: [
       {
         protocol: "https",
