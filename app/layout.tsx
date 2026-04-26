@@ -3,6 +3,8 @@ import "./globals.css";
 import { Navbar } from "@/components/layout/Navbar";
 import { Footer } from "@/components/layout/Footer";
 import { Cursor } from "@/components/ui/Cursor";
+import AstraBot from "@/components/AstraBot";
+import AdCard   from "@/components/AdCard";
 
 export const metadata: Metadata = {
   title: {
@@ -66,6 +68,10 @@ export default function RootLayout({
         <Navbar />
         <main>{children}</main>
         <Footer />
+        {/* AstraBot — global chatbot, fixed position, persists across all page navigations */}
+        <AstraBot />
+        {/* AdCard — global floating ad, fixed bottom-left, dismissible per session */}
+        <AdCard />
       </body>
     </html>
   );

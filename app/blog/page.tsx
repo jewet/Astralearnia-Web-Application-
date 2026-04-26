@@ -1,321 +1,366 @@
-// ─── app/blog/page.tsx ────────────────────────────────────────────────────────
 "use client";
-import { useState } from "react";
+// ─── app/blog/page.tsx ────────────────────────────────────────────────────────
+// AstraLearnia Blog — listing page
+// Fixes the 404 error when navigating to /blog
+// Connects to lib/blog-data.ts for all post data
+// ─────────────────────────────────────────────────────────────────────────────
+
 import Link from "next/link";
 import Image from "next/image";
-import { BLOG_POSTS } from "@/lib/blog-data";
+import { useEffect, useRef, useState, useMemo } from "react";
+import { BLOG_POSTS, type BlogPost } from "@/lib/blog-data";
 
-const FILTER_TAGS = ["All", "Technology", "Institute", "Case Studies", "Engineering", "Product"];
-
-const tagStyle = (tag: string) => {
-  if (tag === "Technology") return { bg: "rgba(0,200,255,0.12)",   border: "rgba(0,200,255,0.28)",   color: "#00c8ff" };
-  if (tag === "Institute")  return { bg: "rgba(168,85,247,0.12)",  border: "rgba(168,85,247,0.28)",  color: "#a855f7" };
-  return                           { bg: "rgba(255,255,255,0.06)", border: "rgba(255,255,255,0.12)", color: "rgba(255,255,255,0.45)" };
-};
-
-export default function BlogPage() {
-  const [activeTag, setActiveTag] = useState("All");
-  const [email,     setEmail]     = useState("");
-  const [subDone,   setSubDone]   = useState(false);
-
-  const filtered  = activeTag === "All" ? BLOG_POSTS : BLOG_POSTS.filter(p => p.tag === activeTag);
-  const featured  = filtered[0];
-  const remaining = filtered.slice(1);
-
+// ── Fade-in hook ──────────────────────────────────────────────────────────────
+function useFade(thr = 0.08) {
+  const ref = useRef<HTMLDivElement>(null);
+  const [v, setV] = useState(false);
+  useEffect(() => {
+    const el = ref.current; if (!el) return;
+    const o = new IntersectionObserver(
+      ([e]) => { if (e.isIntersecting) { setV(true); o.disconnect(); } },
+      { threshold: thr }
+    );
+    o.observe(el); return () => o.disconnect();
+  }, [thr]);
+  return { ref, v };
+}
+function FadeIn({ children, d = 0, cls = "" }: { children: React.ReactNode; d?: number; cls?: string }) {
+  const { ref, v } = useFade();
   return (
-    <div className="bg-[#050810] min-h-screen text-white font-sans antialiased">
+    <div ref={ref} className={cls}
+      style={{ opacity: v ? 1 : 0, transform: v ? "none" : "translateY(20px)", transition: `opacity .55s ease ${d}ms, transform .55s ease ${d}ms` }}>
+      {children}
+    </div>
+  );
+}
 
-      {/* ── ambient background ── */}
-      <div className="fixed inset-0 pointer-events-none z-0">
-        <div className="absolute inset-0 bg-[radial-gradient(ellipse_70%_40%_at_50%_0%,rgba(0,200,255,0.07),transparent)]" />
-        <div className="absolute inset-0 opacity-[0.025]"
-          style={{ backgroundImage: "radial-gradient(circle,rgba(0,200,255,0.8) 1px,transparent 1px)", backgroundSize: "44px 44px" }} />
+// ── Tag colour helper ─────────────────────────────────────────────────────────
+function tagStyle(tag: string) {
+  if (tag === "Technology") return { bg: "rgba(0,200,255,0.12)",  border: "rgba(0,200,255,0.28)",  color: "#00c8ff" };
+  if (tag === "Institute")  return { bg: "rgba(168,85,247,0.12)", border: "rgba(168,85,247,0.28)", color: "#a855f7" };
+  return                          { bg: "rgba(255,255,255,0.06)", border: "rgba(255,255,255,0.12)", color: "rgba(255,255,255,0.45)" };
+}
+
+// ── Featured card ─────────────────────────────────────────────────────────────
+function FeaturedCard({ post }: { post: BlogPost }) {
+  const ts = tagStyle(post.tag);
+  return (
+    <Link
+      href={`/blog/${post.slug}`}
+      className="group block"
+      style={{
+        borderRadius: 20,
+        overflow:     "hidden",
+        background:   "#0a1220",
+        border:       "1px solid rgba(0,200,255,0.14)",
+        transition:   "transform .3s, border-color .3s, box-shadow .3s",
+        textDecoration: "none",
+        display:      "flex",
+        flexDirection: "column",
+      }}
+      onMouseEnter={e => { const el = e.currentTarget as HTMLElement; el.style.borderColor = "rgba(0,200,255,0.38)"; el.style.transform = "translateY(-4px)"; el.style.boxShadow = "0 0 50px rgba(0,200,255,0.09)"; }}
+      onMouseLeave={e => { const el = e.currentTarget as HTMLElement; el.style.borderColor = "rgba(0,200,255,0.14)"; el.style.transform = "translateY(0)"; el.style.boxShadow = "none"; }}
+    >
+      {/* Cover */}
+      <div style={{ position: "relative", width: "100%", aspectRatio: "16/8", overflow: "hidden", background: "#060e1c" }}>
+        <Image
+          src={post.coverImage} alt={post.coverAlt}
+          fill className="object-cover"
+          style={{ opacity: 0.6, transition: "opacity .4s, transform .5s" }}
+          sizes="(max-width: 768px) 100vw, 60vw"
+          onMouseEnter={e => { (e.currentTarget as HTMLElement).style.opacity = "0.8"; (e.currentTarget as HTMLElement).style.transform = "scale(1.04)"; }}
+          onMouseLeave={e => { (e.currentTarget as HTMLElement).style.opacity = "0.6"; (e.currentTarget as HTMLElement).style.transform = "scale(1)"; }}
+        />
+        <div style={{ position: "absolute", inset: 0, background: "linear-gradient(to top,#0a1220 5%,transparent 60%)" }} />
+        {/* Featured badge */}
+        <div style={{
+          position:    "absolute", top: 16, left: 16,
+          padding:     "4px 10px", borderRadius: 8,
+          fontSize:    "0.62rem", fontWeight: 800, letterSpacing: "0.1em", textTransform: "uppercase",
+          background:  "linear-gradient(135deg,#00c8ff,#3b82f6)",
+          color:       "#fff",
+          boxShadow:   "0 3px 12px rgba(0,200,255,0.35)",
+        }}>★ Featured</div>
+        <div style={{ position: "absolute", top: 16, right: 16, display: "flex", gap: 6, alignItems: "center" }}>
+          <span style={{ padding: "4px 10px", borderRadius: 8, fontSize: "0.62rem", fontWeight: 800, textTransform: "uppercase", letterSpacing: "0.08em", background: ts.bg, border: `1px solid ${ts.border}`, color: ts.color }}>{post.tag}</span>
+        </div>
       </div>
 
-      {/* ══════════════════════════════════════════════════
-          HERO
-      ══════════════════════════════════════════════════ */}
-      <section className="relative z-10 pt-32 pb-12 px-4 sm:px-6 lg:px-12 max-w-screen-xl mx-auto">
-        <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full
-                        border border-white/15 bg-white/[0.04]
-                        text-white/60 text-xs font-black uppercase tracking-[0.18em] mb-8">
-          <span className="w-2 h-2 rounded-full bg-cyan-400 animate-pulse" />
-          Signal Intelligence
+      {/* Body */}
+      <div style={{ padding: "clamp(18px,3vw,28px)", flex: 1, display: "flex", flexDirection: "column" }}>
+        <div style={{ display: "flex", gap: 8, alignItems: "center", marginBottom: 10 }}>
+          <span style={{ fontSize: "0.68rem", fontWeight: 700, color: "rgba(255,255,255,0.3)" }}>{post.date}</span>
+          <span style={{ width: 3, height: 3, borderRadius: "50%", background: "rgba(255,255,255,0.15)" }} />
+          <span style={{ fontSize: "0.68rem", fontWeight: 700, color: "rgba(255,255,255,0.3)" }}>{post.readTime}</span>
+        </div>
+        <h2 style={{ fontSize: "clamp(1.1rem,2.5vw,1.5rem)", fontWeight: 900, color: "#fff", lineHeight: 1.2, marginBottom: 10, letterSpacing: "-0.02em" }}>{post.title}</h2>
+        <p style={{ fontSize: "0.875rem", color: "rgba(255,255,255,0.48)", lineHeight: 1.65, flex: 1, marginBottom: 16 }}>{post.excerpt}</p>
+        <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+          <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+            <div style={{
+              width: 28, height: 28, borderRadius: "50%",
+              background: `${post.authorColor}20`, border: `1.5px solid ${post.authorColor}40`, color: post.authorColor,
+              display: "flex", alignItems: "center", justifyContent: "center", fontSize: "0.68rem", fontWeight: 800,
+            }}>{post.authorInitials}</div>
+            <span style={{ fontSize: "0.75rem", fontWeight: 700, color: "rgba(255,255,255,0.45)" }}>{post.author}</span>
+          </div>
+          <span style={{ fontSize: "0.75rem", fontWeight: 800, color: "#00c8ff" }}>Read article →</span>
+        </div>
+      </div>
+    </Link>
+  );
+}
+
+// ── Small card ────────────────────────────────────────────────────────────────
+function PostCard({ post, delay = 0 }: { post: BlogPost; delay?: number }) {
+  const ts = tagStyle(post.tag);
+  return (
+    <FadeIn d={delay}>
+      <Link
+        href={`/blog/${post.slug}`}
+        style={{
+          display:      "flex",
+          flexDirection: "column",
+          borderRadius: 18,
+          overflow:     "hidden",
+          background:   "#0a1220",
+          border:       "1px solid rgba(255,255,255,0.07)",
+          textDecoration: "none",
+          height:       "100%",
+          transition:   "transform .25s, border-color .25s, box-shadow .25s",
+        }}
+        onMouseEnter={e => { const el = e.currentTarget as HTMLElement; el.style.borderColor = "rgba(0,200,255,0.3)"; el.style.transform = "translateY(-3px)"; el.style.boxShadow = "0 0 35px rgba(0,200,255,0.08)"; }}
+        onMouseLeave={e => { const el = e.currentTarget as HTMLElement; el.style.borderColor = "rgba(255,255,255,0.07)"; el.style.transform = "translateY(0)"; el.style.boxShadow = "none"; }}
+      >
+        {/* Thumbnail */}
+        <div style={{ position: "relative", width: "100%", aspectRatio: "16/9", overflow: "hidden", background: "#060e1c", flexShrink: 0 }}>
+          <Image src={post.coverImage} alt={post.coverAlt} fill
+            className="object-cover" style={{ opacity: 0.55, transition: "opacity .4s, transform .5s" }}
+            sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
+          />
+          <div style={{ position: "absolute", inset: 0, background: "linear-gradient(to top,#0a1220 5%,transparent 60%)" }} />
+          <div style={{ position: "absolute", top: 12, left: 12 }}>
+            <span style={{ padding: "3px 9px", borderRadius: 7, fontSize: "0.6rem", fontWeight: 800, textTransform: "uppercase", letterSpacing: "0.08em", background: ts.bg, border: `1px solid ${ts.border}`, color: ts.color }}>{post.tag}</span>
+          </div>
+          <div style={{ position: "absolute", top: 12, right: 12, fontSize: "1.1rem" }}>{post.emoji}</div>
         </div>
 
-        <div className="flex flex-col lg:flex-row lg:items-end justify-between gap-8">
-          <div>
-            <h1 className="font-black leading-[0.95] tracking-[-0.04em] text-4xl sm:text-6xl lg:text-7xl mb-5">
-              <span className="block text-white">Intelligence</span>
-              <span className="block" style={{
-                background: "linear-gradient(135deg,#00c8ff,#7c5cff)",
-                WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent", backgroundClip: "text",
-                filter: "drop-shadow(0 0 30px rgba(0,200,255,0.35))"
-              }}>Insights</span>
-            </h1>
-            <p className="text-base sm:text-xl text-slate-300 max-w-xl leading-relaxed font-light">
-              Deep dives on enterprise AI, adaptive learning, and the future of intelligent organisations —
-              from the Astralearnia engineering and education team.
-            </p>
+        {/* Body */}
+        <div style={{ padding: "16px 18px", display: "flex", flexDirection: "column", flex: 1 }}>
+          <div style={{ display: "flex", gap: 6, alignItems: "center", marginBottom: 8 }}>
+            <span style={{ fontSize: "0.65rem", fontWeight: 700, color: "rgba(255,255,255,0.28)" }}>{post.date}</span>
+            <span style={{ width: 2, height: 2, borderRadius: "50%", background: "rgba(255,255,255,0.12)" }} />
+            <span style={{ fontSize: "0.65rem", fontWeight: 700, color: "rgba(255,255,255,0.28)" }}>{post.readTime}</span>
           </div>
+          <h3 style={{ fontSize: "0.875rem", fontWeight: 800, color: "#fff", lineHeight: 1.3, marginBottom: 8, letterSpacing: "-0.01em" }}>{post.title}</h3>
+          <p style={{ fontSize: "0.75rem", color: "rgba(255,255,255,0.38)", lineHeight: 1.6, flex: 1, display: "-webkit-box", WebkitLineClamp: 2, WebkitBoxOrient: "vertical", overflow: "hidden" }}>{post.excerpt}</p>
+          <div style={{ marginTop: 12, display: "flex", alignItems: "center", gap: 6 }}>
+            <div style={{ width: 20, height: 20, borderRadius: "50%", background: `${post.authorColor}20`, border: `1px solid ${post.authorColor}40`, color: post.authorColor, display: "flex", alignItems: "center", justifyContent: "center", fontSize: "0.55rem", fontWeight: 800 }}>{post.authorInitials}</div>
+            <span style={{ fontSize: "0.68rem", fontWeight: 700, color: "rgba(255,255,255,0.3)" }}>{post.author}</span>
+          </div>
+        </div>
+      </Link>
+    </FadeIn>
+  );
+}
 
-          {/* quick stats */}
-          <div className="flex gap-6 sm:gap-8 shrink-0 pb-1">
+// ── Page ──────────────────────────────────────────────────────────────────────
+export default function BlogPage() {
+  const [filter,  setFilter]  = useState<"All" | "Technology" | "Institute">("All");
+  const [search,  setSearch]  = useState("");
+  const [focused, setFocused] = useState(false);
+
+  const featured = BLOG_POSTS[BLOG_POSTS.length - 1]; // most recent long-form
+
+  const filtered = useMemo(() => {
+    let posts = BLOG_POSTS.filter(p => p.slug !== featured.slug);
+    if (filter !== "All") posts = posts.filter(p => p.tag === filter);
+    if (search.trim()) {
+      const q = search.toLowerCase();
+      posts = posts.filter(p =>
+        p.title.toLowerCase().includes(q) ||
+        p.excerpt.toLowerCase().includes(q) ||
+        p.author.toLowerCase().includes(q) ||
+        p.tag.toLowerCase().includes(q)
+      );
+    }
+    return posts;
+  }, [filter, search, featured.slug]);
+
+  return (
+    <main style={{ background: "#040710", color: "#fff", fontFamily: "sans-serif", overflowX: "hidden", minHeight: "100vh" }}>
+      <style>{`
+        @keyframes shimmer{0%{background-position:200% center}100%{background-position:-200% center}}
+        @keyframes gpulse{0%,100%{opacity:.35}50%{opacity:1}}
+        .blog-shimmer{background-size:200% auto;animation:shimmer 5s linear infinite}
+        .blog-search:focus{outline:none;border-color:rgba(0,200,255,0.45)!important;box-shadow:0 0 0 3px rgba(0,200,255,0.08)!important}
+        .blog-search::placeholder{color:rgba(255,255,255,0.22)}
+        .blog-filter-btn{transition:all .2s}
+        .blog-filter-btn:hover{border-color:rgba(0,200,255,0.45)!important;color:rgba(255,255,255,0.8)!important}
+      `}</style>
+
+      {/* Fixed ambient bg */}
+      <div style={{ position: "fixed", inset: 0, pointerEvents: "none", zIndex: 0 }}>
+        <div style={{ position: "absolute", inset: 0, background: "radial-gradient(ellipse 100% 45% at 50% -5%,rgba(0,180,255,0.09),transparent)" }} />
+        <div style={{ position: "absolute", inset: 0, background: "radial-gradient(ellipse 50% 40% at 85% 70%,rgba(168,85,247,0.05),transparent)" }} />
+        <div style={{ position: "absolute", inset: 0, opacity: 0.018, backgroundImage: "linear-gradient(rgba(0,220,255,.9) 1px,transparent 1px),linear-gradient(90deg,rgba(0,220,255,.9) 1px,transparent 1px)", backgroundSize: "72px 72px" }} />
+      </div>
+
+      {/* ── HERO ── */}
+      <section style={{ position: "relative", zIndex: 10, padding: "clamp(88px,14vw,130px) clamp(16px,4vw,56px) clamp(32px,5vw,56px)", maxWidth: 1280, margin: "0 auto" }}>
+        <FadeIn>
+          <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 20 }}>
+            <Link href="/" style={{ fontSize: "0.75rem", fontWeight: 700, color: "rgba(255,255,255,0.35)", textDecoration: "none" }}>← Home</Link>
+            <span style={{ color: "rgba(255,255,255,0.15)" }}>/</span>
+            <span style={{
+              display: "inline-flex", alignItems: "center", gap: 6, padding: "3px 10px", borderRadius: 20,
+              fontSize: "0.62rem", fontWeight: 800, letterSpacing: "0.12em", textTransform: "uppercase",
+              border: "1px solid rgba(0,200,255,0.28)", background: "rgba(0,200,255,0.07)", color: "#00c8ff",
+            }}>
+              <span style={{ width: 5, height: 5, borderRadius: "50%", background: "#00c8ff", boxShadow: "0 0 5px #00c8ff", animation: "gpulse 2.5s ease-in-out infinite" }} />
+              Insights & Research
+            </span>
+          </div>
+        </FadeIn>
+
+        <FadeIn d={60}>
+          <h1 style={{ fontWeight: 900, lineHeight: 0.95, letterSpacing: "-0.04em", fontSize: "clamp(2.2rem,8vw,6rem)", marginBottom: "clamp(14px,2vw,20px)" }}>
+            <span style={{ display: "block", color: "#fff" }}>Intelligence,</span>
+            <span className="blog-shimmer" style={{ display: "block", background: "linear-gradient(90deg,#00c8ff,#3b82f6,#a855f7,#00c8ff)", WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent", backgroundClip: "text" }}>
+              Written Down.
+            </span>
+          </h1>
+        </FadeIn>
+
+        <FadeIn d={120}>
+          <p style={{ fontSize: "clamp(0.9rem,2vw,1.1rem)", color: "rgba(255,255,255,0.5)", maxWidth: 540, lineHeight: 1.65, fontWeight: 500, marginBottom: "clamp(24px,4vw,36px)" }}>
+            Deep guides on enterprise AI, adaptive learning, data engineering, and the future of work — written by the engineers and educators building these systems.
+          </p>
+        </FadeIn>
+
+        {/* Stats */}
+        <FadeIn d={170}>
+          <div style={{ display: "flex", flexWrap: "wrap", gap: "clamp(16px,4vw,36px)" }}>
             {[
-              { val: String(BLOG_POSTS.length), label: "Articles" },
-              { val: "Weekly",                  label: "Cadence"  },
-              { val: "Free",                    label: "Always"   },
-            ].map(s => (
-              <div key={s.label} className="text-center">
-                <div className="text-2xl sm:text-3xl font-black text-white"
-                  style={{ filter: "drop-shadow(0 0 10px rgba(0,200,255,0.4))" }}>{s.val}</div>
-                <div className="text-[10px] font-black uppercase tracking-widest text-white/30 mt-1">{s.label}</div>
+              [String(BLOG_POSTS.length), "Articles", "#00c8ff"],
+              ["2",   "Divisions covered",  "#a855f7"],
+              ["28m", "Longest read",        "#00ffb2"],
+            ].map(([v, l, c]) => (
+              <div key={l}>
+                <div style={{ fontSize: "clamp(1.2rem,3vw,1.7rem)", fontWeight: 900, color: c, filter: `drop-shadow(0 0 6px ${c}45)` }}>{v}</div>
+                <div style={{ fontSize: "0.62rem", fontWeight: 800, letterSpacing: "0.1em", textTransform: "uppercase", color: "rgba(255,255,255,0.28)", marginTop: 2 }}>{l}</div>
               </div>
             ))}
           </div>
-        </div>
+        </FadeIn>
       </section>
 
-      {/* ══════════════════════════════════════════════════
-          FILTER BAR
-      ══════════════════════════════════════════════════ */}
-      <div className="relative z-10 border-y border-white/[0.06] bg-[#080c14]/90 backdrop-blur-md">
-        <div className="max-w-screen-xl mx-auto px-4 sm:px-6 lg:px-12 py-4 flex items-center gap-2 overflow-x-auto scrollbar-none">
-          {FILTER_TAGS.map(t => (
-            <button key={t} onClick={() => setActiveTag(t)}
-              className="px-3 sm:px-4 py-2 rounded-xl text-xs font-black whitespace-nowrap transition-all duration-200 hover:-translate-y-0.5"
-              style={{
-                background: activeTag === t ? "rgba(0,200,255,0.15)"         : "rgba(255,255,255,0.03)",
-                border:     `1px solid ${activeTag === t ? "rgba(0,200,255,0.45)" : "rgba(255,255,255,0.08)"}`,
-                color:      activeTag === t ? "#00c8ff"                      : "rgba(255,255,255,0.45)",
-                boxShadow:  activeTag === t ? "0 0 16px rgba(0,200,255,0.2)" : "none",
-              }}>
-              {t}
-            </button>
-          ))}
-          <span className="ml-auto shrink-0 text-[11px] font-bold text-white/25">
-            {filtered.length} article{filtered.length !== 1 ? "s" : ""}
-          </span>
-        </div>
-      </div>
+      {/* ── FEATURED POST ── */}
+      <section style={{ position: "relative", zIndex: 10, maxWidth: 1280, margin: "0 auto", padding: "0 clamp(16px,4vw,56px) clamp(32px,5vw,52px)" }}>
+        <FadeIn>
+          <FeaturedCard post={featured} />
+        </FadeIn>
+      </section>
 
-      {/* ══════════════════════════════════════════════════
-          FEATURED POST
-      ══════════════════════════════════════════════════ */}
-      {featured && (
-        <section className="relative z-10 max-w-screen-xl mx-auto px-4 sm:px-6 lg:px-12 pt-10 sm:pt-12 pb-4">
-          <p className="text-[11px] font-black uppercase tracking-[0.22em] text-white/25 mb-5">★ Featured Article</p>
-          <Link href={`/blog/${featured.slug}`}
-            className="group grid grid-cols-1 lg:grid-cols-2 rounded-2xl overflow-hidden transition-all duration-400 hover:-translate-y-1"
-            style={{ background: "#0d1622", border: "1px solid rgba(255,255,255,0.09)" }}
-            onMouseEnter={e => { const el = e.currentTarget as HTMLElement; el.style.borderColor = "rgba(0,200,255,0.42)"; el.style.boxShadow = "0 0 65px rgba(0,200,255,0.14)"; }}
-            onMouseLeave={e => { const el = e.currentTarget as HTMLElement; el.style.borderColor = "rgba(255,255,255,0.09)"; el.style.boxShadow = "none"; }}>
-            {/* thumbnail */}
-            <div className="relative aspect-video lg:aspect-auto min-h-[200px] sm:min-h-[220px] overflow-hidden bg-gradient-to-br from-[#101c2e] to-[#0a0f1a] border-b lg:border-b-0 lg:border-r border-white/[0.06]">
-              <Image src={featured.coverImage} alt={featured.coverAlt} fill
-                className="object-cover opacity-60 group-hover:opacity-75 group-hover:scale-105 transition-all duration-500"
-                sizes="(max-width: 1024px) 100vw, 50vw" priority />
-              <div className="absolute inset-0 bg-gradient-to-tr from-cyan-400/[0.06] to-violet-400/[0.06] group-hover:from-cyan-400/[0.12] group-hover:to-violet-400/[0.12] transition-all duration-400" />
-              <div className="absolute inset-0 bg-gradient-to-t from-[#0d1622]/70 to-transparent lg:hidden" />
-              <div className="absolute top-4 left-4">
-                {(() => { const ts = tagStyle(featured.tag); return (
-                  <span className="px-3 py-1.5 rounded-xl text-xs font-black uppercase tracking-wider"
-                    style={{ background: ts.bg, border: `1px solid ${ts.border}`, color: ts.color }}>{featured.tag}</span>
-                ); })()}
-              </div>
+      {/* ── FILTER + SEARCH BAR ── */}
+      <section style={{ position: "relative", zIndex: 10, maxWidth: 1280, margin: "0 auto", padding: "0 clamp(16px,4vw,56px) clamp(24px,4vw,36px)" }}>
+        <FadeIn>
+          <div style={{ display: "flex", flexWrap: "wrap", gap: 12, alignItems: "center", justifyContent: "space-between" }}>
+            {/* Filter pills */}
+            <div style={{ display: "flex", gap: 8 }}>
+              {(["All", "Technology", "Institute"] as const).map(f => {
+                const active = filter === f;
+                const c = f === "Technology" ? "#00c8ff" : f === "Institute" ? "#a855f7" : undefined;
+                return (
+                  <button
+                    key={f}
+                    className="blog-filter-btn"
+                    onClick={() => setFilter(f)}
+                    style={{
+                      padding: "7px 16px", borderRadius: 20, border: "1px solid",
+                      fontSize: "0.75rem", fontWeight: 800, cursor: "pointer",
+                      background: active ? (c ? `${c}14` : "rgba(255,255,255,0.08)") : "rgba(255,255,255,0.03)",
+                      borderColor: active ? (c ?? "rgba(255,255,255,0.35)") + (c ? "45" : "") : "rgba(255,255,255,0.1)",
+                      color: active ? (c ?? "#fff") : "rgba(255,255,255,0.42)",
+                    }}
+                  >{f}</button>
+                );
+              })}
             </div>
-            {/* copy */}
-            <div className="p-6 sm:p-8 lg:p-10 flex flex-col justify-between">
-              <div>
-                <p className="text-xs font-black uppercase tracking-widest text-white/25 mb-4">{featured.date} · {featured.readTime}</p>
-                <h2 className="text-xl sm:text-2xl lg:text-3xl font-black text-white leading-tight mb-4 sm:mb-5 group-hover:text-cyan-100 transition-colors duration-300">{featured.title}</h2>
-                <p className="text-sm sm:text-base text-white/55 leading-relaxed mb-6 sm:mb-8">{featured.excerpt}</p>
-              </div>
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-3">
-                  <div className="w-9 h-9 rounded-full flex items-center justify-center text-xs font-black shrink-0"
-                    style={{ background: `${featured.authorColor}20`, border: `1px solid ${featured.authorColor}40`, color: featured.authorColor }}>
-                    {featured.authorInitials}
-                  </div>
-                  <div>
-                    <div className="text-sm font-black text-white/80">{featured.author}</div>
-                    <div className="text-xs text-white/35 hidden sm:block">{featured.authorRole}</div>
-                  </div>
-                </div>
-                <span className="text-sm font-black text-cyan-400/60 group-hover:text-cyan-400 group-hover:translate-x-1 transition-all duration-300">Read →</span>
-              </div>
-            </div>
-          </Link>
-        </section>
-      )}
 
-      {/* ══════════════════════════════════════════════════
-          ADVERTISE WITH US — compact contextual banner
-      ══════════════════════════════════════════════════ */}
-      <div className="relative z-10 max-w-screen-xl mx-auto px-4 sm:px-6 lg:px-12 pt-6 pb-2">
-        <div className="rounded-2xl px-5 sm:px-7 py-4 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 sm:gap-4"
-          style={{ background: "linear-gradient(90deg,rgba(124,92,255,0.08),rgba(0,200,255,0.06))", border: "1px solid rgba(124,92,255,0.18)" }}>
-          <div className="flex items-center gap-3">
-            {/* accent bar */}
-            <div className="w-1 h-10 rounded-full shrink-0" style={{ background: "linear-gradient(180deg,#7c5cff,#00c8ff)" }} />
-            <div>
-              <div className="text-xs font-black text-white/70 uppercase tracking-widest mb-0.5">Advertise on Astralearnia</div>
-              <p className="text-xs text-white/40 leading-relaxed max-w-lg">
-                Reach <span className="text-white/65 font-bold">50,000+ enterprise AI decision-makers</span> monthly — engineers, L&D leads, and CTOs across Africa and beyond.
-              </p>
+            {/* Search */}
+            <div style={{ position: "relative", flexGrow: 1, maxWidth: 280 }}>
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="rgba(255,255,255,0.3)" style={{ position: "absolute", left: 12, top: "50%", transform: "translateY(-50%)", pointerEvents: "none" }}>
+                <path d="M21 21l-4.35-4.35M17 11A6 6 0 1 1 5 11a6 6 0 0 1 12 0z" stroke="rgba(255,255,255,0.3)" strokeWidth="2" fill="none" strokeLinecap="round"/>
+              </svg>
+              <input
+                className="blog-search"
+                value={search}
+                onChange={e => setSearch(e.target.value)}
+                onFocus={() => setFocused(true)}
+                onBlur={() => setFocused(false)}
+                placeholder="Search articles…"
+                style={{
+                  width: "100%", padding: "8px 12px 8px 34px",
+                  background: "rgba(255,255,255,0.04)",
+                  border: `1px solid ${focused ? "rgba(0,200,255,0.38)" : "rgba(255,255,255,0.1)"}`,
+                  borderRadius: 20, color: "#fff", fontSize: "0.8rem", fontFamily: "inherit", fontWeight: 500,
+                  transition: "border-color .2s",
+                }}
+              />
             </div>
           </div>
-          <Link href="/contact?subject=advertise"
-            className="shrink-0 px-5 py-2.5 rounded-xl text-xs font-black text-white whitespace-nowrap transition-all hover:-translate-y-0.5"
-            style={{ background: "linear-gradient(135deg,#7c5cff,#00c8ff)", boxShadow: "0 4px 16px rgba(124,92,255,0.3)" }}>
-            Get Media Kit →
-          </Link>
-        </div>
-      </div>
+        </FadeIn>
+      </section>
 
-      {/* ══════════════════════════════════════════════════
-          REMAINING POSTS GRID
-      ══════════════════════════════════════════════════ */}
-      {remaining.length > 0 && (
-        <section className="relative z-10 max-w-screen-xl mx-auto px-4 sm:px-6 lg:px-12 pb-14 sm:pb-16 pt-6 sm:pt-8">
-          <p className="text-[11px] font-black uppercase tracking-[0.22em] text-white/25 mb-5">More Articles</p>
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-5">
-            {remaining.map(post => {
-              const ts = tagStyle(post.tag);
-              return (
-                <Link key={post.slug} href={`/blog/${post.slug}`}
-                  className="group flex flex-col rounded-2xl overflow-hidden transition-all duration-300 hover:-translate-y-1"
-                  style={{ background: "#0d1622", border: "1px solid rgba(255,255,255,0.08)" }}
-                  onMouseEnter={e => { const el = e.currentTarget as HTMLElement; el.style.borderColor = "rgba(0,200,255,0.35)"; el.style.boxShadow = "0 0 40px rgba(0,200,255,0.10)"; }}
-                  onMouseLeave={e => { const el = e.currentTarget as HTMLElement; el.style.borderColor = "rgba(255,255,255,0.08)"; el.style.boxShadow = "none"; }}>
-                  {/* thumbnail */}
-                  <div className="relative w-full aspect-video overflow-hidden bg-gradient-to-br from-[#101c2e] to-[#0a0f1a] border-b border-white/[0.05]">
-                    <Image src={post.coverImage} alt={post.coverAlt} fill
-                      className="object-cover opacity-55 group-hover:opacity-70 group-hover:scale-105 transition-all duration-500"
-                      sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw" />
-                    <div className="absolute inset-0 bg-gradient-to-t from-[#0d1622]/70 to-transparent" />
-                    <div className="absolute top-3 left-3">
-                      <span className="px-2.5 py-1 rounded-lg text-xs font-black uppercase tracking-wider"
-                        style={{ background: ts.bg, border: `1px solid ${ts.border}`, color: ts.color }}>{post.tag}</span>
-                    </div>
-                  </div>
-                  {/* body */}
-                  <div className="p-4 sm:p-5 flex flex-col flex-1">
-                    <h3 className="text-sm font-black text-white mb-2.5 leading-snug line-clamp-2 group-hover:text-cyan-100 transition-colors">{post.title}</h3>
-                    <p className="text-xs text-white/40 leading-relaxed line-clamp-3 mb-4 flex-1">{post.excerpt}</p>
-                    <div className="flex items-center justify-between pt-3 border-t border-white/[0.06]">
-                      <div className="flex items-center gap-2">
-                        <div className="w-6 h-6 rounded-full flex items-center justify-center text-[9px] font-black shrink-0"
-                          style={{ background: `${post.authorColor}18`, color: post.authorColor }}>{post.authorInitials}</div>
-                        <span className="text-xs font-bold text-white/45 truncate max-w-[100px]">{post.author}</span>
-                      </div>
-                      <span className="text-[10px] text-white/25 shrink-0">{post.readTime}</span>
-                    </div>
-                  </div>
-                </Link>
-              );
-            })}
-          </div>
-        </section>
-      )}
-
-      {/* empty state */}
-      {filtered.length === 0 && (
-        <section className="relative z-10 py-28 text-center px-6">
-          <div className="text-5xl opacity-25 mb-4">◈</div>
-          <h3 className="text-xl font-black text-white mb-2">No articles in this category yet</h3>
-          <p className="text-white/40 text-sm mb-7">We publish weekly — check back soon.</p>
-          <button onClick={() => setActiveTag("All")}
-            className="px-6 py-3 rounded-xl text-sm font-black text-white transition-all hover:-translate-y-0.5"
-            style={{ background: "linear-gradient(135deg,#00c8ff,#7c5cff)", boxShadow: "0 6px 20px rgba(0,200,255,0.3)" }}>
-            View All Articles
-          </button>
-        </section>
-      )}
-
-      {/* ══════════════════════════════════════════════════
-          NEWSLETTER
-      ══════════════════════════════════════════════════ */}
-      <section className="relative z-10 border-t border-white/[0.06] bg-[#080c14] py-16 sm:py-20 px-4 sm:px-6">
-        <div className="max-w-xl mx-auto text-center">
-          <div className="text-3xl mb-5">✉</div>
-          <h2 className="text-2xl sm:text-3xl font-black text-white mb-3">Get Insights in Your Inbox</h2>
-          <p className="text-white/45 mb-8 text-sm sm:text-base leading-relaxed">
-            New deep-dives every week on enterprise AI and adaptive learning. No fluff. Unsubscribe anytime.
-          </p>
-          {subDone ? (
-            <div className="flex items-center justify-center gap-3 py-3">
-              <span className="w-8 h-8 rounded-full flex items-center justify-center shrink-0"
-                style={{ background: "rgba(0,255,178,0.15)", border: "1px solid rgba(0,255,178,0.35)", color: "#00ffb2" }}>✓</span>
-              <span className="font-black text-white/80">You&apos;re subscribed. Welcome aboard.</span>
-            </div>
-          ) : (
-            <div className="flex flex-col sm:flex-row gap-3 max-w-md mx-auto">
-              <input type="email" value={email} onChange={e => setEmail(e.target.value)}
-                placeholder="your@email.com"
-                className="flex-1 px-4 py-3 rounded-xl text-sm text-white bg-white/[0.04] border border-white/10 placeholder:text-white/25 focus:outline-none focus:border-cyan-400/50 transition-all" />
-              <button onClick={() => { if (email) setSubDone(true); }}
-                className="px-6 py-3 rounded-xl font-black text-white text-sm shrink-0 transition-all hover:-translate-y-0.5"
-                style={{ background: "linear-gradient(135deg,#00c8ff,#7c5cff)", boxShadow: "0 6px 20px rgba(0,200,255,0.35)" }}>
-                Subscribe →
+      {/* ── POST GRID ── */}
+      <section style={{ position: "relative", zIndex: 10, maxWidth: 1280, margin: "0 auto", padding: "0 clamp(16px,4vw,56px) clamp(48px,8vw,80px)" }}>
+        {filtered.length === 0 ? (
+          <FadeIn>
+            <div style={{ textAlign: "center", padding: "60px 0", color: "rgba(255,255,255,0.28)" }}>
+              <div style={{ fontSize: "2.5rem", marginBottom: 12, opacity: 0.3 }}>◈</div>
+              <p style={{ fontWeight: 700, fontSize: "1rem" }}>No articles match your search.</p>
+              <button onClick={() => { setSearch(""); setFilter("All"); }} style={{ marginTop: 14, padding: "8px 18px", borderRadius: 10, border: "1px solid rgba(255,255,255,0.12)", background: "rgba(255,255,255,0.04)", color: "#fff", cursor: "pointer", fontSize: "0.8rem", fontWeight: 700 }}>
+                Clear filters
               </button>
             </div>
-          )}
-        </div>
+          </FadeIn>
+        ) : (
+          <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill,minmax(clamp(260px,30vw,340px),1fr))", gap: "clamp(12px,2vw,20px)" }}>
+            {filtered.map((post, i) => (
+              <PostCard key={post.slug} post={post} delay={i * 45} />
+            ))}
+          </div>
+        )}
       </section>
 
-      {/* ══════════════════════════════════════════════════
-          WORK WITH US
-      ══════════════════════════════════════════════════ */}
-      <section className="relative z-10 border-t border-white/[0.06] py-16 sm:py-20 px-4 sm:px-6 bg-[#050810]">
-        <div className="max-w-screen-lg mx-auto">
-          <div className="text-center mb-10 sm:mb-12">
-            <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full border border-white/10 bg-white/[0.03] text-white/50 text-xs font-black uppercase tracking-[0.18em] mb-5">
-              <span className="w-1.5 h-1.5 rounded-full bg-violet-400 animate-pulse" />
-              Build With Astralearnia
-            </div>
-            <h2 className="text-2xl sm:text-4xl font-black text-white mb-4 leading-tight">Ready to work with us?</h2>
-            <p className="text-white/45 max-w-xl mx-auto text-sm sm:text-base leading-relaxed">
-              Whether you&apos;re an enterprise looking to deploy AI, or a talented engineer wanting to build the future — there&apos;s a seat at the table for you.
+      {/* ── CTA BAND ── */}
+      <section style={{ position: "relative", zIndex: 10, padding: "clamp(48px,7vw,80px) clamp(16px,4vw,56px)", textAlign: "center", background: "linear-gradient(180deg,#040710,#070c18 40%,#040710)" }}>
+        <div style={{ position: "absolute", inset: 0, background: "radial-gradient(ellipse 65% 55% at 50% 50%,rgba(0,200,255,0.05),transparent)", pointerEvents: "none" }} />
+        <FadeIn>
+          <div style={{ maxWidth: 520, margin: "0 auto", position: "relative", zIndex: 1 }}>
+            <h2 style={{ fontWeight: 900, fontSize: "clamp(1.5rem,3.5vw,2.4rem)", color: "#fff", marginBottom: 10, letterSpacing: "-0.02em" }}>
+              Want to see it in practice?
+            </h2>
+            <p style={{ color: "rgba(255,255,255,0.42)", fontSize: "0.925rem", maxWidth: 400, margin: "0 auto 24px", lineHeight: 1.65, fontWeight: 500 }}>
+              Our technology and learning systems are built on the principles our engineers write about. Book a demo to see them live.
             </p>
-          </div>
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-5 max-w-2xl mx-auto">
-            {/* Client project */}
-            <div className="rounded-2xl p-6 sm:p-8 flex flex-col gap-5"
-              style={{ background: "linear-gradient(135deg,rgba(0,200,255,0.07),rgba(124,92,255,0.07))", border: "1px solid rgba(0,200,255,0.2)", boxShadow: "0 0 40px rgba(0,200,255,0.06)" }}>
-              <div>
-                <div className="w-10 h-10 rounded-xl flex items-center justify-center mb-4 text-lg"
-                  style={{ background: "rgba(0,200,255,0.15)", border: "1px solid rgba(0,200,255,0.3)" }}>◈</div>
-                <h3 className="text-lg font-black text-white mb-2">Start a Project</h3>
-                <p className="text-sm text-white/50 leading-relaxed">Need a custom AI solution, LLM integration, or enterprise training platform? We build end-to-end. Tell us what you&apos;re working on.</p>
-              </div>
-              <div className="mt-auto flex flex-col gap-2">
-                <Link href="/contact" className="w-full text-center px-5 py-3 rounded-xl font-black text-white text-sm transition-all hover:-translate-y-0.5"
-                  style={{ background: "linear-gradient(135deg,#00c8ff,#7c5cff)", boxShadow: "0 6px 20px rgba(0,200,255,0.28)" }}>Start a Conversation →</Link>
-                <Link href="/book-demo" className="w-full text-center px-5 py-3 rounded-xl font-black text-white/60 text-sm transition-all hover:text-white hover:-translate-y-0.5"
-                  style={{ background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.1)" }}>Book a Demo</Link>
-              </div>
-            </div>
-            {/* Careers */}
-            <div className="rounded-2xl p-6 sm:p-8 flex flex-col gap-5"
-              style={{ background: "linear-gradient(135deg,rgba(168,85,247,0.07),rgba(255,110,199,0.07))", border: "1px solid rgba(168,85,247,0.2)", boxShadow: "0 0 40px rgba(168,85,247,0.06)" }}>
-              <div>
-                <div className="w-10 h-10 rounded-xl flex items-center justify-center mb-4 text-lg"
-                  style={{ background: "rgba(168,85,247,0.15)", border: "1px solid rgba(168,85,247,0.3)" }}>✦</div>
-                <h3 className="text-lg font-black text-white mb-2">Join the Team</h3>
-                <p className="text-sm text-white/50 leading-relaxed">We hire engineers, educators, and AI researchers who want to work on hard problems for African enterprises. We&apos;re always open to strong talent.</p>
-              </div>
-              <div className="mt-auto flex flex-col gap-2">
-                <Link href="/careers" className="w-full text-center px-5 py-3 rounded-xl font-black text-white text-sm transition-all hover:-translate-y-0.5"
-                  style={{ background: "linear-gradient(135deg,#a855f7,#ff6ec7)", boxShadow: "0 6px 20px rgba(168,85,247,0.28)" }}>View Open Roles →</Link>
-                <Link href="/contact?subject=talent" className="w-full text-center px-5 py-3 rounded-xl font-black text-white/60 text-sm transition-all hover:text-white hover:-translate-y-0.5"
-                  style={{ background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.1)" }}>Send Your CV</Link>
-              </div>
+            <div style={{ display: "flex", flexWrap: "wrap", gap: 10, justifyContent: "center" }}>
+              <Link href="/book-demo" style={{
+                padding: "11px 24px", borderRadius: 12, fontWeight: 800, color: "#fff", fontSize: "0.875rem",
+                textDecoration: "none", textAlign: "center",
+                background: "linear-gradient(135deg,#00c8ff,#3b82f6)",
+                boxShadow: "0 6px 22px rgba(0,200,255,0.3)",
+              }}>Book a Demo →</Link>
+              <Link href="/contact" style={{
+                padding: "11px 22px", borderRadius: 12, fontWeight: 700, color: "rgba(255,255,255,0.55)", fontSize: "0.875rem",
+                textDecoration: "none", textAlign: "center",
+                border: "1px solid rgba(255,255,255,0.14)", background: "rgba(255,255,255,0.02)",
+              }}>Talk to an Engineer</Link>
             </div>
           </div>
-        </div>
+        </FadeIn>
       </section>
-
-    </div>
+    </main>
   );
 }
