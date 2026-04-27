@@ -8,7 +8,7 @@
     "start": "next start",
     "lint": "next lint",
     "type-check": "tsc --noEmit",
-    "pages:build": "npx @opennextjs/cloudflare build && cp .open-next/worker.js .open-next/_worker.js && cp -r .open-next/assets/_next .open-next/_next 2>/dev/null || true"
+   "pages:build": "npx @opennextjs/cloudflare build && echo '--- .open-next contents ---' && ls -la .open-next/ && echo '--- assets contents ---' && ls -la .open-next/assets/ 2>/dev/null && cp .open-next/worker.js .open-next/_worker.js && cp -r .open-next/assets/. .open-next/"
   },
   "dependencies": {
     "clsx": "^2.1.1",
