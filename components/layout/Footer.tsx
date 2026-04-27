@@ -252,7 +252,7 @@ export function Footer() {
               boxShadow: "0 4px 16px rgba(255,255,255,0.12)", padding:2,
             }}>
               {!logoError ? (
-                <Image src={logoImage} alt="Astralearnia" width={30} height={30}
+                <Image src="/logo.png" alt="Astralearnia" width={30} height={30}
                   style={{ objectFit:"contain", borderRadius:6 }}
                   onError={() => setLogoError(true)} />
               ) : (

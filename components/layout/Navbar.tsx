@@ -4,7 +4,7 @@ import Link from "next/link";
 import { useEffect, useState } from "react";
 import { usePathname } from "next/navigation";
 import Image from "next/image";
-import logoImage from "@/assets/logo.png";
+//import logoImage from "@/assets/logo.png";
 
 const navLinks = [
   { label: "Technology", href: "/technologies" },
@@ -98,8 +98,8 @@ export function Navbar() {
                 padding:3,
               }}>
                 {!logoError ? (
-                  <Image
-                    src={logoImage}
+              <Image
+                    src="/logo.png"
                     alt="Astralearnia"
                     width={30}
                     height={30}
