@@ -99,7 +99,7 @@ export function Navbar() {
               }}>
                 {!logoError ? (
               <Image
-                    src="/logo.png"
+                    src="/favicon.png"
                     alt="Astralearnia"
                     width={30}
                     height={30}

@@ -103,7 +103,7 @@ export default async function BlogPostPage({ params }: Props) {
           name:    "Astralearnia",
           logo: {
             "@type": "ImageObject",
-            url:     `${SITE_URL}/logo.png`,
+            url:     `${SITE_URL}/favicon.png`,
           },
         },
         mainEntityOfPage: {

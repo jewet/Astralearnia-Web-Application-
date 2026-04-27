@@ -29,10 +29,10 @@ export const metadata: Metadata = {
   creator: "Astralearnia",
   icons: {
     icon: [
-      { url: "/logo.png", type: "image/png" },
+      { url: "/favicon.png", type: "image/png" },
     ],
-    shortcut: "/logo.png",
-    apple: "/logo.png",
+    shortcut: "/favicon.png",
+    apple: "/favicon.png",
   },
   openGraph: {
     type: "website",
@@ -42,14 +42,14 @@ export const metadata: Metadata = {
     description:
       "Enterprise AI systems, secure cloud infrastructure, and next-generation education technology.",
     siteName: "Astralearnia",
-    images: [{ url: "/logo.png" }],
+    images: [{ url: "/favicon.png" }],
   },
   twitter: {
     card: "summary_large_image",
     title: "Astralearnia",
     description: "Engineering Intelligence. Empowering Minds.",
     creator: "@astralearnia",
-    images: ["/logo.png"],
+    images: ["/favicon.png"],
   },
   robots: {
     index: true,
@@ -71,8 +71,8 @@ export default function RootLayout({
       <head>
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
-        <link rel="icon" href="/logo.png" type="image/png" />
-        <link rel="apple-touch-icon" href="/logo.png" />
+        <link rel="icon" href="/favicon.png" type="image/png" />
+        <link rel="apple-touch-icon" href="/favicon.png" />
       </head>
       <body suppressHydrationWarning>
         <Cursor />
