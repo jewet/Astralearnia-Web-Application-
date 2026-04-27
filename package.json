@@ -8,7 +8,7 @@
     "start": "next start",
     "lint": "next lint",
     "type-check": "tsc --noEmit",
-    "pages:build": "npx @opennextjs/cloudflare build && cp .open-next/worker.js .open-next/_worker.js && cp -r .open-next/assets/. .open-next/ && echo '{\"version\":1,\"include\":[\"/*\"],\"exclude\":[\"/_next/static/*\",\"/_next/image*\",\"/favicon.ico\",\"/favicon.png\",\"/logo.png\"]}' > .open-next/_routes.json"
+   "pages:build": "npx @opennextjs/cloudflare build && cp .open-next/worker.js .open-next/_worker.js && cp -r .open-next/assets/. .open-next/ && cp public/favicon.png .open-next/favicon.png && cp public/logo.png .open-next/logo.png && echo '{\"version\":1,\"include\":[\"/*\"],\"exclude\":[\"/_next/static/*\",\"/_next/image*\",\"/favicon.ico\",\"/favicon.png\",\"/logo.png\"]}' > .open-next/_routes.json"
   },
   "dependencies": {
     "clsx": "^2.1.1",
