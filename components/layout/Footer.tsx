@@ -254,6 +254,7 @@ export function Footer() {
               {!logoError ? (
                 <Image src="/favicon.png" alt="Astralearnia" width={30} height={30}
                   style={{ objectFit:"contain", borderRadius:6 }}
+                  unoptimized
                   onError={() => setLogoError(true)} />
               ) : (
                 <span style={{ fontWeight:900, color:"#fff", fontSize:"1rem" }}>A</span>

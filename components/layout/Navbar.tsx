@@ -104,6 +104,7 @@ export function Navbar() {
                     width={30}
                     height={30}
                     style={{ objectFit:"contain", borderRadius:7 }}
+                    unoptimized
                     onError={() => setLogoError(true)}
                   />
                 ) : (
