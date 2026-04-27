@@ -27,6 +27,13 @@ export const metadata: Metadata = {
   ],
   authors: [{ name: "Astralearnia Technologies" }],
   creator: "Astralearnia",
+  icons: {
+    icon: [
+      { url: "/logo.png", type: "image/png" },
+    ],
+    shortcut: "/logo.png",
+    apple: "/logo.png",
+  },
   openGraph: {
     type: "website",
     locale: "en_US",
@@ -35,12 +42,14 @@ export const metadata: Metadata = {
     description:
       "Enterprise AI systems, secure cloud infrastructure, and next-generation education technology.",
     siteName: "Astralearnia",
+    images: [{ url: "/logo.png" }],
   },
   twitter: {
     card: "summary_large_image",
     title: "Astralearnia",
     description: "Engineering Intelligence. Empowering Minds.",
     creator: "@astralearnia",
+    images: ["/logo.png"],
   },
   robots: {
     index: true,
@@ -62,15 +71,15 @@ export default function RootLayout({
       <head>
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
+        <link rel="icon" href="/logo.png" type="image/png" />
+        <link rel="apple-touch-icon" href="/logo.png" />
       </head>
       <body suppressHydrationWarning>
         <Cursor />
         <Navbar />
         <main>{children}</main>
         <Footer />
-        {/* AstraBot — global chatbot, fixed position, persists across all page navigations */}
         <AstraBot />
-        {/* AdCard — global floating ad, fixed bottom-left, dismissible per session */}
         <AdCard />
       </body>
     </html>
