@@ -100,15 +100,238 @@ const ANIM_MESSAGES: AnimMessage[] = [
   { anim:"masked",  eyebrow:"One Unified Platform", tag:"Why Astralearnia", accent:"#34d399", text:"One Company. Infinite Impact.", highlight:"Infinite Impact.", sub:"Two powerful divisions. One coherent intelligence platform. Whether you need enterprise AI or transformative learning — Astralearnia has a dedicated path for it.", mediaLabel:"The Astralearnia Platform", mediaEmoji:"✦", mediaBg:"from-emerald-950/60 to-cyan-950/40", mediaAccent:"#34d399", detail:"Clients report 3.2× average ROI, decisions made 3× faster, and AI deployments live in under 48 hours. This is what the intelligence layer looks like in practice." },
 ];
 
-// ─── Solutions slides ─────────────────────────────────────────────────────────
-const SOLUTIONS_SLIDES: Array<{ id:number; category:string; icon:string; color:SlideColor; borderColor:string; glowColor:string; gradientFrom:string; gradientTo:string; title:string; subtitle:string; description:string; features:string[]; }> = [
-  { id:1, category:"Robotics", icon:"🤖", color:"cyan", borderColor:"#22d3ee", glowColor:"rgba(0,200,255,0.3)", gradientFrom:"#0e2a35", gradientTo:"#091522", title:"Robotics Systems", subtitle:"ROS2 · Physics Simulation · Manufacturing", description:"End-to-end robotics solutions from concept to deployment. We build ROS2-based autonomous systems, physics simulation environments, and integrate smart robotics into manufacturing pipelines with AI-powered control loops.", features:["ROS2 / ROS1 Integration","Physics Simulation (Gazebo, Isaac)","Industrial Robot Programming","SLAM & Autonomous Navigation","Computer Vision & Perception","Manufacturing Line Automation"] },
-  { id:2, category:"Embedded C", icon:"💾", color:"blue", borderColor:"#60a5fa", glowColor:"rgba(60,120,255,0.3)", gradientFrom:"#0c1a30", gradientTo:"#060d1a", title:"Embedded Systems", subtitle:"Firmware · Microcontrollers · RTOS", description:"Bare-metal and RTOS-based firmware development for mission-critical applications. From IoT edge devices to industrial controllers — we write optimised Embedded C/C++ that performs at the edge where milliseconds matter.", features:["ARM Cortex / STM32 / ESP32","FreeRTOS / Zephyr RTOS","CAN, SPI, I2C, UART Protocols","Low-Power Optimisation","OTA Firmware Updates","Hardware Abstraction Layers"] },
-  { id:3, category:"Automation", icon:"⚙️", color:"emerald", borderColor:"#34d399", glowColor:"rgba(52,211,153,0.3)", gradientFrom:"#081e12", gradientTo:"#040e09", title:"Process Automation", subtitle:"Industrial · Workflow · AI-Driven", description:"Transform repetitive, manual processes into intelligent automated pipelines. From PLC-level industrial automation to enterprise workflow orchestration powered by our AI decision engine — we eliminate bottlenecks permanently.", features:["PLC & SCADA Systems","RPA (Robotic Process Automation)","AI-Powered Workflow Engines","Industrial IoT Integration","Digital Twin Modelling","Predictive Maintenance AI"] },
-  { id:4, category:"Cybersecurity", icon:"🔐", color:"red", borderColor:"#f87171", glowColor:"rgba(248,113,113,0.3)", gradientFrom:"#200a0a", gradientTo:"#100404", title:"Cybersecurity", subtitle:"Zero-Trust · Threat Intel · Pen Testing", description:"Enterprise-grade security architecture, real-time threat detection, and full incident response. We secure AI systems, embedded devices, and cloud infrastructure against modern attack vectors with zero-trust principles.", features:["Penetration Testing & Red Team","Zero-Trust Architecture","AI-Powered Threat Detection","Embedded System Security","SOC-as-a-Service","ISO 27001 Compliance & Audit"] },
-  { id:5, category:"Blockchain", icon:"⛓️", color:"violet", borderColor:"#a78bfa", glowColor:"rgba(167,139,250,0.3)", gradientFrom:"#130a20", gradientTo:"#08040f", title:"Blockchain Solutions", subtitle:"Smart Contracts · DeFi · Supply Chain", description:"Build trust at scale with distributed ledger technology. Smart contract development, DeFi protocols, tokenisation infrastructure, and blockchain-based supply chain traceability systems that bring real-world transparency.", features:["Solidity / Rust Smart Contracts","Ethereum / Solana / Polkadot","DeFi Protocol Design","Supply Chain Traceability","NFT & Token Platforms","Web3 API & SDK Integration"] },
-  { id:6, category:"MVP & Rapid Build", icon:"🚀", color:"fuchsia", borderColor:"#e879f9", glowColor:"rgba(232,121,249,0.3)", gradientFrom:"#1a0820", gradientTo:"#0c040f", title:"MVP & Rapid Build", subtitle:"Idea → Product → Market in 4–8 Weeks", description:"Got an idea? We take you from raw concept to a working, investor-ready MVP in 4–8 weeks. Product strategy workshops, technical architecture, prototype development, AI feature integration, and launch-ready delivery.", features:["Product Discovery Workshops","Technical Architecture Design","Full-Stack MVP Development","AI Feature Integration","Investor-Ready Demos","Post-Launch Iteration Support"] },
+// ─── Solutions slides — each has an Unsplash image URL ───────────────────────
+const SOLUTIONS_SLIDES: Array<{
+  id:number; category:string; icon:string; color:SlideColor;
+  borderColor:string; glowColor:string; gradientFrom:string; gradientTo:string;
+  title:string; subtitle:string; description:string; features:string[];
+  image:string; imageAlt:string;
+}> = [
+  {
+    id:1, category:"Robotics", icon:"🤖", color:"cyan",
+    borderColor:"#22d3ee", glowColor:"rgba(0,200,255,0.3)",
+    gradientFrom:"#0e2a35", gradientTo:"#091522",
+    title:"Robotics Systems", subtitle:"ROS2 · Physics Simulation · Manufacturing",
+    description:"End-to-end robotics solutions from concept to deployment. We build ROS2-based autonomous systems, physics simulation environments, and integrate smart robotics into manufacturing pipelines with AI-powered control loops.",
+    features:["ROS2 / ROS1 Integration","Physics Simulation (Gazebo, Isaac)","Industrial Robot Programming","SLAM & Autonomous Navigation","Computer Vision & Perception","Manufacturing Line Automation"],
+    image:"https://images.unsplash.com/photo-1485827404703-89b55fcc595e?w=900&q=85&fit=crop&auto=format",
+    imageAlt:"Industrial robotic arm in a modern facility",
+  },
+  {
+    id:2, category:"Embedded C", icon:"💾", color:"blue",
+    borderColor:"#60a5fa", glowColor:"rgba(60,120,255,0.3)",
+    gradientFrom:"#0c1a30", gradientTo:"#060d1a",
+    title:"Embedded Systems", subtitle:"Firmware · Microcontrollers · RTOS",
+    description:"Bare-metal and RTOS-based firmware development for mission-critical applications. From IoT edge devices to industrial controllers — we write optimised Embedded C/C++ that performs at the edge where milliseconds matter.",
+    features:["ARM Cortex / STM32 / ESP32","FreeRTOS / Zephyr RTOS","CAN, SPI, I2C, UART Protocols","Low-Power Optimisation","OTA Firmware Updates","Hardware Abstraction Layers"],
+    image:"https://images.unsplash.com/photo-1518770660439-4636190af475?w=900&q=85&fit=crop&auto=format",
+    imageAlt:"Close-up of green circuit board with microchips",
+  },
+  {
+    id:3, category:"Automation", icon:"⚙️", color:"emerald",
+    borderColor:"#34d399", glowColor:"rgba(52,211,153,0.3)",
+    gradientFrom:"#081e12", gradientTo:"#040e09",
+    title:"Process Automation", subtitle:"Industrial · Workflow · AI-Driven",
+    description:"Transform repetitive, manual processes into intelligent automated pipelines. From PLC-level industrial automation to enterprise workflow orchestration powered by our AI decision engine — we eliminate bottlenecks permanently.",
+    features:["PLC & SCADA Systems","RPA (Robotic Process Automation)","AI-Powered Workflow Engines","Industrial IoT Integration","Digital Twin Modelling","Predictive Maintenance AI"],
+    image:"https://images.unsplash.com/photo-1565043666747-69f6646db940?w=900&q=85&fit=crop&auto=format",
+    imageAlt:"Automated production line with robotic arms in a factory",
+  },
+  {
+    id:4, category:"Cybersecurity", icon:"🔐", color:"red",
+    borderColor:"#f87171", glowColor:"rgba(248,113,113,0.3)",
+    gradientFrom:"#200a0a", gradientTo:"#100404",
+    title:"Cybersecurity", subtitle:"Zero-Trust · Threat Intel · Pen Testing",
+    description:"Enterprise-grade security architecture, real-time threat detection, and full incident response. We secure AI systems, embedded devices, and cloud infrastructure against modern attack vectors with zero-trust principles.",
+    features:["Penetration Testing & Red Team","Zero-Trust Architecture","AI-Powered Threat Detection","Embedded System Security","SOC-as-a-Service","ISO 27001 Compliance & Audit"],
+    image:"https://images.unsplash.com/photo-1550751827-4bd374c3f58b?w=900&q=85&fit=crop&auto=format",
+    imageAlt:"Digital cybersecurity concept with blue lock and data streams",
+  },
+  {
+    id:5, category:"Blockchain", icon:"⛓️", color:"violet",
+    borderColor:"#a78bfa", glowColor:"rgba(167,139,250,0.3)",
+    gradientFrom:"#130a20", gradientTo:"#08040f",
+    title:"Blockchain Solutions", subtitle:"Smart Contracts · DeFi · Supply Chain",
+    description:"Build trust at scale with distributed ledger technology. Smart contract development, DeFi protocols, tokenisation infrastructure, and blockchain-based supply chain traceability systems that bring real-world transparency.",
+    features:["Solidity / Rust Smart Contracts","Ethereum / Solana / Polkadot","DeFi Protocol Design","Supply Chain Traceability","NFT & Token Platforms","Web3 API & SDK Integration"],
+    image:"https://images.unsplash.com/photo-1639762681485-074b7f938ba0?w=900&q=85&fit=crop&auto=format",
+    imageAlt:"Abstract blockchain network nodes glowing in blue and purple",
+  },
+  {
+    id:6, category:"MVP & Rapid Build", icon:"🚀", color:"fuchsia",
+    borderColor:"#e879f9", glowColor:"rgba(232,121,249,0.3)",
+    gradientFrom:"#1a0820", gradientTo:"#0c040f",
+    title:"MVP & Rapid Build", subtitle:"Idea → Product → Market in 4–8 Weeks",
+    description:"Got an idea? We take you from raw concept to a working, investor-ready MVP in 4–8 weeks. Product strategy workshops, technical architecture, prototype development, AI feature integration, and launch-ready delivery.",
+    features:["Product Discovery Workshops","Technical Architecture Design","Full-Stack MVP Development","AI Feature Integration","Investor-Ready Demos","Post-Launch Iteration Support"],
+    image:"https://images.unsplash.com/photo-1522202176988-66273c2fd55f?w=900&q=85&fit=crop&auto=format",
+    imageAlt:"Diverse team collaborating on a startup project at a whiteboard",
+  },
 ];
+
+// ─── Solutions grid — 3 images per card (auto-cycling slider) ────────────────
+const GRID_IMAGES = {
+  main: [
+    "https://images.unsplash.com/photo-1677442135703-1787eea5ce01?w=1200&q=80&fit=crop&auto=format",
+    "https://images.unsplash.com/photo-1620712943543-bcc4688e7485?w=1200&q=80&fit=crop&auto=format",
+    "https://images.unsplash.com/photo-1451187580459-43490279c0fa?w=1200&q=80&fit=crop&auto=format",
+  ],
+  decision: [
+    "https://images.unsplash.com/photo-1551288049-bebda4e38f71?w=800&q=80&fit=crop&auto=format",
+    "https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=800&q=80&fit=crop&auto=format",
+    "https://images.unsplash.com/photo-1504868584819-f8e8b4b6d7e3?w=800&q=80&fit=crop&auto=format",
+  ],
+  api: [
+    "https://images.unsplash.com/photo-1555066931-4365d14bab8c?w=800&q=80&fit=crop&auto=format",
+    "https://images.unsplash.com/photo-1518770660439-4636190af475?w=800&q=80&fit=crop&auto=format",
+    "https://images.unsplash.com/photo-1607252650355-f7fd0460ccdb?w=800&q=80&fit=crop&auto=format",
+  ],
+};
+
+// ─── Extra images per blog post (2 additional beyond coverImage) ──────────────
+const BLOG_EXTRA: Record<string, [string, string]> = {
+  "complete-guide-ai-agents-2026": [
+    "https://images.unsplash.com/photo-1620712943543-bcc4688e7485?w=700&q=75&fit=crop&auto=format",
+    "https://images.unsplash.com/photo-1485827404703-89b55fcc595e?w=700&q=75&fit=crop&auto=format",
+  ],
+  "prompt-engineering-enterprise": [
+    "https://images.unsplash.com/photo-1516321318423-f06f85e504b3?w=700&q=75&fit=crop&auto=format",
+    "https://images.unsplash.com/photo-1522202176988-66273c2fd55f?w=700&q=75&fit=crop&auto=format",
+  ],
+  "api-first-ai-architecture": [
+    "https://images.unsplash.com/photo-1518770660439-4636190af475?w=700&q=75&fit=crop&auto=format",
+    "https://images.unsplash.com/photo-1607252650355-f7fd0460ccdb?w=700&q=75&fit=crop&auto=format",
+  ],
+  "why-decision-intelligence-beats-dashboards": [
+    "https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=700&q=75&fit=crop&auto=format",
+    "https://images.unsplash.com/photo-1504868584819-f8e8b4b6d7e3?w=700&q=75&fit=crop&auto=format",
+  ],
+  "africa-ai-skills-gap-2026": [
+    "https://images.unsplash.com/photo-1522202176988-66273c2fd55f?w=700&q=75&fit=crop&auto=format",
+    "https://images.unsplash.com/photo-1434030216411-0b793f4b4173?w=700&q=75&fit=crop&auto=format",
+  ],
+  "fine-tuning-llms-on-proprietary-data": [
+    "https://images.unsplash.com/photo-1655720828018-edd2daec9349?w=700&q=75&fit=crop&auto=format",
+    "https://images.unsplash.com/photo-1518770660439-4636190af475?w=700&q=75&fit=crop&auto=format",
+  ],
+  "roi-of-adaptive-learning-corporate": [
+    "https://images.unsplash.com/photo-1434030216411-0b793f4b4173?w=700&q=75&fit=crop&auto=format",
+    "https://images.unsplash.com/photo-1522202176988-66273c2fd55f?w=700&q=75&fit=crop&auto=format",
+  ],
+};
+
+// ─── CardImageSlider ──────────────────────────────────────────────────────────
+// Cycles through 3 images with a flip-and-crossfade transition.
+// Used in both solutions grid cards and blog cards so both sections look
+// identical. Parent MUST be position:relative with a defined height.
+function CardImageSlider({
+  images,
+  alt,
+  accent = "rgba(0,200,255,0.16)",
+  interval = 3800,
+  bgColor = "#0d1622",
+}: {
+  images:    string[];
+  alt:       string;
+  accent?:   string;
+  interval?: number;
+  bgColor?:  string;
+}) {
+  const [idx,      setIdx]      = useState(0);
+  const [prev,     setPrev]     = useState<number | null>(null);
+  const [flipping, setFlipping] = useState(false);
+  const thinAccent = accent.replace(/[\d.]+\)$/, "0.10)");
+
+  useEffect(() => {
+    const t = setInterval(() => {
+      setFlipping(true);
+      setTimeout(() => {
+        setIdx(c => {
+          const next = (c + 1) % images.length;
+          setPrev(c);
+          return next;
+        });
+        setFlipping(false);
+      }, 380);
+    }, interval);
+    return () => clearInterval(t);
+  }, [images.length, interval]);
+
+  return (
+    <>
+      {/* Dark base so the card never flashes white */}
+      <div style={{ position:"absolute", inset:0, background:bgColor, zIndex:0 }} />
+
+      {/* All three images stacked; only current is visible */}
+      {images.map((src, i) => {
+        const isCurrent = i === idx;
+        const isLeaving = i === prev && flipping;
+        return (
+          <img
+            key={src}
+            src={src}
+            alt={alt}
+            loading={i === 0 ? "eager" : "lazy"}
+            decoding="async"
+            style={{
+              position:   "absolute",
+              inset:      0,
+              width:      "100%",
+              height:     "100%",
+              objectFit:  "cover",
+              filter:     "saturate(0.68) brightness(0.50)",
+              zIndex:     isCurrent ? 2 : isLeaving ? 1 : 0,
+              opacity:    isCurrent ? (flipping ? 0 : 1) : isLeaving ? 1 : 0,
+              transform:  isCurrent
+                ? (flipping ? "perspective(800px) rotateY(-15deg) scale(0.97)" : "perspective(800px) rotateY(0deg) scale(1)")
+                : isLeaving
+                ? (flipping ? "perspective(800px) rotateY(15deg) scale(0.97)" : "perspective(800px) rotateY(0deg) scale(1)")
+                : "none",
+              transition: "opacity 0.38s ease, transform 0.38s ease",
+            }}
+          />
+        );
+      })}
+
+      {/* Colour tint overlay */}
+      <div style={{ position:"absolute", inset:0, zIndex:3,
+        background:`linear-gradient(135deg,${accent} 0%,transparent 60%)` }} />
+
+      {/* Subtle tech grid */}
+      <div style={{ position:"absolute", inset:0, zIndex:4,
+        backgroundImage:`linear-gradient(${thinAccent} 1px,transparent 1px),linear-gradient(90deg,${thinAccent} 1px,transparent 1px)`,
+        backgroundSize:"36px 36px", opacity:0.55 }} />
+
+      {/* Bottom fade into card body */}
+      <div style={{ position:"absolute", inset:0, zIndex:5,
+        background:`linear-gradient(to top,${bgColor} 0%,transparent 52%)` }} />
+
+      {/* Dot indicators */}
+      <div style={{ position:"absolute", bottom:8, right:10, zIndex:6,
+        display:"flex", gap:4, alignItems:"center" }}>
+        {images.map((_, i) => (
+          <button
+            key={i}
+            onClick={() => { setPrev(idx); setIdx(i); }}
+            style={{
+              width:      i === idx ? 18 : 6,
+              height:     6,
+              borderRadius: 3,
+              border:     "none",
+              padding:    0,
+              cursor:     "pointer",
+              background: i === idx
+                ? accent.replace(/[\d.]+\)$/, "0.95)")
+                : "rgba(255,255,255,0.28)",
+              transition: "all 0.3s ease",
+              boxShadow:  i === idx ? `0 0 8px ${accent}` : "none",
+            }}
+          />
+        ))}
+      </div>
+    </>
+  );
+}
 
 // ═══════════════════════════════════════════════════════════════════════════════
 // useSectionVisible
@@ -506,16 +729,21 @@ function TextAnimSliderSection() {
 }
 
 // ═══════════════════════════════════════════════════════════════════════════════
-// SOLUTIONS CAROUSEL
+// SOLUTIONS CAROUSEL — with real Unsplash images in the media panel
 // ═══════════════════════════════════════════════════════════════════════════════
 function SolutionsCarousel() {
   const [current, setCurrent] = useState(0);
   const [animKey, setAnimKey] = useState(0);
+  const [imgLoaded, setImgLoaded] = useState(false);
   const total = SOLUTIONS_SLIDES.length;
   const touchStart = useRef<number | null>(null);
   const { ref, visible } = useSectionVisible();
 
-  const go = useCallback((idx:number) => { setAnimKey(k=>k+1); setCurrent(idx); }, []);
+  const go = useCallback((idx:number) => {
+    setImgLoaded(false);
+    setAnimKey(k=>k+1);
+    setCurrent(idx);
+  }, []);
   const prev = () => go((current-1+total)%total);
   const next = () => go((current+1)%total);
   const handleTouchStart = (e:React.TouchEvent<HTMLDivElement>) => { touchStart.current=e.touches[0].clientX; };
@@ -552,9 +780,12 @@ function SolutionsCarousel() {
           </div>
           <Link href="/solutions" className={`${btnGhost} w-full sm:w-auto shrink-0`}>All Solutions →</Link>
         </div>
+
         <div onTouchStart={handleTouchStart} onTouchEnd={handleTouchEnd} style={{ borderRadius:24, border:`1px solid ${cc.border}`, background:`linear-gradient(135deg,${cc.bg1},${cc.bg2})`, boxShadow:`0 0 80px ${cc.glow},0 0 160px ${cc.glow.replace("0.35","0.1")}`, overflow:"hidden", transition:"border-color 0.6s ease,box-shadow 0.6s ease,background 0.6s ease" }}>
           <div style={{ height:3, background:`linear-gradient(90deg,transparent 0%,${cc.primary} 30%,${cc.primary} 70%,transparent 100%)`, opacity:0.8 }} />
+
           <div style={{ display:"grid", gridTemplateColumns:"1fr", gap:0 }} className="lg:![grid-template-columns:1fr_1fr]">
+            {/* ── Left: text content ── */}
             <div style={{ padding:"clamp(20px,4vw,56px)" }}>
               <div key={`c-${animKey}`} style={{ animation:"slideInContent 0.5s cubic-bezier(0.25,0.46,0.45,0.94) both" }}>
                 <div style={{ display:"inline-flex", alignItems:"center", gap:8, padding:"6px 14px", borderRadius:8, marginBottom:16, fontSize:"clamp(9px,1.2vw,12px)", fontWeight:900, letterSpacing:"0.18em", textTransform:"uppercase" as const, border:`1px solid ${cc.primary}30`, background:`${cc.primary}10`, color:cc.primary }}><span style={{ fontSize:"1.2em" }}>{slide.icon}</span>{slide.category}</div>
@@ -570,22 +801,59 @@ function SolutionsCarousel() {
                 </div>
               </div>
             </div>
-            <div style={{ position:"relative", overflow:"hidden", minHeight:"clamp(180px,32vw,480px)", borderLeft:`1px solid ${cc.primary}15` }}>
-              <div key={`m-${animKey}`} style={{ position:"absolute", inset:0, animation:"slideInMedia 0.6s cubic-bezier(0.25,0.46,0.45,0.94) both" }}>
-                <div style={{ position:"absolute", inset:0, backgroundImage:`linear-gradient(${cc.primary}12 1px,transparent 1px),linear-gradient(90deg,${cc.primary}12 1px,transparent 1px)`, backgroundSize:"40px 40px" }} />
-                <div style={{ position:"absolute", inset:0, background:`radial-gradient(ellipse 70% 70% at 50% 50%,${cc.glow.replace("0.35","0.12")},transparent)` }} />
-                <div style={{ position:"absolute", inset:0, display:"flex", flexDirection:"column", alignItems:"center", justifyContent:"center", gap:16 }}>
-                  <div style={{ fontSize:"clamp(3rem,8vw,7rem)", filter:`drop-shadow(0 0 30px ${cc.primary})`, animation:"iconFloat 3s ease-in-out infinite" }}>{slide.icon}</div>
-                  <div style={{ fontSize:"clamp(0.6rem,1.2vw,0.85rem)", fontWeight:900, color:"rgba(255,255,255,0.25)", letterSpacing:"0.25em", textTransform:"uppercase" as const, fontFamily:"monospace", textAlign:"center", padding:"0 24px" }}>Image / Video Placeholder<br /><span style={{ color:cc.primary, opacity:0.6 }}>{slide.category}</span></div>
-                  <div style={{ position:"absolute", width:"60%", paddingBottom:"60%", borderRadius:"50%", border:`1px solid ${cc.primary}20`, animation:"orbitSpin 8s linear infinite" }}>
-                    <div style={{ position:"absolute", top:-5, left:"50%", width:10, height:10, borderRadius:"50%", background:cc.primary, boxShadow:`0 0 15px ${cc.primary}`, transform:"translateX(-50%)" }} />
-                  </div>
+
+            {/* ── Right: real Unsplash image ── */}
+            <div style={{ position:"relative", overflow:"hidden", minHeight:"clamp(200px,36vw,520px)", borderLeft:`1px solid ${cc.primary}15` }}>
+              <div key={`m-${animKey}`} style={{ position:"absolute", inset:0, animation:"slideInMedia 0.7s cubic-bezier(0.25,0.46,0.45,0.94) both" }}>
+
+                {/* Actual photo */}
+                <img
+                  src={slide.image}
+                  alt={slide.imageAlt}
+                  onLoad={() => setImgLoaded(true)}
+                  style={{
+                    position:"absolute", inset:0,
+                    width:"100%", height:"100%",
+                    objectFit:"cover",
+                    opacity: imgLoaded ? 1 : 0,
+                    transition:"opacity 0.6s ease",
+                    filter:`saturate(0.75) brightness(0.55)`,
+                  }}
+                />
+
+                {/* Colour-tinted gradient overlay — keeps the dark-UI look */}
+                <div style={{ position:"absolute", inset:0, background:`linear-gradient(135deg, ${cc.bg1}cc 0%, transparent 55%, ${cc.bg2}aa 100%)`, mixBlendMode:"multiply" }} />
+
+                {/* Grid lines overlay */}
+                <div style={{ position:"absolute", inset:0, backgroundImage:`linear-gradient(${cc.primary}18 1px,transparent 1px),linear-gradient(90deg,${cc.primary}18 1px,transparent 1px)`, backgroundSize:"44px 44px", opacity:0.7 }} />
+
+                {/* Radial glow */}
+                <div style={{ position:"absolute", inset:0, background:`radial-gradient(ellipse 60% 60% at 50% 50%, ${cc.glow.replace("0.35","0.18")}, transparent)` }} />
+
+                {/* Icon floating badge */}
+                <div style={{ position:"absolute", inset:0, display:"flex", alignItems:"center", justifyContent:"center", pointerEvents:"none" }}>
+                  <div style={{ fontSize:"clamp(3rem,7vw,5.5rem)", filter:`drop-shadow(0 0 40px ${cc.primary}) drop-shadow(0 0 80px ${cc.primary}80)`, animation:"iconFloat 3s ease-in-out infinite", opacity: imgLoaded ? 0.85 : 1, transition:"opacity 0.6s ease 0.4s" }}>{slide.icon}</div>
                 </div>
-                <div style={{ position:"absolute", top:16, right:16, background:"rgba(0,0,0,0.6)", backdropFilter:"blur(8px)", border:`1px solid ${cc.primary}30`, borderRadius:6, padding:"4px 10px", fontSize:10, fontWeight:900, color:cc.primary, fontFamily:"monospace", letterSpacing:"0.1em" }}>◈ {slide.category.toUpperCase()}</div>
+
+                {/* Bottom gradient fade into card bg */}
+                <div style={{ position:"absolute", bottom:0, left:0, right:0, height:"40%", background:`linear-gradient(to top, ${cc.bg2}f0, transparent)` }} />
+
+                {/* Accent corner lines */}
+                {[{top:0,left:0,w:32,h:2},{top:0,left:0,w:2,h:32},{top:0,right:0,w:32,h:2},{top:0,right:0,w:2,h:32},{bottom:0,left:0,w:32,h:2},{bottom:0,left:0,w:2,h:32},{bottom:0,right:0,w:32,h:2},{bottom:0,right:0,w:2,h:32}].map((c,ci)=>(
+                  <div key={ci} style={{ position:"absolute", background:cc.primary, opacity:0.7, ...c } as CSSProperties} />
+                ))}
+
+                {/* Category badge */}
+                <div style={{ position:"absolute", top:16, right:16, background:"rgba(0,0,0,0.72)", backdropFilter:"blur(10px)", border:`1px solid ${cc.primary}50`, borderRadius:8, padding:"5px 12px", fontSize:10, fontWeight:900, color:cc.primary, fontFamily:"monospace", letterSpacing:"0.12em" }}>◈ {slide.category.toUpperCase()}</div>
+
+                {/* Image credit — tiny, bottom-left */}
+                <div style={{ position:"absolute", bottom:10, left:12, fontSize:9, fontWeight:600, color:"rgba(255,255,255,0.22)", fontFamily:"monospace", letterSpacing:"0.08em" }}>Photo · Unsplash</div>
               </div>
             </div>
           </div>
         </div>
+
+        {/* Nav dots & arrows */}
         <div style={{ marginTop:20, display:"flex", alignItems:"center", justifyContent:"center", gap:14, flexWrap:"wrap" }}>
           <button onClick={prev} style={{ width:44, height:44, borderRadius:"50%", background:"rgba(255,255,255,0.05)", border:"1px solid rgba(255,255,255,0.2)", color:"#fff", fontSize:20, cursor:"pointer", display:"flex", alignItems:"center", justifyContent:"center", transition:"all 0.2s ease" }}>‹</button>
           <div style={{ display:"flex", gap:8, alignItems:"center" }}>
@@ -597,9 +865,8 @@ function SolutionsCarousel() {
       </div>
       <style>{`
         @keyframes slideInContent{from{opacity:0;transform:translateX(-30px)}to{opacity:1;transform:translateX(0)}}
-        @keyframes slideInMedia{from{opacity:0;transform:scale(0.95)}to{opacity:1;transform:scale(1)}}
+        @keyframes slideInMedia{from{opacity:0;transform:scale(0.97)}to{opacity:1;transform:scale(1)}}
         @keyframes iconFloat{0%,100%{transform:translateY(0)}50%{transform:translateY(-12px)}}
-        @keyframes orbitSpin{from{transform:rotate(0deg)}to{transform:rotate(360deg)}}
       `}</style>
     </section>
   );
@@ -750,9 +1017,6 @@ export default function HomePage() {
   const ctaSection          = useSectionVisible();
 
   const heroSub = HERO_ROTATIONS[0].sub;
-
-  // ── Latest 3 blog posts pulled from lib/blog-data — slug-routed ─────────────
-  // Reverses so newest appears first; takes first 3 for the homepage grid.
   const featuredBlogPosts = [...BLOG_POSTS].reverse().slice(0, 3);
 
   if (!introComplete) return <RobotIntro onComplete={handleIntroComplete} />;
@@ -807,6 +1071,14 @@ export default function HomePage() {
 
         /* blog card hover */
         .hp-blog-card:hover{transform:translateY(-3px)!important;border-color:rgba(0,200,255,0.35)!important;box-shadow:0 0 40px rgba(0,200,255,0.1)!important}
+        .hp-blog-card:hover img{transform:scale(1.05)!important;filter:saturate(0.8) brightness(0.55)!important}
+
+        /* cover image shimmer skeleton */
+        @keyframes hbImgShimmer{0%,100%{background-position:200% 0}50%{background-position:-200% 0}}
+
+        /* solutions grid image hover */
+        .hp-sol-img-wrap img{transition:transform 0.6s cubic-bezier(0.25,0.46,0.45,0.94),filter 0.4s ease}
+        .hp-sol-img-wrap:hover img{transform:scale(1.06);filter:saturate(0.9) brightness(0.6)!important}
       `}</style>
 
       <main className="hp-root bg-[#050810] text-white font-sans antialiased">
@@ -951,7 +1223,7 @@ export default function HomePage() {
           </div>
         </section>
 
-        {/* ═══ 5. SOLUTIONS GRID ═══ */}
+        {/* ═══ 5. SOLUTIONS GRID — with real Unsplash images ═══ */}
         <section ref={solutionsSection.ref as React.RefCallback<HTMLElement>} className="relative bg-[#050810] py-8 sm:py-14 lg:py-20">
           <div className="absolute inset-0 bg-[radial-gradient(ellipse_60%_40%_at_80%_20%,rgba(120,40,255,0.08),transparent)] pointer-events-none" />
           <div className="mx-auto w-full max-w-screen-xl px-4 sm:px-6 lg:px-12 relative z-10">
@@ -962,11 +1234,20 @@ export default function HomePage() {
               </div>
               <Link href="/solutions" className={`${btnGhost} w-full sm:w-auto`}>Explore All Solutions →</Link>
             </div>
+
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6 mb-4">
+              {/* ── Main card ── */}
               <div className="lg:row-span-2 group relative bg-[#0d1622] rounded-2xl border border-cyan-400/20 hover:border-cyan-400/50 overflow-hidden hover:shadow-[0_0_55px_rgba(0,200,255,0.2)] flex flex-col transition-all duration-400">
-                <div className="w-full h-32 sm:h-56 bg-gradient-to-br from-cyan-900/30 to-blue-900/20 border-b border-cyan-400/10 flex items-center justify-center relative overflow-hidden">
-                  <div className="text-slate-700 text-center pointer-events-none select-none"><div className="text-4xl sm:text-5xl mb-2 text-cyan-400/20">🖼</div><p className="text-xs font-black uppercase tracking-widest">Image / Video Slot</p></div>
-                  <div className="absolute inset-0 bg-gradient-to-t from-[#0d1622]/80 to-transparent" />
+                {/* 3-image cycling slider */}
+                <div className="hp-sol-img-wrap w-full h-32 sm:h-56 relative overflow-hidden border-b border-cyan-400/10">
+                  <CardImageSlider
+                    images={GRID_IMAGES.main}
+                    alt="AI platform — adaptive learning engine"
+                    accent="rgba(0,200,255,0.18)"
+                    interval={3600}
+                  />
+                  {/* Badge sits above slider layers */}
+                  <div style={{ position:"absolute", top:12, left:12, zIndex:7, background:"rgba(0,0,0,0.7)", backdropFilter:"blur(8px)", border:"1px solid rgba(0,200,255,0.4)", borderRadius:6, padding:"4px 10px", fontSize:10, fontWeight:900, color:"#22d3ee", fontFamily:"monospace", letterSpacing:"0.1em" }}>◈ CORE PLATFORM</div>
                 </div>
                 <div className="p-4 sm:p-8 lg:p-10 flex flex-col flex-1">
                   <div className="inline-flex px-2 sm:px-3 py-0.5 sm:py-1 rounded-lg bg-cyan-400/10 border border-cyan-400/15 text-cyan-300 text-[9px] sm:text-xs font-black uppercase tracking-widest mb-2.5 sm:mb-4 self-start">Core Platform</div>
@@ -978,14 +1259,43 @@ export default function HomePage() {
                   </div>
                 </div>
               </div>
+
+              {/* ── Sub card grid ── */}
               <div className="hp-sol-sub">
+                {/* Decision Intelligence */}
                 <div className="group relative bg-[#0d1622] rounded-2xl border border-violet-400/20 hover:border-violet-400/50 overflow-hidden hover:shadow-[0_0_45px_rgba(120,40,255,0.2)] flex flex-col transition-all duration-400">
-                  <div className="hp-sol-sub-img w-full bg-gradient-to-br from-violet-900/30 to-blue-900/20 border-b border-violet-400/10 flex items-center justify-center relative overflow-hidden"><div className="text-slate-700 text-center pointer-events-none"><div className="text-2xl sm:text-3xl text-violet-400/20">🖼</div></div><div className="absolute inset-0 bg-gradient-to-t from-[#0d1622]/80 to-transparent" /></div>
-                  <div className="p-3 sm:p-7 flex flex-col flex-1"><div className="inline-flex px-2 sm:px-3 py-0.5 sm:py-1 rounded-lg bg-violet-400/10 border border-violet-400/15 text-violet-300 text-[8px] sm:text-xs font-black uppercase tracking-widest mb-2 sm:mb-3 self-start">Enterprise AI</div><h3 className="text-xs sm:text-2xl font-black text-white mb-1.5 sm:mb-3 leading-tight">Decision Intelligence Suite</h3><p className="text-[10px] sm:text-base text-slate-300 leading-relaxed mb-3 sm:mb-5 flex-1 font-semibold">AI-assisted decision support connected directly to your existing data warehouse.</p><Link href="/contact" className={`${btnViolet} w-full`}>Get a Quote →</Link></div>
+                  <div className="hp-sol-img-wrap hp-sol-sub-img w-full relative overflow-hidden border-b border-violet-400/10">
+                    <CardImageSlider
+                      images={GRID_IMAGES.decision}
+                      alt="Decision intelligence analytics"
+                      accent="rgba(167,139,250,0.20)"
+                      interval={4200}
+                    />
+                  </div>
+                  <div className="p-3 sm:p-7 flex flex-col flex-1">
+                    <div className="inline-flex px-2 sm:px-3 py-0.5 sm:py-1 rounded-lg bg-violet-400/10 border border-violet-400/15 text-violet-300 text-[8px] sm:text-xs font-black uppercase tracking-widest mb-2 sm:mb-3 self-start">Enterprise AI</div>
+                    <h3 className="text-xs sm:text-2xl font-black text-white mb-1.5 sm:mb-3 leading-tight">Decision Intelligence Suite</h3>
+                    <p className="text-[10px] sm:text-base text-slate-300 leading-relaxed mb-3 sm:mb-5 flex-1 font-semibold">AI-assisted decision support connected directly to your existing data warehouse.</p>
+                    <Link href="/contact" className={`${btnViolet} w-full`}>Get a Quote →</Link>
+                  </div>
                 </div>
+
+                {/* Intelligence API */}
                 <div className="group relative bg-[#0d1622] rounded-2xl border border-blue-400/20 hover:border-blue-400/50 overflow-hidden hover:shadow-[0_0_45px_rgba(60,120,255,0.2)] flex flex-col transition-all duration-400">
-                  <div className="hp-sol-sub-img w-full bg-gradient-to-br from-blue-900/30 to-cyan-900/20 border-b border-blue-400/10 flex items-center justify-center relative overflow-hidden"><div className="text-slate-700 text-center pointer-events-none"><div className="text-2xl sm:text-3xl text-blue-400/20">🖼</div></div><div className="absolute inset-0 bg-gradient-to-t from-[#0d1622]/80 to-transparent" /></div>
-                  <div className="p-3 sm:p-7 flex flex-col flex-1"><div className="inline-flex px-2 sm:px-3 py-0.5 sm:py-1 rounded-lg bg-blue-400/10 border border-blue-400/15 text-blue-300 text-[8px] sm:text-xs font-black uppercase tracking-widest mb-2 sm:mb-3 self-start">Developer API</div><h3 className="text-xs sm:text-2xl font-black text-white mb-1.5 sm:mb-3 leading-tight">Intelligence API &amp; SDK</h3><p className="text-[10px] sm:text-base text-slate-300 leading-relaxed mb-3 sm:mb-5 flex-1 font-semibold">REST &amp; GraphQL endpoints, model fine-tuning, and webhooks ready in under 48 hours.</p><Link href="/docs" className={`${btnGhost} w-full`}>View Docs →</Link></div>
+                  <div className="hp-sol-img-wrap hp-sol-sub-img w-full relative overflow-hidden border-b border-blue-400/10">
+                    <CardImageSlider
+                      images={GRID_IMAGES.api}
+                      alt="Developer API and SDK integration"
+                      accent="rgba(96,165,250,0.20)"
+                      interval={4600}
+                    />
+                  </div>
+                  <div className="p-3 sm:p-7 flex flex-col flex-1">
+                    <div className="inline-flex px-2 sm:px-3 py-0.5 sm:py-1 rounded-lg bg-blue-400/10 border border-blue-400/15 text-blue-300 text-[8px] sm:text-xs font-black uppercase tracking-widest mb-2 sm:mb-3 self-start">Developer API</div>
+                    <h3 className="text-xs sm:text-2xl font-black text-white mb-1.5 sm:mb-3 leading-tight">Intelligence API &amp; SDK</h3>
+                    <p className="text-[10px] sm:text-base text-slate-300 leading-relaxed mb-3 sm:mb-5 flex-1 font-semibold">REST &amp; GraphQL endpoints, model fine-tuning, and webhooks ready in under 48 hours.</p>
+                    <Link href="/docs" className={`${btnGhost} w-full`}>View Docs →</Link>
+                  </div>
                 </div>
               </div>
             </div>
@@ -1012,7 +1322,7 @@ export default function HomePage() {
           </div>
         </section>
 
-        {/* ═══ 7. BLOG — Dynamic from lib/blog-data, slug-linked ═══ */}
+        {/* ═══ 7. BLOG ═══ */}
         <section ref={blogSection.ref as React.RefCallback<HTMLElement>} className="relative bg-[#050810] py-8 sm:py-14 lg:py-20">
           <div className="mx-auto w-full max-w-screen-xl px-4 sm:px-6 lg:px-12">
             <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 sm:gap-6 mb-5 sm:mb-10">
@@ -1040,13 +1350,46 @@ export default function HomePage() {
                     className="hp-blog-card group bg-[#0d1622] rounded-2xl border border-white/10 overflow-hidden flex flex-col transition-all duration-300"
                     style={{ textDecoration:"none", opacity:blogSection.visible?1:0, animation:blogSection.visible?`sectionHeaderReveal 0.7s ease ${i*0.1}s both`:"none" }}
                   >
-                    <div className="w-full aspect-video bg-gradient-to-br from-[#101c2e] to-[#0a0f1a] border-b border-white/5 flex items-center justify-center relative overflow-hidden">
-                      <span className="text-2xl sm:text-7xl opacity-15 group-hover:opacity-25 transition-opacity select-none">{post.emoji}</span>
-                      <div className="absolute inset-0 bg-gradient-to-t from-[#0d1622]/70 to-transparent" />
-                      <div className="absolute top-2 left-2 sm:top-3 sm:left-3">
-                        <span style={{ padding:"3px 9px", borderRadius:7, fontSize:"0.6rem", fontWeight:800, textTransform:"uppercase", letterSpacing:"0.08em", background:ts.bg, border:`1px solid ${ts.border}`, color:ts.color }}>{post.tag}</span>
-                      </div>
-                    </div>
+                    {/* 3-image cycling slider — same images used on /blog listing */}
+                    {(() => {
+                      const extra = BLOG_EXTRA[post.slug];
+                      const imgs: string[] = extra
+                        ? [post.coverImage, extra[0], extra[1]]
+                        : [
+                            post.coverImage,
+                            post.tag === "Technology"
+                              ? "https://images.unsplash.com/photo-1620712943543-bcc4688e7485?w=700&q=75&fit=crop&auto=format"
+                              : "https://images.unsplash.com/photo-1522202176988-66273c2fd55f?w=700&q=75&fit=crop&auto=format",
+                            post.tag === "Technology"
+                              ? "https://images.unsplash.com/photo-1518770660439-4636190af475?w=700&q=75&fit=crop&auto=format"
+                              : "https://images.unsplash.com/photo-1434030216411-0b793f4b4173?w=700&q=75&fit=crop&auto=format",
+                          ];
+                      const blogAccent = post.tag === "Technology"
+                        ? "rgba(0,200,255,0.16)"
+                        : post.tag === "Institute"
+                        ? "rgba(168,85,247,0.16)"
+                        : "rgba(255,255,255,0.08)";
+                      return (
+                        <div
+                          className="w-full relative overflow-hidden border-b border-white/5"
+                          style={{ aspectRatio:"16/9", background:"#060e1c", flexShrink:0 }}
+                        >
+                          <CardImageSlider
+                            images={imgs}
+                            alt={post.coverAlt}
+                            accent={blogAccent}
+                            interval={3400 + i * 400}
+                            bgColor="#060e1c"
+                          />
+                          {/* Tag badge above slider */}
+                          <div style={{ position:"absolute", top:10, left:10, zIndex:7 }}>
+                            <span style={{ padding:"3px 9px", borderRadius:7, fontSize:"0.6rem", fontWeight:800, textTransform:"uppercase", letterSpacing:"0.08em", background:ts.bg, border:`1px solid ${ts.border}`, color:ts.color }}>{post.tag}</span>
+                          </div>
+                          {/* Subtle emoji watermark */}
+                          <div style={{ position:"absolute", left:10, bottom:10, fontSize:"1.3rem", opacity:0.14, zIndex:7, userSelect:"none", pointerEvents:"none" }}>{post.emoji}</div>
+                        </div>
+                      );
+                    })()}
                     <div className="p-2.5 sm:p-6 flex flex-col flex-1">
                       <div style={{ display:"flex", gap:6, alignItems:"center", marginBottom:6 }}>
                         <span style={{ fontSize:"0.65rem", fontWeight:700, color:"rgba(255,255,255,0.28)" }}>{post.date}</span>
@@ -1103,14 +1446,6 @@ export default function HomePage() {
         </section>
 
       </main>
-
-      {/*
-       * NOTE: <AstraBot /> has been removed from this page.
-       * It now lives in app/layout.tsx so it mounts once globally
-       * and persists across all client-side navigation without re-mounting.
-       * If you still see a duplicate bot, remove the <AstraBot /> call
-       * from any other page file that still imports it.
-       */}
     </>
   );
 }
