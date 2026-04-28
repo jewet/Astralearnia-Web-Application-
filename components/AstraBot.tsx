@@ -884,7 +884,7 @@ export default function AstraBot() {
               <div style={{ display: "flex", alignItems: "center", gap: 5, marginTop: 1 }}>
                 <div style={{ width: 6, height: 6, borderRadius: "50%", background: "#00ffb2", boxShadow: "0 0 5px #00ffb2", animation: "astra-pulse 2s ease-in-out infinite" }} />
                 <span style={{ fontSize: "0.68rem", color: "rgba(255,255,255,0.35)", fontWeight: 600 }}>
-                  {USE_OPENAI ? "GPT-4o powered" : "Knowledge base · OpenAI-ready"}
+                  {USE_OPENAI ? "GPT-4o powered" : "Knowledge base · Astra v1.0"}
                 </span>
               </div>
             </div>
