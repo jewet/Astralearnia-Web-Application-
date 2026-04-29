@@ -815,7 +815,7 @@ function SolutionsCarousel() {
                     position:"absolute", inset:0,
                     width:"100%", height:"100%",
                     objectFit:"cover",
-                    opacity: imgLoaded ? 1 : 0,
+                    opacity: 1,
                     transition:"opacity 0.6s ease",
                     filter:`saturate(0.75) brightness(0.55)`,
                   }}
