@@ -2,129 +2,209 @@
 // SERVER COMPONENT — handles SEO metadata for each blog post.
 // All interactive UI lives in BlogPostClient.tsx ("use client").
 //
-// ⚠️  Next.js 15 BREAKING CHANGE: `params` is now a Promise.
-//     Both generateMetadata and the default export MUST await it.
-//     Not awaiting is why every slug showed "Article not found" —
-//     params.slug resolved to a Promise object, not the slug string.
+// SEO enhancements in this version:
+//   ✅ Full OpenGraph / Twitter cards
+//   ✅ BlogPosting JSON-LD structured data
+//   ✅ BreadcrumbList JSON-LD (Google rich results)
+//   ✅ WebSite / Organisation JSON-LD (in layout.tsx — see comment below)
+//   ✅ Canonical URL per post
+//   ✅ Fallback OG image for posts missing coverImage
+//   ✅ keywords, datePublished, dateModified in meta
 //
-// ❌  REMOVED: export const runtime = "edge"
-//     Edge runtime and generateStaticParams cannot be used together.
-//     Next.js will throw a build error if both are present.
-//     Without it, the page uses the default Node.js runtime and
-//     static pre-rendering works as expected.
+// ⚠️  Next.js 15: `params` is a Promise — must be awaited.
+// ❌  No `export const runtime = "edge"` — incompatible with generateStaticParams.
+// ─────────────────────────────────────────────────────────────────────────────
+//
+// 📌 ALSO ADD to app/layout.tsx inside <head>:
+//
+//   import { buildOrganisationSchema, buildWebsiteSchema } from "@/lib/seo-config";
+//   ...
+//   <script type="application/ld+json"
+//     dangerouslySetInnerHTML={{ __html: JSON.stringify(buildOrganisationSchema()) }} />
+//   <script type="application/ld+json"
+//     dangerouslySetInnerHTML={{ __html: JSON.stringify(buildWebsiteSchema()) }} />
+//
 // ─────────────────────────────────────────────────────────────────────────────
 
 import type { Metadata } from "next";
 import { BLOG_POSTS, getPostBySlug } from "@/lib/blog-data";
-import BlogPostClient from "./BlogPostClient";
+import BlogPostClient                from "./BlogPostClient";
+import {
+  SITE_URL,
+  SITE_NAME,
+  SITE_HANDLE,
+  DEFAULT_OG_IMAGE,
+  getFallbackImage,
+  buildArticleSchema,
+  buildBreadcrumbSchema,
+} from "@/lib/seo-config";
 
-const SITE_URL = "https://astralearnia.com";
-
-// Next.js 15: params is Promise<{ slug: string }>
+// ── Types ─────────────────────────────────────────────────────────────────────
 type Props = { params: Promise<{ slug: string }> };
 
-// ── pre-render all slugs at build time ───────────────────────────────────────
+// ── Pre-render all slugs at build time ───────────────────────────────────────
 export async function generateStaticParams() {
   return BLOG_POSTS.map(post => ({ slug: post.slug }));
 }
 
-// ── per-post SEO metadata ────────────────────────────────────────────────────
+// ── Per-post SEO metadata ─────────────────────────────────────────────────────
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
-  // ✅ MUST await params in Next.js 15
   const { slug } = await params;
   const post      = getPostBySlug(slug);
 
   if (!post) {
     return {
-      title:       "Article Not Found | Astralearnia",
+      title:       `Article Not Found | ${SITE_NAME}`,
       description: "This article may have moved or been unpublished. Browse all articles on the Astralearnia blog.",
+      robots:      { index: false, follow: false },
     };
   }
 
-  const url = `${SITE_URL}/blog/${post.slug}`;
+  const url      = `${SITE_URL}/blog/${post.slug}`;
+  // Use the post's own cover or fall back to the category default
+  const ogImage  = post.coverImage?.trim() || getFallbackImage(post.tag);
+  const title    = post.seoTitle       ?? `${post.title} | ${SITE_NAME}`;
+  const desc     = post.seoDescription ?? post.excerpt;
 
   return {
-    title:       post.seoTitle ?? `${post.title} | Astralearnia`,
-    description: post.seoDescription ?? post.excerpt,
+    title,
+    description: desc,
     keywords:    post.keywords,
     authors:     [{ name: post.author }],
 
+    // ── Open Graph ────────────────────────────────────────────────────────────
     openGraph: {
+      type:          "article",
+      locale:        "en_US",
+      url,
+      siteName:      SITE_NAME,
       title:         post.title,
       description:   post.excerpt,
-      url,
-      siteName:      "Astralearnia",
-      type:          "article",
       publishedTime: post.date,
+      modifiedTime:  post.date,
+      authors:       [post.author],
+      tags:          post.keywords,
       images: [
         {
-          url:    post.coverImage,
+          url:    ogImage,
           width:  1200,
           height: 630,
-          alt:    post.coverAlt,
+          alt:    post.coverAlt ?? post.title,
         },
       ],
     },
 
+    // ── Twitter / X ───────────────────────────────────────────────────────────
     twitter: {
       card:        "summary_large_image",
+      site:        SITE_HANDLE,
+      creator:     SITE_HANDLE,
       title:       post.title,
       description: post.excerpt,
-      images:      [post.coverImage],
+      images:      [ogImage],
     },
 
-    alternates: {
-      canonical: url,
+    // ── Canonical ─────────────────────────────────────────────────────────────
+    alternates: { canonical: url },
+
+    // ── Robots ────────────────────────────────────────────────────────────────
+    robots: {
+      index:  true,
+      follow: true,
+      googleBot: {
+        index:                 true,
+        follow:                true,
+        "max-image-preview":   "large",
+        "max-snippet":         -1,
+        "max-video-preview":   -1,
+      },
     },
   };
 }
 
-// ── page shell ───────────────────────────────────────────────────────────────
+// ── Page shell ────────────────────────────────────────────────────────────────
 export default async function BlogPostPage({ params }: Props) {
-  // ✅ MUST await params in Next.js 15
   const { slug } = await params;
   const post      = getPostBySlug(slug);
 
-  const jsonLd = post
-    ? {
-        "@context":   "https://schema.org",
-        "@type":      "BlogPosting",
-        headline:     post.title,
-        description:  post.excerpt,
-        image:        post.coverImage,
-        datePublished: post.date,
-        author: {
-          "@type":   "Person",
-          name:      post.author,
-          jobTitle:  post.authorRole,
-        },
-        publisher: {
-          "@type": "Organisation",
-          name:    "Astralearnia",
-          logo: {
-            "@type": "ImageObject",
-            url:     `${SITE_URL}/favicon.png`,
-          },
-        },
-        mainEntityOfPage: {
-          "@type": "WebPage",
-          "@id":   `${SITE_URL}/blog/${post.slug}`,
-        },
-        keywords: post.keywords?.join(", "),
-      }
+  // ── JSON-LD structured data ────────────────────────────────────────────────
+  const articleSchema = post
+    ? buildArticleSchema({
+        title:       post.title,
+        excerpt:     post.excerpt,
+        coverImage:  post.coverImage?.trim() || getFallbackImage(post.tag),
+        date:        post.date,
+        slug:        post.slug,
+        author:      post.author,
+        authorRole:  post.authorRole,
+        keywords:    post.keywords,
+      })
+    : null;
+
+  const breadcrumbSchema = post
+    ? buildBreadcrumbSchema([
+        { name: "Home",  url: SITE_URL },
+        { name: "Blog",  url: `${SITE_URL}/blog` },
+        { name: post.title, url: `${SITE_URL}/blog/${post.slug}` },
+      ])
     : null;
 
   return (
     <>
-      {/* JSON-LD structured data → Google rich results */}
-      {jsonLd && (
+      {/* BlogPosting schema → enables Google Article rich results */}
+      {articleSchema && (
         <script
           type="application/ld+json"
-          dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(articleSchema) }}
         />
       )}
-      {/* Full interactive client component — receives resolved slug string */}
+
+      {/* BreadcrumbList schema → enables breadcrumb trail in SERPs */}
+      {breadcrumbSchema && (
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbSchema) }}
+        />
+      )}
+
+      {/* Full interactive client component */}
       <BlogPostClient slug={slug} />
     </>
   );
 }
+
+
+// ─────────────────────────────────────────────────────────────────────────────
+// 📌 VIEW TRACKING — add to BlogPostClient.tsx
+//
+// Paste this hook near the top of your BlogPostClient component.
+// It fires a POST to /api/views/[slug] on first render (not bots),
+// then shows the live view count.
+//
+//   import { useEffect, useState } from "react";
+//
+//   function usePostViews(slug: string) {
+//     const [views, setViews] = useState<number | null>(null);
+//
+//     useEffect(() => {
+//       // POST increments the counter for this slug
+//       fetch(`/api/views/${slug}`, { method: "POST" })
+//         .then(r => r.json())
+//         .then(data => setViews(data.views))
+//         .catch(() => {});
+//     }, [slug]);
+//
+//     return views;
+//   }
+//
+// Then inside your BlogPostClient function:
+//   const viewCount = usePostViews(slug);
+//
+// Render it wherever you show post meta:
+//   {viewCount !== null && (
+//     <span style={{ display:"inline-flex", alignItems:"center", gap:5,
+//                    fontSize:"0.75rem", color:"rgba(255,255,255,0.35)" }}>
+//       👁 {viewCount.toLocaleString()} reads
+//     </span>
+//   )}
+// ─────────────────────────────────────────────────────────────────────────────

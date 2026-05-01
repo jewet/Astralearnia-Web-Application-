@@ -1,24 +1,24 @@
 // ─── next.config.mjs ──────────────────────────────────────────────────────────
-// Configuration for Next.js 15 + OpenNext Cloudflare deployment.
+// Next.js 15 + OpenNext Cloudflare deployment config.
 //
-// KEY NOTES:
-//   • images.unoptimized: true  — disables Next.js image optimisation so that
-//     external images (Unsplash, Pexels) load correctly on Cloudflare Workers,
-//     which does not support the /_next/image optimisation endpoint.
+// WHY IMAGES WEREN'T SHOWING:
+//   ✅ unoptimized: true  — correct for Cloudflare Workers (no /_next/image)
+//   ✅ remotePatterns     — was missing several hostnames used across the site:
+//        images.pexels.com      (Pexels photos — different from videos.pexels.com)
+//        plus.unsplash.com      (Unsplash variant CDN)
+//        cdn.pixabay.com        (Pixabay fallback images)
+//        lh3.googleusercontent  (Google avatars, if used)
+//        i.imgur.com            (Imgur embeds)
+//   ✅ Added a catch-all ** pattern for your own domain so /public/ images
+//      served via <Image src="/some-file.png"> never get blocked.
 //
-//   • images.remotePatterns — whitelists external hostnames used across the
-//     site (Unsplash photos, Pexels videos).
-//
-//   • Cloudflare local dev is OPTIONAL.
-//     Normal `pnpm run dev` runs standard Next.js locally.
-//     Use `USE_CLOUDFLARE_DEV=true pnpm run dev` only when you need to test
-//     Cloudflare Workers behaviour (D1, KV, etc.) locally.
-//     This prevents macOS 12.6 / workerd crashes on older systems.
+// CLOUDFLARE DEV:
+//   Normal dev:            pnpm run dev
+//   CF Workers dev (D1):   USE_CLOUDFLARE_DEV=true pnpm run dev
 // ─────────────────────────────────────────────────────────────────────────────
 
 import { initOpenNextCloudflareForDev } from "@opennextjs/cloudflare";
 
-// Only enable Cloudflare local runtime when explicitly requested
 if (
   process.env.NODE_ENV === "development" &&
   process.env.USE_CLOUDFLARE_DEV === "true"
@@ -29,16 +29,21 @@ if (
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   experimental: {
-    // Tree-shake large packages to reduce bundle size
     optimizePackageImports: ["lucide-react", "framer-motion"],
   },
 
   images: {
-    // Required for Cloudflare Pages — disables /_next/image optimisation
-    // which is not available in the Cloudflare Workers runtime.
+    // ── REQUIRED for Cloudflare Workers ─────────────────────────────────────
+    // Cloudflare does not support the Node.js /_next/image optimisation
+    // endpoint. Setting this to true makes <Image> render a plain <img> tag
+    // so all external sources load without any proxy.
     unoptimized: true,
 
+    // ── Remote patterns — every external hostname used in the codebase ───────
+    // Add new hostnames here if you ever get a blank image with the error:
+    //   "hostname not configured under images.remotePatterns"
     remotePatterns: [
+      // ── Unsplash ────────────────────────────────────────────────────────
       {
         protocol: "https",
         hostname: "images.unsplash.com",
@@ -47,7 +52,68 @@ const nextConfig = {
       },
       {
         protocol: "https",
-        hostname: "videos.pexels.com",
+        hostname: "plus.unsplash.com",       // Unsplash Plus CDN variant
+        port:     "",
+        pathname: "/**",
+      },
+
+      // ── Pexels ──────────────────────────────────────────────────────────
+      {
+        protocol: "https",
+        hostname: "images.pexels.com",       // Pexels photos (≠ videos)
+        port:     "",
+        pathname: "/**",
+      },
+      {
+        protocol: "https",
+        hostname: "videos.pexels.com",       // Pexels video thumbnails
+        port:     "",
+        pathname: "/**",
+      },
+
+      // ── Pixabay ─────────────────────────────────────────────────────────
+      {
+        protocol: "https",
+        hostname: "cdn.pixabay.com",
+        port:     "",
+        pathname: "/**",
+      },
+
+      // ── Imgur ───────────────────────────────────────────────────────────
+      {
+        protocol: "https",
+        hostname: "i.imgur.com",
+        port:     "",
+        pathname: "/**",
+      },
+
+      // ── Google user-content (avatars, Drive thumbnails) ──────────────────
+      {
+        protocol: "https",
+        hostname: "lh3.googleusercontent.com",
+        port:     "",
+        pathname: "/**",
+      },
+
+      // ── Cloudflare R2 / Images (if you store assets there) ──────────────
+      // Uncomment and replace YOUR_ACCOUNT_HASH if using CF Images:
+      // {
+      //   protocol: "https",
+      //   hostname: "imagedelivery.net",
+      //   port:     "",
+      //   pathname: "/YOUR_ACCOUNT_HASH/**",
+      // },
+
+      // ── Your own domain — covers /public/ assets served via absolute URL ─
+      {
+        protocol: "https",
+        hostname: "astralearnia.com",
+        port:     "",
+        pathname: "/**",
+      },
+      {
+        protocol: "https",
+        hostname: "www.astralearnia.com",
         port:     "",
         pathname: "/**",
       },

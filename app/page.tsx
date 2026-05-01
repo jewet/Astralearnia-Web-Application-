@@ -1082,6 +1082,12 @@ export default function HomePage() {
       `}</style>
 
       <main className="hp-root bg-[#050810] text-white font-sans antialiased">
+         {/* ── TEMPORARY TEST IMAGE — delete after confirming ── */}
+          <img 
+            src="https://images.unsplash.com/photo-1677442135703-1787eea5ce01?w=400&q=80" 
+            alt="test"
+            style={{ width: 400, height: 300, objectFit: "cover" }}
+          />
 
         {/* ═══ 1. HERO ═══ */}
         <section className="relative min-h-[100dvh] flex items-center overflow-hidden">
