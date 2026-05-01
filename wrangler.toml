@@ -1,19 +1,4 @@
-name                   = "astralearnia"
-pages_build_output_dir = ".open-next/assets"
-
-compatibility_date     = "2025-01-01"
-compatibility_flags    = ["nodejs_compat"]
-
 [[d1_databases]]
-binding       = "DB"
+binding = "DB"
 database_name = "astralearnia-comments"
-database_id   = "1b4b4535-8b78-4e94-93de-20f2121f231c"
-
-[vars]
-NEXT_PUBLIC_SITE_URL = "https://astralearnia.com"
-
-[env.production.vars]
-NEXT_PUBLIC_SITE_URL = "https://astralearnia.com"
-
-[env.preview.vars]
-NEXT_PUBLIC_SITE_URL = "https://preview.astralearnia.pages.dev"
+database_id = "1b4b4535-8b78-4e94-93de-20f2121f231c"
